@@ -1,0 +1,193 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased min-h-screen selection:bg-indigo-500/20 selection:text-indigo-900;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* KaTeX equations in math elements */
+.katex-display {
+  margin: 0.5em 0 !important;
+}
+
+/* Print Styles for A4 Paper Export */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+}
+
+/* ==============================================================
+   OMR BUBBLE BUTTONS SPECIFICATION (3-Sütun, 10px Font, 18-20px Dairə)
+   A, B, C, D, E circular options with flexbox centering & border-radius 50%
+   ============================================================== */
+.omr-bubble-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5px; /* Minimal gap between bubbles */
+}
+
+.omr-bubble-btn {
+  width: 19px !important; /* Dairələrin diametri təxminən 18-20px (19px) */
+  height: 19px !important;
+  min-width: 19px !important;
+  min-height: 19px !important;
+  border-radius: 50% !important; /* Perfect circle */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 800;
+  font-size: 10px !important; /* Dəqiq 10px şrift ölçüsü */
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.12s ease-in-out;
+  border: 1px solid #cbd5e1; /* slate-300 */
+  background-color: #ffffff;
+  color: #334155; /* slate-700 */
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.omr-bubble-btn:hover:not(:disabled) {
+  border-color: #64748b;
+  background-color: #f1f5f9;
+}
+
+/* Green selected state: teacher correct answer OR student selected answer */
+.omr-bubble-btn.omr-selected {
+  background-color: #059669 !important; /* emerald-600 */
+  border-color: #047857 !important; /* emerald-700 */
+  color: #ffffff !important; /* White high-contrast letter */
+  box-shadow: 0 0 0 1.5px #a7f3d0;
+  transform: scale(1.08);
+}
+
+.omr-bubble-btn:focus-visible {
+  outline: 2px solid #059669;
+  outline-offset: 1px;
+}
+
+/* 3-Column OMR Card Container */
+.omr-column-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0; /* slate-200 */
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.25rem;
+  min-width: 145px;
+}
+
+/* 6-Column Numeric Grid (Açıq Sual - Üstdəki A-E variantları ilə eyni yığcam ölçüdə) */
+.omr-numeric-grid {
+  display: inline-flex;
+  gap: 2.5px; /* Üstdəki omr-bubble-row ilə eyni məsafə */
+  justify-content: flex-start;
+  align-items: center;
+  padding: 3px 5px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  width: fit-content;
+  max-width: fit-content;
+}
+
+.omr-numeric-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.5px;
+  flex: 0 0 auto;
+  width: 19px; /* Üstdəki A-E dairələri ilə tam eyni ölçü */
+}
+
+.omr-numeric-box {
+  width: 19px;
+  height: 19px;
+  border: 1.5px solid #94a3b8;
+  border-radius: 3px;
+  background-color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+  color: #0f172a;
+  outline: none;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.omr-numeric-box:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 1px #4f46e5;
+}
+
+.omr-numeric-bubble {
+  width: 19px !important;
+  height: 19px !important;
+  min-width: 19px !important;
+  min-height: 19px !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 800;
+  font-size: 10px !important;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #334155;
+  padding: 0;
+  transition: all 0.1s ease-in-out;
+  box-sizing: border-box;
+}
+
+.omr-numeric-bubble:hover {
+  background-color: #f1f5f9;
+  border-color: #64748b;
+}
+
+.omr-numeric-bubble.omr-selected {
+  background-color: #059669 !important;
+  border-color: #047857 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 1.5px #a7f3d0;
+  transform: scale(1.08);
+}
+
