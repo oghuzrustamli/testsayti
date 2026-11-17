@@ -1338,284 +1338,330 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
             </div>
           </div>
 
-          {/* OMR Question Rows: DƏQİQ 3 SÜTUNLU LAYOUT (Müstəqil Sürüşdürmə - Tələb 9) */}
-          <div className="flex-1 overflow-y-auto overscroll-contain independent-scroll p-2 scrollbar-thin min-h-0">
+          {/* OMR Question Rows: DƏQİQ SEKSİYALI SƏLİQƏLİ NİZAMLAMA (Qapalı 3 sütun + Açıq 6-sütunlu grid + Situasiya) */}
+          <div className="flex-1 overflow-y-auto overscroll-contain independent-scroll p-3 scrollbar-thin min-h-0">
             {(() => {
+              const closedRows = omrRows.filter(r => r.type === 'single_choice');
+              const openRows = omrRows.filter(r => r.type === 'numeric_grid');
+              const situationRows = omrRows.filter(r => r.type === 'situation');
+
               const numCols = 3;
-              const perCol = Math.ceil(omrRows.length / numCols);
+              const perCol = Math.ceil(closedRows.length / numCols);
               const columnSlices = Array.from({ length: numCols }, (_, colIdx) => {
-                return omrRows.slice(colIdx * perCol, (colIdx + 1) * perCol);
+                return closedRows.slice(colIdx * perCol, (colIdx + 1) * perCol);
               });
 
               return (
-                <div className="grid grid-cols-3 gap-2 items-stretch">
-                  {columnSlices.map((colRows, colIdx) => (
-                    <div key={colIdx} className="omr-column-card h-full min-h-full">
-                      <div className="flex flex-col gap-0.5">
-                        {colRows.map((row) => {
+                <div className="flex flex-col gap-3.5">
+                  {/* 1. QAPALI SUALLAR - DƏQİQ VƏ BƏRABƏR 3 SÜTUNLU OPTİK QABARCIQLAR */}
+                  {closedRows.length > 0 && (
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between px-1">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-700">
+                          Qapalı Suallar (1 - {closedRows.length})
+                        </span>
+                        <span className="text-[9px] text-slate-400 font-semibold">
+                          3 Sütunlu Standart A-E
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 items-stretch">
+                        {columnSlices.map((colRows, colIdx) => (
+                          <div key={colIdx} className="omr-column-card h-full min-h-full">
+                            <div className="flex flex-col gap-0.5">
+                              {colRows.map((row) => {
+                                const currentChoice = activeOmrTab === 'teacher_key'
+                                  ? row.selectedAnswer
+                                  : (studentAnswers[row.number] || '');
+
+                                return (
+                                  <div
+                                    key={row.number}
+                                    className={`px-2 py-0.5 rounded-md border flex items-center justify-center gap-2 transition-colors ${currentChoice
+                                      ? 'bg-emerald-50/60 border-emerald-300'
+                                      : 'bg-white border-slate-200 hover:border-slate-300'
+                                      }`}
+                                  >
+                                    {/* Sual nömrəsi */}
+                                    <div className="flex items-center gap-0.5 shrink-0 min-w-[20px] text-right justify-end">
+                                      <span className="font-mono font-bold text-[10px] text-slate-800">
+                                        {row.number < 10 ? `0${row.number}` : row.number}.
+                                      </span>
+                                      {currentChoice && (
+                                        <span className="text-[8.5px] font-black text-emerald-700 bg-emerald-100 px-0.5 rounded leading-none">
+                                          {currentChoice}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    {/* A, B, C, D, E Circular Buttons */}
+                                    <div className="omr-bubble-row shrink-0" role="radiogroup">
+                                      {['A', 'B', 'C', 'D', 'E'].map((letter) => {
+                                        const isSelected = currentChoice === letter;
+                                        return (
+                                          <button
+                                            key={letter}
+                                            type="button"
+                                            onClick={() => {
+                                              if (activeOmrTab === 'teacher_key') {
+                                                handleTeacherSelect(row.number, letter);
+                                              } else {
+                                                handleStudentSelect(row.number, letter);
+                                              }
+                                            }}
+                                            className={`omr-bubble-btn ${isSelected ? 'omr-selected' : ''}`}
+                                            title={`Sual ${row.number}: ${letter}`}
+                                            aria-label={`Sual ${row.number} Variant ${letter}`}
+                                          >
+                                            {letter}
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 2. AÇIQ SUALLAR (RƏQƏMLİ 6-SÜTUNLU GRİD) - YANAŞI 2 SÜTUN */}
+                  {openRows.length > 0 && (
+                    <div className="pt-2.5 border-t border-slate-200 flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between px-1">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-indigo-900 flex items-center gap-1">
+                          <Plus className="w-3 h-3 text-indigo-600" />
+                          Açıq Cavablı Suallar ({openRows.length})
+                        </span>
+                        <span className="text-[9px] font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200">
+                          6-Sütunlu Rəqəm Matrisi
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {openRows.map((row) => {
+                          const studentCols = parseStringToColumns(studentAnswers[row.number] || '');
+                          const currentCols = activeOmrTab === 'teacher_key'
+                            ? (row.numericColumns || ['', '', '', '', '', ''])
+                            : studentCols;
                           const currentChoice = activeOmrTab === 'teacher_key'
                             ? row.selectedAnswer
                             : (studentAnswers[row.number] || '');
 
-                          // ==============================================================
-                          // SİTUASİYA TİPLİ TEST KARTI (Tələb 1, 2, 5, 7)
-                          // ==============================================================
-                          if (row.type === 'situation') {
-                            const studentText = studentAnswers[row.number] || '';
-                            const isTeacher = activeOmrTab === 'teacher_key';
-
-                            return (
-                              <div
-                                key={row.number}
-                                className="bg-gradient-to-b from-amber-50/70 to-white border-2 border-amber-300 rounded-xl p-2 flex flex-col gap-1.5 shadow-2xs my-1"
-                              >
-                                {/* Header */}
-                                <div className="flex items-center justify-between pb-1 border-b border-amber-200 text-[10px]">
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="font-mono font-bold text-slate-800">
-                                      {row.number < 10 ? `0${row.number}` : row.number}.
-                                    </span>
-                                    <span className="bg-amber-100 text-amber-900 border border-amber-200 font-extrabold px-1.5 py-0.2 rounded text-[8.5px] flex items-center gap-0.5">
-                                      <Layers className="w-2.5 h-2.5 text-amber-700" />
-                                      Situasiya
-                                    </span>
-                                    <span className="text-[9px] font-bold text-slate-500">
-                                      {row.points || 6} bal
-                                    </span>
-                                  </div>
-
-                                  <div className="flex items-center gap-1">
-                                    <button
-                                      type="button"
-                                      onClick={() => handleEditSituationQuestion(row.number)}
-                                      className="p-1 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded transition-colors flex items-center gap-0.5 text-[9px] font-bold"
-                                      title="Situasiya mətni, 10 açar söz və meyarları redaktə et"
-                                    >
-                                      <Edit3 className="w-3 h-3" />
-                                      <span>Redaktə</span>
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      onClick={() => setSituationDeleteConfirmNum(row.number)}
-                                      className="p-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded transition-colors flex items-center gap-0.5 text-[9px] font-bold"
-                                      title="Situasiya sualını sil"
-                                    >
-                                      <Trash2 className="w-3 h-3" />
-                                      <span>Sil</span>
-                                    </button>
-                                  </div>
-                                </div>
-
-                                {/* Situation text / question snippet */}
-                                <div className="text-[10px] text-slate-700 line-clamp-2 leading-relaxed bg-white/80 p-1.5 rounded-lg border border-amber-100 font-sans">
-                                  {row.situation_text ? (
-                                    <span><strong>Situasiya:</strong> {row.situation_text}</span>
-                                  ) : (
-                                    <span className="italic text-slate-400">Situasiya mətni daxil edilməyib. 'Redaktə' düyməsinə klikləyin.</span>
-                                  )}
-                                </div>
-
-                                {row.question_text && (
-                                  <div className="text-[9.5px] text-slate-800 font-semibold px-1">
-                                    <span>Sual: {row.question_text}</span>
-                                  </div>
-                                )}
-
-                                {/* Teacher View: 10 Keywords summary & Model answer */}
-                                {isTeacher ? (
-                                  <div className="flex flex-col gap-1 text-[9px] pt-1 border-t border-amber-100">
-                                    <div className="flex items-center justify-between text-slate-500">
-                                      <span>Model: <strong>{row.situation_grading_mode === 'dim_tiered' ? 'DİM tipli' : '10 Açar söz'}</strong></span>
-                                      <span className="font-mono text-indigo-700 font-bold">
-                                        {(row.situation_keywords || []).filter(k => k && k.trim()).length}/10 açar söz
-                                      </span>
-                                    </div>
-                                    {row.situation_model_answer && (
-                                      <div className="text-[8.5px] text-emerald-800 bg-emerald-50/60 p-1 rounded border border-emerald-200">
-                                        <strong>Cavab:</strong> {row.situation_model_answer}
-                                      </div>
-                                    )}
-                                  </div>
-                                ) : (
-                                  /* Student View: Written Answer Textarea (Tələb 7) */
-                                  <div className="flex flex-col gap-1 pt-1 border-t border-amber-100">
-                                    <label className="text-[9px] font-bold text-slate-600">
-                                      Şagirdin Yazılı Cavabı:
-                                    </label>
-                                    <textarea
-                                      rows={2}
-                                      value={studentText}
-                                      onChange={(e) => handleStudentSelect(row.number, e.target.value)}
-                                      placeholder="Şagirdin yazılı cavabını daxil edin..."
-                                      className="w-full px-2 py-1 text-[10px] bg-white border border-amber-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 text-slate-800 resize-none font-sans"
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          }
-
-                          // ==============================================================
-                          // 7. RƏQƏMLİ OMR CAVAB KARTI - DƏQİQ 6 SÜTUN (Açıq Sual)
-                          // ==============================================================
-                          if (row.type === 'numeric_grid') {
-                            const studentCols = parseStringToColumns(studentAnswers[row.number] || '');
-                            const currentCols = activeOmrTab === 'teacher_key'
-                              ? (row.numericColumns || ['', '', '', '', '', ''])
-                              : studentCols;
-
-                            return (
-                              <div
-                                key={row.number}
-                                className="w-full bg-slate-50 border-2 border-indigo-200 rounded-lg p-1.5 flex flex-col gap-1 shadow-xs my-0.5"
-                              >
-                                {/* Header */}
-                                <div className="flex items-center justify-between pb-1 border-b border-indigo-100 text-[10px]">
-                                  <div className="flex items-center gap-1">
-                                    <span className="font-mono font-bold text-slate-800">
-                                      {row.number < 10 ? `0${row.number}` : row.number}.
-                                    </span>
-                                    <span className="bg-indigo-100 text-indigo-800 font-extrabold px-1 py-0.2 rounded text-[8.5px]">
-                                      Açıq
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center gap-1.5">
-                                    {currentChoice && (
-                                      <span className="font-mono font-bold text-emerald-700 bg-emerald-100 px-1 py-0.2 rounded text-[9px]">
-                                        {currentChoice}
-                                      </span>
-                                    )}
-                                    {activeOmrTab === 'teacher_key' && (
-                                      <button
-                                        type="button"
-                                        onClick={() => handleToggleQuestionType(row.number)}
-                                        className="text-[8.5px] text-slate-400 hover:text-indigo-600 underline"
-                                        title="A-E variantına keç"
-                                      >
-                                        A-E
-                                      </button>
-                                    )}
-                                    <button
-                                      type="button"
-                                      onClick={() => handleDeleteQuestion(row.number)}
-                                      className="px-1.5 py-0.5 text-rose-600 hover:text-white hover:bg-rose-600 bg-rose-50 border border-rose-200 rounded transition-colors flex items-center gap-0.5 text-[9px] font-bold shadow-2xs"
-                                      title={`Açıq sual №${row.number}-i sil`}
-                                    >
-                                      <Trash2 className="w-3 h-3" />
-                                      <span>Sil</span>
-                                    </button>
-                                  </div>
-                                </div>
-
-                                {/* Teacher whole input (Tələb 8) */}
-                                {activeOmrTab === 'teacher_key' && (
-                                  <div className="flex items-center gap-1 text-[9px]">
-                                    <span className="text-slate-500 font-semibold shrink-0">Cavab:</span>
-                                    <input
-                                      type="text"
-                                      value={row.selectedAnswer}
-                                      onChange={(e) => handleNumericWholeInput(row.number, e.target.value)}
-                                      placeholder="Məs: 0,7896"
-                                      maxLength={6}
-                                      className="w-full px-1 py-0.5 bg-white border border-slate-300 rounded font-mono font-bold text-indigo-700 text-[10px] focus:border-indigo-500 focus:outline-none"
-                                    />
-                                  </div>
-                                )}
-
-                                {/* Dəqiq 6 Sütun x 12 Sətir Grid - Vahid Hündürlük */}
-                                <div className="flex justify-start pt-0.5">
-                                  <div className="omr-numeric-grid">
-                                    {[0, 1, 2, 3, 4, 5].map((cIdx) => {
-                                      const colVal = currentCols[cIdx] || '';
-                                      return (
-                                        <div key={cIdx} className="omr-numeric-col">
-                                          {/* Sətir 1: Boş xana */}
-                                          <input
-                                            type="text"
-                                            maxLength={1}
-                                            value={colVal}
-                                            onChange={(e) => handleNumericBoxInput(row.number, cIdx, e.target.value, activeOmrTab === 'teacher_key')}
-                                            className="omr-numeric-box"
-                                          />
-                                          {/* Sətir 2-12: 0..9 və Vergül (,) */}
-                                          {DIGIT_ROWS.map((ch) => {
-                                            const isSelected = colVal === ch;
-                                            return (
-                                              <button
-                                                key={ch}
-                                                type="button"
-                                                onClick={() => handleNumericBubbleClick(row.number, cIdx, ch, activeOmrTab === 'teacher_key')}
-                                                className={`omr-numeric-bubble ${isSelected ? 'omr-selected' : ''}`}
-                                                title={`Sütun ${cIdx + 1}: ${ch}`}
-                                              >
-                                                {ch}
-                                              </button>
-                                            );
-                                          })}
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          // ==============================================================
-                          // 4 & 5. ADİ OMR TEST - 3 SÜTUN, 10px FONT, 18-20px DAİRƏ
-                          // Sual nömrəsi ilə dairələr arası boşluq minimuma endirildi
-                          // ==============================================================
                           return (
                             <div
                               key={row.number}
-                              className={`px-2 py-0.5 rounded-md border flex items-center justify-center gap-2 transition-colors ${currentChoice
-                                ? 'bg-emerald-50/60 border-emerald-300'
-                                : 'bg-white border-slate-200 hover:border-slate-300'
-                                }`}
+                              className="w-full bg-slate-50 border-2 border-indigo-200 rounded-xl p-2 flex flex-col gap-1.5 shadow-2xs"
                             >
-                              {/* Sual nömrəsi */}
-                              <div className="flex items-center gap-0.5 shrink-0 min-w-[20px] text-right justify-end">
-                                <span className="font-mono font-bold text-[10px] text-slate-800">
-                                  {row.number < 10 ? `0${row.number}` : row.number}.
-                                </span>
-                                {currentChoice && (
-                                  <span className="text-[8.5px] font-black text-emerald-700 bg-emerald-100 px-0.5 rounded leading-none">
-                                    {currentChoice}
+                              {/* Header */}
+                              <div className="flex items-center justify-between pb-1 border-b border-indigo-100 text-[10px]">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-mono font-bold text-slate-800">
+                                    {row.number < 10 ? `0${row.number}` : row.number}.
                                   </span>
-                                )}
+                                  <span className="bg-indigo-100 text-indigo-800 font-extrabold px-1.5 py-0.2 rounded text-[8.5px]">
+                                    Açıq Sual
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  {currentChoice && (
+                                    <span className="font-mono font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded text-[9px]">
+                                      {currentChoice}
+                                    </span>
+                                  )}
+                                  {activeOmrTab === 'teacher_key' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleToggleQuestionType(row.number)}
+                                      className="text-[8.5px] text-slate-400 hover:text-indigo-600 underline"
+                                      title="A-E variantına keç"
+                                    >
+                                      A-E
+                                    </button>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteQuestion(row.number)}
+                                    className="px-1.5 py-0.5 text-rose-600 hover:text-white hover:bg-rose-600 bg-rose-50 border border-rose-200 rounded transition-colors flex items-center gap-0.5 text-[9px] font-bold shadow-2xs"
+                                    title={`Açıq sual №${row.number}-i sil`}
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                    <span>Sil</span>
+                                  </button>
+                                </div>
                               </div>
 
-                              {/* A, B, C, D, E Circular Buttons (19px diameter, 10px font size) */}
-                              <div className="omr-bubble-row shrink-0" role="radiogroup">
-                                {['A', 'B', 'C', 'D', 'E'].map((letter) => {
-                                  const isSelected = currentChoice === letter;
-                                  return (
-                                    <button
-                                      key={letter}
-                                      type="button"
-                                      onClick={() => {
-                                        if (activeOmrTab === 'teacher_key') {
-                                          handleTeacherSelect(row.number, letter);
-                                        } else {
-                                          handleStudentSelect(row.number, letter);
-                                        }
-                                      }}
-                                      className={`omr-bubble-btn ${isSelected ? 'omr-selected' : ''}`}
-                                      title={`Sual ${row.number}: ${letter}`}
-                                      aria-label={`Sual ${row.number} Variant ${letter}`}
-                                    >
-                                      {letter}
-                                    </button>
-                                  );
-                                })}
+                              {/* Teacher whole input */}
+                              {activeOmrTab === 'teacher_key' && (
+                                <div className="flex items-center gap-1.5 text-[9px]">
+                                  <span className="text-slate-500 font-semibold shrink-0">Cavab:</span>
+                                  <input
+                                    type="text"
+                                    value={row.selectedAnswer}
+                                    onChange={(e) => handleNumericWholeInput(row.number, e.target.value)}
+                                    placeholder="Məs: 0,7896"
+                                    maxLength={6}
+                                    className="w-full px-2 py-0.5 bg-white border border-slate-300 rounded font-mono font-bold text-indigo-700 text-[10px] focus:border-indigo-500 focus:outline-none"
+                                  />
+                                </div>
+                              )}
+
+                              {/* Dəqiq 6 Sütun x 12 Sətir Grid */}
+                              <div className="flex justify-center pt-0.5">
+                                <div className="omr-numeric-grid">
+                                  {[0, 1, 2, 3, 4, 5].map((cIdx) => {
+                                    const colVal = currentCols[cIdx] || '';
+                                    return (
+                                      <div key={cIdx} className="omr-numeric-col">
+                                        {/* Sətir 1: Boş xana */}
+                                        <input
+                                          type="text"
+                                          maxLength={1}
+                                          value={colVal}
+                                          onChange={(e) => handleNumericBoxInput(row.number, cIdx, e.target.value, activeOmrTab === 'teacher_key')}
+                                          className="omr-numeric-box"
+                                        />
+                                        {/* Sətir 2-12: 0..9 və Vergül (,) */}
+                                        {DIGIT_ROWS.map((ch) => {
+                                          const isSelected = colVal === ch;
+                                          return (
+                                            <button
+                                              key={ch}
+                                              type="button"
+                                              onClick={() => handleNumericBubbleClick(row.number, cIdx, ch, activeOmrTab === 'teacher_key')}
+                                              className={`omr-numeric-bubble ${isSelected ? 'omr-selected' : ''}`}
+                                              title={`Sütun ${cIdx + 1}: ${ch}`}
+                                            >
+                                              {ch}
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
                               </div>
                             </div>
                           );
                         })}
                       </div>
                     </div>
-                  ))}
+                  )}
+
+                  {/* 3. SİTUASİYA SUALLARI - TAM ENLİ KARTLAR */}
+                  {situationRows.length > 0 && (
+                    <div className="pt-2.5 border-t border-amber-200 flex flex-col gap-2">
+                      <div className="flex items-center justify-between px-1">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 flex items-center gap-1">
+                          <Layers className="w-3.5 h-3.5 text-amber-600" />
+                          Situasiya Sualları ({situationRows.length})
+                        </span>
+                        <span className="text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded border border-amber-200">
+                          Mətn və Meyar Əsaslı
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col gap-2.5">
+                        {situationRows.map((row) => {
+                          const studentText = studentAnswers[row.number] || '';
+                          const isTeacher = activeOmrTab === 'teacher_key';
+
+                          return (
+                            <div
+                              key={row.number}
+                              className="bg-gradient-to-b from-amber-50/70 to-white border-2 border-amber-300 rounded-xl p-3 flex flex-col gap-2 shadow-2xs"
+                            >
+                              {/* Header */}
+                              <div className="flex items-center justify-between pb-1.5 border-b border-amber-200 text-[10.5px]">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-mono font-bold text-slate-800">
+                                    {row.number < 10 ? `0${row.number}` : row.number}.
+                                  </span>
+                                  <span className="bg-amber-100 text-amber-900 border border-amber-200 font-extrabold px-1.5 py-0.2 rounded text-[8.5px] flex items-center gap-0.5">
+                                    <Layers className="w-2.5 h-2.5 text-amber-700" />
+                                    Situasiya
+                                  </span>
+                                  <span className="text-[9px] font-bold text-slate-500">
+                                    {row.points || 6} bal
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditSituationQuestion(row.number)}
+                                    className="px-2 py-0.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded transition-colors flex items-center gap-0.5 text-[9.5px] font-bold border border-indigo-200"
+                                    title="Situasiya mətni, 10 açar söz və meyarları redaktə et"
+                                  >
+                                    <Edit3 className="w-3 h-3" />
+                                    <span>Redaktə</span>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => setSituationDeleteConfirmNum(row.number)}
+                                    className="px-2 py-0.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded transition-colors flex items-center gap-0.5 text-[9.5px] font-bold border border-rose-200"
+                                    title="Situasiya sualını sil"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                    <span>Sil</span>
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Situation text / question snippet */}
+                              <div className="text-[10px] text-slate-700 leading-relaxed bg-white/90 p-2 rounded-lg border border-amber-100 font-sans">
+                                {row.situation_text ? (
+                                  <span><strong>Situasiya:</strong> {row.situation_text}</span>
+                                ) : (
+                                  <span className="italic text-slate-400">Situasiya mətni daxil edilməyib. 'Redaktə' düyməsinə klikləyin.</span>
+                                )}
+                              </div>
+
+                              {row.question_text && (
+                                <div className="text-[10px] text-slate-900 font-semibold px-1">
+                                  <span>Sual: {row.question_text}</span>
+                                </div>
+                              )}
+
+                              {/* Teacher View: 10 Keywords summary & Model answer */}
+                              {isTeacher ? (
+                                <div className="flex flex-col gap-1 text-[9.5px] pt-1.5 border-t border-amber-100">
+                                  <div className="flex items-center justify-between text-slate-500">
+                                    <span>Model: <strong>{row.situation_grading_mode === 'dim_tiered' ? 'DİM tipli' : '10 Açar söz'}</strong></span>
+                                    <span className="font-mono text-indigo-700 font-bold">
+                                      {(row.situation_keywords || []).filter(k => k && k.trim()).length}/10 açar söz
+                                    </span>
+                                  </div>
+                                  {row.situation_model_answer && (
+                                    <div className="text-[9px] text-emerald-800 bg-emerald-50/80 p-1.5 rounded border border-emerald-200">
+                                      <strong>Etalon Cavab:</strong> {row.situation_model_answer}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                /* Student View: Written Answer Textarea */
+                                <div className="flex flex-col gap-1 pt-1.5 border-t border-amber-100">
+                                  <label className="text-[9.5px] font-bold text-slate-600">
+                                    Şagirdin Yazılı Cavabı:
+                                  </label>
+                                  <textarea
+                                    rows={2}
+                                    value={studentText}
+                                    onChange={(e) => handleStudentSelect(row.number, e.target.value)}
+                                    placeholder="Şagirdin yazılı cavabını daxil edin..."
+                                    className="w-full px-2 py-1.5 text-[10.5px] bg-white border border-amber-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 text-slate-800 resize-none font-sans"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })()}
