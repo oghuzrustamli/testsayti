@@ -173,9 +173,24 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* ==============================================================
-          ƏSAS MENYU: SINAQ İMTAHANLARI + 4 ƏSAS İMTAHAN MODELİ (BÖYÜK, QARA, SABİT)
+          ƏSAS MENYU: AI İLƏ TEST YARAT + SINAQ İMTAHANLARI + 4 ƏSAS İMTAHAN MODELİ
           ============================================================== */}
       <nav ref={dropdownRef} className="hidden xl:flex items-center gap-2 relative">
+        {/* AI ilə test yarat Direct Button */}
+        <button
+          type="button"
+          onClick={() => {
+            if (onNavigateTab) {
+              onNavigateTab('ai_test');
+            }
+          }}
+          className="px-3 py-2 rounded-xl text-[13px] font-black tracking-tight bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-xs shadow-indigo-100 border border-violet-500"
+          title="Süni İntellektlə Avtomatik Test Hazırla"
+        >
+          <Sparkles className="w-3.5 h-3.5 fill-white" />
+          <span>AI ilə test yarat</span>
+        </button>
+
         {/* Sınaq İmtahanları Direct Button */}
         <button
           type="button"

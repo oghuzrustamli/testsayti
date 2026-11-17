@@ -177,7 +177,7 @@ const ContinuousOmrPdfPage: React.FC<{
     return () => {
       isCancelled = true;
       if (renderTask) {
-        try { renderTask.cancel(); } catch {}
+        try { renderTask.cancel(); } catch { }
       }
     };
   }, [pdfDoc, pageNum, scale]);
@@ -1207,11 +1207,10 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                                     setSubject(sub.subject);
                                     setActiveCategoryMenu(null);
                                   }}
-                                  className={`w-full text-left px-2 py-1 rounded text-[10px] font-semibold transition-colors flex items-center justify-between ${
-                                    selectedSubCategory === sub.name
+                                  className={`w-full text-left px-2 py-1 rounded text-[10px] font-semibold transition-colors flex items-center justify-between ${selectedSubCategory === sub.name
                                       ? 'bg-indigo-600 text-white font-bold'
                                       : 'text-slate-700 hover:bg-slate-200/70'
-                                  }`}
+                                    }`}
                                 >
                                   <span className="truncate">{sub.name}</span>
                                 </button>
@@ -1296,22 +1295,20 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                   <button
                     type="button"
                     onClick={() => setActiveOmrTab('teacher_key')}
-                    className={`h-6 px-2 rounded font-bold transition-all ${
-                      activeOmrTab === 'teacher_key'
+                    className={`h-6 px-2 rounded font-bold transition-all ${activeOmrTab === 'teacher_key'
                         ? 'bg-white text-emerald-800 shadow-2xs font-black'
                         : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                      }`}
                   >
                     Açar ({answeredCount}/{questionCount})
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveOmrTab('student_omr')}
-                    className={`h-6 px-2 rounded font-bold transition-all ${
-                      activeOmrTab === 'student_omr'
+                    className={`h-6 px-2 rounded font-bold transition-all ${activeOmrTab === 'student_omr'
                         ? 'bg-white text-indigo-800 shadow-2xs font-black'
                         : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                      }`}
                   >
                     Şagird ({Object.values(studentAnswers).filter(Boolean).length})
                   </button>
@@ -1528,38 +1525,38 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
 
                                 {/* Dəqiq 6 Sütun x 12 Sətir Grid - Vahid Hündürlük */}
                                 <div className="flex justify-start pt-0.5">
-                            <div className="omr-numeric-grid">
-                                  {[0, 1, 2, 3, 4, 5].map((cIdx) => {
-                                    const colVal = currentCols[cIdx] || '';
-                                    return (
-                                      <div key={cIdx} className="omr-numeric-col">
-                                        {/* Sətir 1: Boş xana */}
-                                        <input
-                                          type="text"
-                                          maxLength={1}
-                                          value={colVal}
-                                          onChange={(e) => handleNumericBoxInput(row.number, cIdx, e.target.value, activeOmrTab === 'teacher_key')}
-                                          className="omr-numeric-box"
-                                        />
-                                        {/* Sətir 2-12: 0..9 və Vergül (,) */}
-                                        {DIGIT_ROWS.map((ch) => {
-                                          const isSelected = colVal === ch;
-                                          return (
-                                            <button
-                                              key={ch}
-                                              type="button"
-                                              onClick={() => handleNumericBubbleClick(row.number, cIdx, ch, activeOmrTab === 'teacher_key')}
-                                              className={`omr-numeric-bubble ${isSelected ? 'omr-selected' : ''}`}
-                                              title={`Sütun ${cIdx + 1}: ${ch}`}
-                                            >
-                                              {ch}
-                                            </button>
-                                          );
-                                        })}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
+                                  <div className="omr-numeric-grid">
+                                    {[0, 1, 2, 3, 4, 5].map((cIdx) => {
+                                      const colVal = currentCols[cIdx] || '';
+                                      return (
+                                        <div key={cIdx} className="omr-numeric-col">
+                                          {/* Sətir 1: Boş xana */}
+                                          <input
+                                            type="text"
+                                            maxLength={1}
+                                            value={colVal}
+                                            onChange={(e) => handleNumericBoxInput(row.number, cIdx, e.target.value, activeOmrTab === 'teacher_key')}
+                                            className="omr-numeric-box"
+                                          />
+                                          {/* Sətir 2-12: 0..9 və Vergül (,) */}
+                                          {DIGIT_ROWS.map((ch) => {
+                                            const isSelected = colVal === ch;
+                                            return (
+                                              <button
+                                                key={ch}
+                                                type="button"
+                                                onClick={() => handleNumericBubbleClick(row.number, cIdx, ch, activeOmrTab === 'teacher_key')}
+                                                className={`omr-numeric-bubble ${isSelected ? 'omr-selected' : ''}`}
+                                                title={`Sütun ${cIdx + 1}: ${ch}`}
+                                              >
+                                                {ch}
+                                              </button>
+                                            );
+                                          })}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
                                 </div>
                               </div>
                             );
@@ -1695,9 +1692,8 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                                   return (
                                     <div
                                       key={r.number}
-                                      className={`px-1.5 py-0.5 rounded-md border flex items-center justify-between transition-colors ${
-                                        ans ? 'bg-emerald-50/60 border-emerald-400' : 'bg-white border-slate-200 hover:border-slate-300'
-                                      }`}
+                                      className={`px-1.5 py-0.5 rounded-md border flex items-center justify-between transition-colors ${ans ? 'bg-emerald-50/60 border-emerald-400' : 'bg-white border-slate-200 hover:border-slate-300'
+                                        }`}
                                     >
                                       <div className="flex items-center gap-0.5 shrink-0 min-w-[22px] text-right justify-end">
                                         <span className="font-mono font-bold text-[10px] text-slate-800">

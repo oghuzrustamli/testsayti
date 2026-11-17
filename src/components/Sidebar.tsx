@@ -23,12 +23,14 @@ import {
   UserCheck,
   ChevronDown,
   ChevronRight,
-  Layers
+  Layers,
+  Sparkles
 } from 'lucide-react';
 
 export type TeacherTab =
   | 'dashboard'
   | 'create_test'
+  | 'ai_test'
   | 'exams_hub'
   | 'exams_subjects'
   | 'exams_grades'
@@ -94,6 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const teacherNav: NavItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'create_test', label: 'Yeni test yarat', icon: PlusCircle, highlight: true },
+    { id: 'ai_test', label: 'AI ilə test yarat', icon: Sparkles, badge: 'AI', highlight: false },
     {
       id: 'exams_hub',
       label: 'Sınaq imtahanları',

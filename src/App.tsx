@@ -23,6 +23,7 @@ import { ShareTestModal } from './components/ShareTestModal';
 import { ProActivationModal } from './components/ProActivationModal';
 import { AdminAuthModal } from './components/AdminAuthModal';
 import { AuthModal } from './components/AuthModal';
+import { AiTestCreatorPage } from './pages/AiTestCreatorPage';
 
 const DEFAULT_TEACHER: User = {
   id: 'usr-teacher-1',
@@ -200,6 +201,26 @@ export function App() {
                   editTestId={editingTestId}
                   onBack={() => setActiveTab('my_tests')}
                   onSaved={(test, shouldShare) => {
+                    if (shouldShare) {
+                      setSharingTest(test);
+                    }
+                    setActiveTab('my_tests');
+                  }}
+                />
+              )}
+
+              {activeTab === 'ai_test' && (
+                <AiTestCreatorPage
+                  user={currentUser}
+                  onBack={() => setActiveTab('my_tests')}
+                  onOpenInteractiveEditor={(testId) => {
+                    setEditingTestId(testId);
+                    setActiveTab('create_test');
+                  }}
+                  onOpenOmrEditor={(testId) => {
+                    setViewingAnsweredTestId(testId);
+                  }}
+                  onTestSaved={(test, shouldShare) => {
                     if (shouldShare) {
                       setSharingTest(test);
                     }
