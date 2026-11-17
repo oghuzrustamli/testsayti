@@ -135,7 +135,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200/90 sticky top-0 z-50 px-3 sm:px-6 flex items-center justify-between shadow-xs gap-3">
+    <header className="h-16 shrink-0 bg-white border-b border-slate-200 sticky top-0 z-50 px-3 sm:px-6 flex items-center justify-between shadow-xs gap-3">
       {/* Left: Brand Logo & Title */}
       <div className="flex items-center gap-3 shrink-0">
         {onToggleSidebar && (

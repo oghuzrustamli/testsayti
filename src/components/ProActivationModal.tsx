@@ -1,5 +1,5 @@
 // src/components/ProActivationModal.tsx
-// EDUNEX PRO & Abunəlik Modalı (Kompakt 1.5x kiçildilmiş ölçü və aydın çıxış düyməsi)
+// EDUNEX PRO & Abunəlik Modalı - Kompakt (1.5x kiçildilmiş), heç vaxt ekrandan kəsilməyən və aydın çıxış düyməli
 import React, { useState, useEffect } from 'react';
 import { User } from '../types';
 import { api } from '../lib/api';
@@ -63,15 +63,15 @@ export const ProActivationModal: React.FC<ProActivationModalProps> = ({
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-150"
     >
-      {/* Modal Dialog Container - 1.5x kiçildilmiş kompakt ölçü */}
+      {/* Modal Dialog Container - 1.5x kiçildilmiş kompakt ölçü (max-w-md, sıx padding) */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-md w-full flex flex-col max-h-[92vh] overflow-hidden my-auto animate-in zoom-in-95 duration-150 relative"
+        className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-md w-full flex flex-col max-h-[94vh] overflow-hidden my-4 sm:my-auto animate-in zoom-in-95 duration-150 relative"
       >
         {/* Sabit Yuxarı Başlıq və Çıxış (X) Düyməsi */}
-        <div className="bg-gradient-to-r from-amber-500 via-indigo-600 to-indigo-800 px-3.5 py-2.5 text-white flex items-center justify-between shrink-0 shadow-xs relative z-10">
+        <div className="bg-gradient-to-r from-amber-500 via-indigo-600 to-indigo-800 px-3.5 py-2 text-white flex items-center justify-between shrink-0 shadow-xs relative z-10">
           <div className="flex items-center gap-1.5">
             <span className="px-2 py-0.5 bg-amber-400 text-slate-950 rounded-md font-black text-[10px] flex items-center gap-1 shadow-2xs">
               <Crown className="w-3 h-3 fill-current" /> EDUNEX PRO
@@ -102,7 +102,7 @@ export const ProActivationModal: React.FC<ProActivationModalProps> = ({
               Müəllim üçün Limitsiz İmtahan İmkanları
             </h3>
             <p className="text-[9.5px] text-slate-500 mt-0.5 leading-snug">
-              Limitsiz test və sual yaratma, AI test generatoru, riyazi düstur klaviaturası və ani OMR analitikası.
+              Limitsiz test və sual yaratma, AI test generatoru, riyazi düstur klaviaturası və ani analitika.
             </p>
           </div>
 
@@ -157,21 +157,21 @@ export const ProActivationModal: React.FC<ProActivationModalProps> = ({
               {PRO_PACKAGES.map((pkg) => (
                 <div
                   key={pkg.id}
-                  className="p-2.5 rounded-xl border border-slate-200 hover:border-indigo-300 bg-white hover:bg-slate-50/60 transition-all flex flex-col justify-between shadow-2xs"
+                  className="p-2 rounded-xl border border-slate-200 hover:border-indigo-300 bg-white hover:bg-slate-50/60 transition-all flex flex-col justify-between shadow-2xs"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-1 mb-0.5">
-                      <span className="font-bold text-slate-900 text-[11px] truncate">{pkg.title}</span>
+                      <span className="font-bold text-slate-900 text-[10.5px] truncate">{pkg.title}</span>
                       {pkg.badge && (
-                        <span className="text-[8px] font-black text-indigo-700 bg-indigo-50 px-1 py-0.2 rounded border border-indigo-200 shrink-0">
+                        <span className="text-[7.5px] font-black text-indigo-700 bg-indigo-50 px-1 py-0.2 rounded border border-indigo-200 shrink-0">
                           {pkg.badge}
                         </span>
                       )}
                     </div>
-                    <div className="text-base font-black text-slate-900 my-0.5">
-                      {pkg.priceAzn} <span className="text-[9px] font-bold text-slate-500">AZN</span>
+                    <div className="text-sm font-black text-slate-900 my-0.5">
+                      {pkg.priceAzn} <span className="text-[8.5px] font-bold text-slate-500">AZN</span>
                     </div>
-                    <ul className="flex flex-col gap-0.5 text-[9px] text-slate-600">
+                    <ul className="flex flex-col gap-0.5 text-[8.5px] text-slate-600">
                       {pkg.features.slice(0, 3).map((f, i) => (
                         <li key={i} className="flex items-center gap-1 leading-tight">
                           <Check className="w-2.5 h-2.5 text-emerald-500 shrink-0" />
@@ -181,7 +181,7 @@ export const ProActivationModal: React.FC<ProActivationModalProps> = ({
                     </ul>
                   </div>
 
-                  <div className="mt-1.5 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
+                  <div className="mt-1 pt-1 border-t border-slate-100 flex items-center justify-between text-[8.5px]">
                     <span className="text-slate-400">Kod daxil et</span>
                     <button
                       type="button"
@@ -198,14 +198,14 @@ export const ProActivationModal: React.FC<ProActivationModalProps> = ({
         </div>
 
         {/* Modal Altlığı - Çıxış / Bağla */}
-        <div className="px-3.5 py-2 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
-          <span className="text-[9.5px] text-slate-400 font-medium">
+        <div className="px-3.5 py-1.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+          <span className="text-[9px] text-slate-400 font-medium">
             ESC və ya kənara klikləyərək bağlaya bilərsiniz
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-[11px] rounded-lg transition-colors cursor-pointer"
+            className="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-[10.5px] rounded-lg transition-colors cursor-pointer"
           >
             Bağla
           </button>

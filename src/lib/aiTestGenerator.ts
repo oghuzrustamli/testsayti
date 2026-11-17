@@ -1,5 +1,5 @@
 // src/lib/aiTestGenerator.ts
-// EDUNEX Next-Gen AI Test Engine: Deep Topic Coverage, Diverse Questions & Zero Duplication
+// EDUNEX Next-Gen AI Test Engine: All School Subjects, Deep Curriculum Coverage & Zero Duplication
 
 import { Question, ExamModel, QuestionOption } from '../types';
 
@@ -7,8 +7,8 @@ export interface AiTestGenerationParams {
   grade: string;
   subject: string;
   selectedTopics: string[];
-  testMode: 'interactive' | 'answered';
-  closedCount: number; // e.g. 20
+  testMode?: 'interactive' | 'answered';
+  closedCount: number; // e.g. 15
   openCount: number; // e.g. 5 (can be 0)
   difficulty: 'easy' | 'medium' | 'hard' | 'mixed';
   optionsCount?: 4 | 5;
@@ -26,7 +26,7 @@ export interface GeneratedAiTestResult {
   closed_questions_count: number;
   open_questions_count: number;
   total_points: number;
-  test_mode: 'interactive' | 'answered';
+  test_mode: 'interactive';
   questions: Question[];
   answer_key: Record<number, string>;
   topic_breakdown: Record<string, { closed: number; open: number }>;
@@ -63,10 +63,6 @@ interface OpenQuestionData {
   keywords: string[];
 }
 
-// -------------------------------------------------------------
-// QUESTION TEMPLATES WITH RICH CURRICULUM VARIETY
-// -------------------------------------------------------------
-
 interface RawQuestionTemplate {
   qText: string;
   correct: string;
@@ -74,7 +70,7 @@ interface RawQuestionTemplate {
   explanation: string;
 }
 
-// Shuffles an array randomly
+// Randomly shuffles array
 function shuffleArray<T>(arr: T[]): T[] {
   const result = [...arr];
   for (let i = result.length - 1; i > 0; i--) {
@@ -84,7 +80,11 @@ function shuffleArray<T>(arr: T[]): T[] {
   return result;
 }
 
-// AZƏRBAYCAN DİLİ SUAL BAZASI
+// -------------------------------------------------------------
+// SUBJECT GENERATORS
+// -------------------------------------------------------------
+
+// 1. AZƏRBAYCAN DİLİ
 const AZE_LANG_TEMPLATES: Record<string, RawQuestionTemplate[]> = {
   fonetika: [
     {
@@ -99,47 +99,32 @@ const AZE_LANG_TEMPLATES: Record<string, RawQuestionTemplate[]> = {
       explanation: '«Liman» sözündə saitlər (i, a) müxtəlif cinsli olduğu üçün ahəng qanunu pozulmuşdur. Samitlər (l, m, n) isə hamısı cingiltilidir.'
     },
     {
-      qText: 'Hansı sözdə uzun tələffüz olunan sait vardır və sözün yazılışı ilə tələffüzü arasında bir fərqli məqam mövcuddur?',
+      qText: 'Hansı sözdə uzun tələffüz olunan sait vardır və sözün yazılışı ilə tələffüzü arasında fərq mövcuddur?',
       correct: 'Tərifnamə',
-      wrongs: [
-        'Dovşan',
-        'Müəllim',
-        'Məktəb',
-        'Kitabxana'
-      ],
+      wrongs: ['Dovşan', 'Müəllim', 'Məktəb', 'Kitabxana'],
       explanation: '«Tərifnamə» sözündə «ə» saiti uzun tələffüz olunur: [tə:rifnamə].'
     },
     {
       qText: 'Hansı bənddəki bütün sözlərdə son samit kar qarşılığı ilə tələffüz olunur?',
       correct: 'Kənd, palıd, polad',
-      wrongs: [
-        'Bulaq, çəmən, quş',
-        'Ağac, qonaq, çay',
-        'Gəmi, çiçək, külək',
-        'Kitab, dəftər, qələm'
-      ],
-      explanation: 'Azərbaycan dilində cingiltili samitlə bitən sözlər təklikdə tələffüz edildikdə [d] → [t] kimi karlaşır: kənd [kənt], palıd [palıt], polad [polat].'
+      wrongs: ['Bulaq, çəmən, quş', 'Ağac, qonaq, çay', 'Gəmi, çiçək, külək', 'Kitab, dəftər, qələm'],
+      explanation: 'Söz sonunda cingiltili samitlər [d] → [t] kimi karlaşır: kənd [kənt], palıd [palıt].'
     },
     {
       qText: 'Qoşa «qq» samitli sözlərin orfoepiyası ilə bağlı hansı fikir tamamilə doğrudur?',
-      correct: 'Qoşa «qq» samitindən birincisi [k\'] kar qarşılığı kimi tələffüz olunur (məsələn, [saq\'qal])',
+      correct: 'Qoşa «qq» samitindən birincisi [k\'] kar qarşılığı kimi tələffüz olunur',
       wrongs: [
         'Hər iki «q» samiti eyni vaxtda düşür',
         '«qq» samitləri hər zaman [xx] kimi səslənir',
         'Heç bir dəyişiklik baş vermir, yazıldığı kimi qalır',
         'İkinci «q» samiti [ğ] kimi tələffüz olunur'
       ],
-      explanation: 'Söz ortasında gələn qoşa «qq» samitlərindən birincisi [k\'] karlaşır: saqqal → [sak\'qal], doqquz → [dok\'quz].'
+      explanation: 'Söz ortasında qoşa «qq» samitlərindən birincisi [k\'] karlaşır: saqqal → [sak\'qal].'
     },
     {
       qText: 'Hansı sözdə vurğu birinci hecanın üzərinə düşür?',
       correct: 'Bəzən',
-      wrongs: [
-        'Vətən',
-        'Məktəbli',
-        'Qəhrəman',
-        'Oxumaq'
-      ],
+      wrongs: ['Vətən', 'Məktəbli', 'Qəhrəman', 'Oxumaq'],
       explanation: '«Bəzən» zaman zərfində vurğu birinci hecaya düşür: [bə́zən].'
     }
   ],
@@ -181,14 +166,14 @@ const AZE_LANG_TEMPLATES: Record<string, RawQuestionTemplate[]> = {
   sintaksis: [
     {
       qText: '«Zəng çalınanda şagirdlər sinfə daxil oldular» cümləsinin sintaktik təhlili ilə bağlı hansı fikir doğrudur?',
-      correct: 'Cümlə feli bağlama tərkibi ilə ifadə olunmuş zaman zərfliyi olan sadə cümlədir',
+      correct: 'Cümlə feli bağlama tərkibi ilə ifadə olunmuş zaman zərflik olan sadə cümlədir',
       wrongs: [
         'Bu cümlə zaman budaq cümləli tabeli mürəkkəb cümlədir',
         'Cümlənin iki qrammatik əsası vardır',
         'Xəbər ismi xəbərdir və sifətlə ifadə olunmuşdur',
         'Mübtəda söz birləşməsi ilə ifadə olunmuşdur'
       ],
-      explanation: '«Zəng çalınanda» feli bağlama tərkibidir və tərkib daxilində parçalanmır. Cümlənin bir qrammatik əsası var: şagirdlər (mübtəda), daxil oldular (xəbər).'
+      explanation: '«Zəng çalınanda» feli bağlama tərkibidir. Sadə cümlədir: şagirdlər (mübtəda), daxil oldular (xəbər).'
     },
     {
       qText: 'Hansı cümlə qeyri-müəyyən şəxsli sadə cümlədir?',
@@ -199,16 +184,13 @@ const AZE_LANG_TEMPLATES: Record<string, RawQuestionTemplate[]> = {
         'Gecə vaxtı küçələr sakit idi',
         'Deyilən sözü geri qaytarmaq olmaz'
       ],
-      explanation: 'Xəbəri III şəxsin cəmində olub, hərəkətin icraçısı qeyri-müəyyən olan cümlələr qeyri-müəyyən şəxsli sadə cümlələrdir.'
+      explanation: 'Xəbəri III şəxsin cəmində olub, hərəkətin icraçısı qeyri-müəyyən olan cümlələr qeyri-müəyyən şəxsli cümlələrdir.'
     }
   ]
 };
 
-// RİYAZİYYAT SUAL BAZASI (DİNAMİK RƏQƏMLƏRLƏ VƏ TƏKRARSIZ)
-function generateMathQuestionItem(
-  topic: string,
-  index: number
-): RawQuestionTemplate {
+// 2. RİYAZİYYAT, CƏBR VƏ HƏNDƏSƏ
+function generateMathQuestionItem(topic: string, index: number): RawQuestionTemplate {
   const tLower = topic.toLowerCase();
 
   if (tLower.includes('tənlik') || tLower.includes('kvadrat') || tLower.includes('viyet')) {
@@ -218,18 +200,17 @@ function generateMathQuestionItem(
     const c = x1 * x2;
     const bStr = b < 0 ? `${b}x` : `+ ${b}x`;
     const sum = x1 + x2;
-    const prod = c;
     const sumSq = x1 * x1 + x2 * x2;
     return {
-      qText: `$x^2 ${bStr} + ${c} = 0$ kvadrat tənliyinin köklərinin cəmini ($x_1+x_2$) və kvadratları cəmini ($x_1^2+x_2^2$) hesablayın.`,
+      qText: `$x^2 ${bStr} + ${c} = 0$ kvadrat tənliyinin köklərinin cəmini ($x_1+x_2$) və kvadratları cəmini ($x_1^2+x_2^2$) tapın.`,
       correct: `Köklərin cəmi = ${sum}, kvadratları cəmi = ${sumSq}`,
       wrongs: [
         `Köklərin cəmi = ${-sum}, kvadratları cəmi = ${sumSq}`,
         `Köklərin cəmi = ${sum}, kvadratları cəmi = ${sumSq + 4}`,
-        `Köklərin cəmi = ${prod}, kvadratları cəmi = ${sumSq - 2}`,
+        `Köklərin cəmi = ${c}, kvadratları cəmi = ${sumSq - 2}`,
         `Köklərin cəmi = ${sum - 1}, kvadratları cəmi = ${sumSq + 1}`
       ],
-      explanation: `Viyet teoreminə əsasən $x_1+x_2 = ${sum}$, $x_1 x_2 = ${c}$. $x_1^2+x_2^2 = (x_1+x_2)^2 - 2x_1 x_2 = ${sum}^2 - 2(${c}) = ${sumSq}$.`
+      explanation: `Viyet teoreminə görə $x_1+x_2 = ${sum}$, $x_1 x_2 = ${c}$. Kvadratlar cəmi: $(x_1+x_2)^2 - 2x_1 x_2 = ${sum}^2 - 2(${c}) = ${sumSq}$.`
     };
   }
 
@@ -240,13 +221,8 @@ function generateMathQuestionItem(
     return {
       qText: `$(x - ${a})(x - ${b}) < 0$ bərabərsizliyini ödəyən neçə tam ədəd vardır?`,
       correct: `${count} sayda`,
-      wrongs: [
-        `${count + 1} sayda`,
-        `${count - 1} sayda`,
-        `${b - a} sayda`,
-        `${count + 2} sayda`
-      ],
-      explanation: `İntervallar üsulu ilə həll aralığı $(${a}; ${b})$ olur. Bu aralıqdakı tam ədədlərin sayı: $${b} - ${a} - 1 = ${count}$.`
+      wrongs: [`${count + 1} sayda`, `${count - 1} sayda`, `${b - a} sayda`, `${count + 2} sayda`],
+      explanation: `İntervallar üsulu ilə həll aralığı $(${a}; ${b})$ olur. Bu aralıqdakı tam ədədlər sayı: $${b} - ${a} - 1 = ${count}$.`
     };
   }
 
@@ -257,13 +233,8 @@ function generateMathQuestionItem(
     return {
       qText: `Məhsulun ilkin qiyməti $${price}\\text{ AZN}$ idi. Qiymət $${p}\\%$ artırıldıqdan sonra neçə AZN oldu?`,
       correct: `${newPrice} AZN`,
-      wrongs: [
-        `${newPrice - 10} AZN`,
-        `${newPrice + 20} AZN`,
-        `${price + p} AZN`,
-        `${newPrice + 15} AZN`
-      ],
-      explanation: `$${price} \\cdot (1 + \\frac{${p}}{100}) = ${price} \\cdot ${(1 + p / 100).toFixed(2)} = ${newPrice}\\text{ AZN}$.`
+      wrongs: [`${newPrice - 10} AZN`, `${newPrice + 20} AZN`, `${price + p} AZN`, `${newPrice + 15} AZN`],
+      explanation: `$${price} \\cdot (1 + \\frac{${p}}{100}) = ${newPrice}\\text{ AZN}$.`
     };
   }
 
@@ -275,21 +246,13 @@ function generateMathQuestionItem(
   return {
     qText: `Katetləri $a = ${a}\\text{ sm}$ və $b = ${b}\\text{ sm}$ olan düzbucaqlı üçbucağın daxilinə çəkilmiş çevrənin radiusunu ($r$) tapın.`,
     correct: `$r = ${r}\\text{ sm}$`,
-    wrongs: [
-      `$r = ${r + 1}\\text{ sm}$`,
-      `$r = ${r + 2}\\text{ sm}$`,
-      `$r = ${(c / 2).toFixed(1)}\\text{ sm}$`,
-      `$r = ${(r + 0.5).toFixed(1)}\\text{ sm}$`
-    ],
-    explanation: `Pifaqor teoremi ilə hipotenuz $c = ${c}\\text{ sm}$. Daxilə çəkilmiş çevrənin radiusu $r = \\frac{a+b-c}{2} = \\frac{${a}+${b}-${c}}{2} = ${r}\\text{ sm}$.`
+    wrongs: [`$r = ${r + 1}\\text{ sm}$`, `$r = ${r + 2}\\text{ sm}$`, `$r = ${(c / 2).toFixed(1)}\\text{ sm}$`, `$r = ${(r + 0.5).toFixed(1)}\\text{ sm}$`],
+    explanation: `Hipotenuz $c = ${c}\\text{ sm}$. Daxilə çəkilmiş çevrənin radiusu $r = \\frac{a+b-c}{2} = \\frac{${a}+${b}-${c}}{2} = ${r}\\text{ sm}$.`
   };
 }
 
-// FİZİKA SUAL BAZASI (DİNAMİK VƏ TƏKRARSIZ)
-function generatePhysicsQuestionItem(
-  topic: string,
-  index: number
-): RawQuestionTemplate {
+// 3. FİZİKA
+function generatePhysicsQuestionItem(topic: string, index: number): RawQuestionTemplate {
   const tLower = topic.toLowerCase();
 
   if (tLower.includes('om') || tLower.includes('müqavimət') || tLower.includes('cərəyan') || tLower.includes('dövrə')) {
@@ -300,25 +263,15 @@ function generatePhysicsQuestionItem(
       return {
         qText: `Müqaviməti $R_1 = ${R1}\\text{ Om}$ və $R_2 = ${R2}\\text{ Om}$ olan iki rezistor ardıcıl birləşdirilmişdir. Dövrənin ümumi müqavimətini tapın.`,
         correct: `$R_\\text{üm} = ${Rum}\\text{ Om}$`,
-        wrongs: [
-          `$R_\\text{üm} = ${Rum - 1}\\text{ Om}$`,
-          `$R_\\text{üm} = ${(R1 * R2 / Rum).toFixed(1)}\\text{ Om}$`,
-          `$R_\\text{üm} = ${Rum + 3}\\text{ Om}$`,
-          `$R_\\text{üm} = ${R2}\\text{ Om}$`
-        ],
-        explanation: `Ardıcıl birləşmədə ümumi müqavimət toplanır: $R_\\text{üm} = R_1 + R_2 = ${R1} + ${R2} = ${Rum}\\text{ Om}$.`
+        wrongs: [`$R_\\text{üm} = ${Rum - 1}\\text{ Om}$`, `$R_\\text{üm} = ${(R1 * R2 / Rum).toFixed(1)}\\text{ Om}$`, `$R_\\text{üm} = ${Rum + 3}\\text{ Om}$`, `$R_\\text{üm} = ${R2}\\text{ Om}$`],
+        explanation: `Ardıcıl birləşmədə ümumi müqavimət toplanır: $R_\\text{üm} = R_1 + R_2 = ${Rum}\\text{ Om}$.`
       };
     } else {
       return {
         qText: `Gərginliyi sabit saxlamaq şərti ilə naqilin en kəsiyinin sahəsini 2 dəfə artırdıqda ondakı cərəyan şiddəti necə dəyişər?`,
         correct: `2 dəfə artar`,
-        wrongs: [
-          `2 dəfə azalar`,
-          `4 dəfə artar`,
-          `Dəyişməz qalar`,
-          `4 dəfə azalar`
-        ],
-        explanation: `$R = \\rho \\frac{l}{S}$ olduğuna görə $S$ 2 dəfə artdıqda $R$ 2 dəfə azalar. Om qanununa görə $I = \\frac{U}{R}$ olduğundan cərəyan şiddəti 2 dəfə artar.`
+        wrongs: [`2 dəfə azalar`, `4 dəfə artar`, `Dəyişməz qalar`, `4 dəfə azalar`],
+        explanation: `$R = \\rho \\frac{l}{S}$ olduğuna görə $S$ 2 dəfə artdıqda $R$ 2 dəfə azalar. $I = \\frac{U}{R}$ olduğundan cərəyan şiddəti 2 dəfə artar.`
       };
     }
   }
@@ -330,41 +283,27 @@ function generatePhysicsQuestionItem(
     return {
       qText: `Kütləsi $m = ${m}\\text{ kq}$ olan suyu $${dt}^\\circ\\text{C}$ qızdırmaq üçün tələb olunan istilik miqdarını hesablayın. ($c = 4200\\text{ C/(kq}\\cdot^\\circ\\text{C)}$)`,
       correct: `$Q = ${Q}\\text{ kC}$`,
-      wrongs: [
-        `$Q = ${Q * 2}\\text{ kC}$`,
-        `$Q = ${(Q / 2).toFixed(1)}\\text{ kC}$`,
-        `$Q = ${Q + 20}\\text{ kC}$`,
-        `$Q = ${Q - 15}\\text{ kC}$`
-      ],
+      wrongs: [`$Q = ${Q * 2}\\text{ kC}$`, `$Q = ${(Q / 2).toFixed(1)}\\text{ kC}$`, `$Q = ${Q + 20}\\text{ kC}$`, `$Q = ${Q - 15}\\text{ kC}$`],
       explanation: `$Q = c m \\Delta t = 4200 \\cdot ${m} \\cdot ${dt} = ${Q * 1000}\\text{ C} = ${Q}\\text{ kC}$.`
     };
   }
 
-  // Mexanika və hərəkət
   const v = 10 + index * 5;
   const t = 4 + index;
   const s = v * t;
   return {
-    qText: `Düzxətli bərabərsürətli hərəkət edən avtomobil $${t}\\text{ saniyə}$ ərzində $${s}\\text{ metr}$ yol getdi. Avtomobilin sürətini tapın.`,
+    qText: `Düzxətli bərabərsürətli hərəkət edən cisim $${t}\\text{ saniyə}$ ərzində $${s}\\text{ metr}$ yol getdi. Cismin sürətini tapın.`,
     correct: `$v = ${v}\\text{ m/san}$`,
-    wrongs: [
-      `$v = ${v + 5}\\text{ m/san}$`,
-      `$v = ${v - 3}\\text{ m/san}$`,
-      `$v = ${(s / (t * 2)).toFixed(1)}\\text{ m/san}$`,
-      `$v = ${v * 2}\\text{ m/san}$`
-    ],
+    wrongs: [`$v = ${v + 5}\\text{ m/san}$`, `$v = ${v - 3}\\text{ m/san}$`, `$v = ${(s / (t * 2)).toFixed(1)}\\text{ m/san}$`, `$v = ${v * 2}\\text{ m/san}$`],
     explanation: `Düzxətli bərabərsürətli hərəkətdə sürət: $v = \\frac{s}{t} = \\frac{${s}}{${t}} = ${v}\\text{ m/san}$.`
   };
 }
 
-// GENERAL SUBJECT GENERATOR
-function generateGeneralSubjectTemplate(
-  subject: string,
-  topic: string,
-  index: number
-): RawQuestionTemplate {
+// 4. KİMYA, BİOLOGİYA, TARİX, COĞRAFİYA VƏ DİGƏR FƏNLƏR
+function generateSubjectSpecificTemplate(subject: string, topic: string, index: number): RawQuestionTemplate {
   const sLower = subject.toLowerCase();
 
+  // Kimya
   if (sLower.includes('kimya')) {
     const list = [
       {
@@ -375,7 +314,7 @@ function generateGeneralSubjectTemplate(
       {
         qText: `Kimyəvi reaksiyanın sürətinə təsir edən amillərlə bağlı hansı fikir doğrudur?`,
         correct: 'Temperatur artdıqda reaksiyanın sürəti əhəmiyyətli dərəcədə yüksəlir',
-        wrongs: ['Bərk maddələrin xırdalanması reaksiyanı zəiflədir', 'Katalizator reaksiyanın istilik effektini dəyişir', 'Qatılığın azalması sürəti artırır', 'Təzyiq yalnız bərk cisimlərin reaksiyasına təsir edir']
+        wrongs: ['Bərk maddələrin xırdalanması reaksiyanı zəiflədir', 'Katalizator reaksiyanın istilik effektini dəyişir', 'Qatılığın azalması sürəti artırır', 'Təzyiq yalnız bərk cisimlərə təsir edir']
       }
     ];
     const picked = list[index % list.length];
@@ -387,6 +326,7 @@ function generateGeneralSubjectTemplate(
     };
   }
 
+  // Biologiya
   if (sLower.includes('biologiya')) {
     const list = [
       {
@@ -409,6 +349,7 @@ function generateGeneralSubjectTemplate(
     };
   }
 
+  // Tarix
   if (sLower.includes('tarix')) {
     return {
       qText: `«${topic}» dövrünə aid baş vermiş tarixi hadisələrin xronoloji ardıcıllığını və əsas tarixi əhəmiyyətini müəyyən edin.`,
@@ -423,18 +364,89 @@ function generateGeneralSubjectTemplate(
     };
   }
 
+  // Coğrafiya
+  if (sLower.includes('coğrafiya')) {
+    return {
+      qText: `«${topic}» mövzusu üzrə ərazinin relyefi, iqlim xüsusiyyətləri və təbii ehtiyatları ilə bağlı hansı fikir doğrudur?`,
+      correct: 'Mülayim və subtropik iqlim qurşaqlarının kəsişməsində zəngin təbii landşaft formalaşmışdır',
+      wrongs: [
+        'Ərazidə yalnız daimi donuşluq və qütb səhraları hökm sürür',
+        'Tektonik fəallıq tamamilə sıfıra bərabərdir',
+        'Su ehtiyatları yalnız yeraltı artezian suları ilə məhdudlaşır',
+        'Bütün çaylar daxili axarsız hövzələrə aiddir'
+      ],
+      explanation: `Fiziki və iqtisadi coğrafiya kurikulumuna əsasən coğrafi qanunauyğunluqlar ödənilir.`
+    };
+  }
+
+  // İnformatika
+  if (sLower.includes('informatika')) {
+    return {
+      qText: `«${topic}» mövzusu üzrə informasiya prosesləri və kompüter texnologiyalarına aid hansı müddəa doğrudur?`,
+      correct: 'Alqoritmin xassələri: müəyyənlik, kütləvilik, nəticəvilik və diskretlikdir',
+      wrongs: [
+        'Kompüterin əməli yaddaşı (RAM) elektrik enerjisi kəsildikdə məlumatı daimi saxlayır',
+        'İkilik say sistemində yalnız 1, 2 və 3 rəqəmlərindən istifadə olunur',
+        'Python proqramlaşdırma dilində dəyişənlərin adları rəqəmlə başlaya bilər',
+        'Bütün antivirus proqramları kompüterin aparat təminatına aiddir'
+      ],
+      explanation: `İnformatika dərslik proqramına əsasən alqoritm və aparat təminatının fundamental qaydaları.`
+    };
+  }
+
+  // İngilis dili
   if (sLower.includes('ingilis') || sLower.includes('english')) {
     return {
-      qText: `Choose the correct grammatical form to complete the sentence: "If she ... harder, she will pass the exam successfully."`,
-      correct: 'studies',
-      wrongs: ['studied', 'will study', 'had studied', 'study'],
-      explanation: 'First Conditional: If + Present Simple (studies), Future Simple (will pass).'
+      qText: `Choose the correct grammatical form according to the topic "${topic}": "If students ... more diligently, they will achieve high scores."`,
+      correct: 'study',
+      wrongs: ['studied', 'will study', 'had studied', 'studies'],
+      explanation: 'First Conditional: If + Present Simple (study), Future Simple (will achieve).'
+    };
+  }
+
+  // Ədəbiyyat
+  if (sLower.includes('ədəbiyyat')) {
+    return {
+      qText: `«${topic}» əsərinin ideya-məzmun xüsusiyyətləri və qəhrəmanların daxili ziddiyyətləri ilə bağlı hansı fikir doğrudur?`,
+      correct: 'Əsərdə vətənpərvərlik, insanpərvərlik və milli azadlıq ideyaları aparıcı xətt təşkil edir',
+      wrongs: [
+        'Əsər sırf məişət komediyası janrında yazılmışdır',
+        'Müəllif hadisələri yalnız tarixi faktların quru xronologiyası kimi təsvir etmişdir',
+        'Əsərdə heç bir bədii təsvir və ifadə vasitəsindən istifadə olunmamışdır',
+        'Bütün obrazlar mənfi planda təqdim edilmişdir'
+      ],
+      explanation: `Azərbaycan ədəbiyyatı dərslik proqramına əsasən əsərin əsas ideya xətti.`
+    };
+  }
+
+  // Məntiq
+  if (sLower.includes('məntiq')) {
+    return {
+      qText: `«${topic}» üzrə verilmiş qanunauyğunluğa əsasən sual işarəsinin (?) yerinə uyğun gələn məntiqi cavabı müəyyən edin: 3, 7, 15, 31, ?`,
+      correct: '63 ($x_{n+1} = 2x_n + 1$)',
+      wrongs: ['55', '60', '65', '72'],
+      explanation: 'Hər sonrakı hədd əvvəlki həddin iki mislindən 1 vahid çoxdur: $31 \\times 2 + 1 = 63$.'
+    };
+  }
+
+  // Həyat bilgisi və ya Təbiət
+  if (sLower.includes('həyat') || sLower.includes('təbiət')) {
+    return {
+      qText: `«${topic}» mövzusu üzrə sağlam həyat tərzi və təbiətin qorunması qaydalarına əsasən hansı davranış düzgündür?`,
+      correct: 'Ətraf mühiti təmiz saxlamaq, tullantıları çeşidləmək və fövqəladə hallarda təlimatlara əməl etmək',
+      wrongs: [
+        'Fövqəladə hal zamanı liftlərdən istifadə etmək',
+        'Təbii ehtiyatlardan qeyri-məhdud və israfçılıqla istifadə etmək',
+        'Şəxsi gigiyena qaydalarını yalnız xəstələndikdə xatırlamaq',
+        'Zədələnmiş elektrik naqillərinə nəm əllə toxunmaq'
+      ],
+      explanation: 'Həyat bilgisi və təhlükəsizlik fənni üzrə əsas vətəndaş və həyati davranış normaları.'
     };
   }
 
   // Standart fənn
   return {
-    qText: `«${topic}» mövzusu üzrə tədris proqramına əsasən verilmiş müddəalardan hansı tamamilə doğrudur?`,
+    qText: `«${topic}» mövzusu üzrə rəsmi məktəb dərslik kurikulumuna əsasən verilmiş müddəalardan hansı tamamilə doğrudur?`,
     correct: `Nəzəri prinsiplər elmi dərslik standartlarına və praktiki tətbiq qaydalarına tam uyğundur`,
     wrongs: [
       `Qanunauyğunluqlar yalnız xüsusi laboratoriya şəraitində ödənilir`,
@@ -442,7 +454,7 @@ function generateGeneralSubjectTemplate(
       `Kəmiyyətlər arasındakı asılılıq təsadüfi xarakter daşıyır`,
       `Əsas anlayışlar yalnız ilkin sinif səviyyəsində qüvvədədir`
     ],
-    explanation: `Seçilmiş mövzu üzrə Azərbaycan təhsil kurikulumunun tələblərinə əsasən tərtib edilmişdir.`
+    explanation: `Seçilmiş mövzu üzrə Azərbaycan təhsil kurikulumunun dərslik tələblərinə əsasən tərtib edilmişdir.`
   };
 }
 
@@ -465,7 +477,7 @@ function generateClosedQuestionData(
 
   let raw: RawQuestionTemplate;
 
-  if (sLower.includes('azərbaycan dili') || sLower.includes('ana dili') || sLower.includes('ədəbiyyat')) {
+  if (sLower.includes('azərbaycan dili') || sLower.includes('ana dili')) {
     let pool: RawQuestionTemplate[] = [];
     if (tLower.includes('fonetik') || tLower.includes('ahəng') || tLower.includes('sait') || tLower.includes('samit') || tLower.includes('vurğu')) {
       pool = AZE_LANG_TEMPLATES.fonetika;
@@ -480,8 +492,6 @@ function generateClosedQuestionData(
         ...AZE_LANG_TEMPLATES.sintaksis
       ];
     }
-
-    // Pick template by offset, avoiding used text
     const idx = (qNum - 1 + attemptOffset) % pool.length;
     raw = pool[idx];
   } else if (sLower.includes('riyaz') || sLower.includes('cəbr') || sLower.includes('həndəsə')) {
@@ -489,13 +499,13 @@ function generateClosedQuestionData(
   } else if (sLower.includes('fizik')) {
     raw = generatePhysicsQuestionItem(topic, qNum - 1 + attemptOffset);
   } else {
-    raw = generateGeneralSubjectTemplate(subject, topic, qNum - 1 + attemptOffset);
+    raw = generateSubjectSpecificTemplate(subject, topic, qNum - 1 + attemptOffset);
   }
 
   // Normalize question text to check uniqueness
   const normalizedText = raw.qText.replace(/\s+/g, ' ').trim();
 
-  // If already used, modify attemptOffset and regenerate
+  // If already used in this test, modify attemptOffset and regenerate
   if (usedQuestionsSet.has(normalizedText) && attemptOffset < 15) {
     return generateClosedQuestionData(
       subject,
@@ -509,7 +519,6 @@ function generateClosedQuestionData(
     );
   }
 
-  // Register in usedQuestionsSet
   usedQuestionsSet.add(normalizedText);
 
   // Randomly shuffle options so correct answer position varies (A, B, C, D, E)
@@ -598,7 +607,7 @@ function generateOpenQuestionData(
 
   return {
     topic,
-    question_text: `${qNum}. «${topic}» mövzusu üzrə əsas qanunauyğunluğu elmi terminlərlə şərh edin və onun praktiki tətbiqinə dair ən azı iki konkret nümunə göstərin.`,
+    question_text: `${qNum}. «${topic}» mövzusu üzrə əsas elmi qanunauyğunluğu və ya qaydanı şərh edin və onun praktiki tətbiqinə dair ən azı iki konkret faktiki nümunə göstərin.`,
     correct_answer: 'Nəzəri anlayışın tam şərhi və 2 düzgün faktiki nümunə.',
     explanation: 'Mövzunun əsas prinsipləri dərslik proqramına uyğun olaraq aydın şərh edilməli və real həyatla əlaqələndirilməlidir.',
     criteria: 'Mövzu dəqiq izah olunub və 2 düzgün nümunə var: 4 bal.\nYalnız 1 nümunə və ya natamam izah: 2 bal.\nCavab verilməyib: 0 bal.',
@@ -614,7 +623,6 @@ export async function generateAiTest(params: AiTestGenerationParams): Promise<Ge
     grade,
     subject,
     selectedTopics,
-    testMode,
     closedCount,
     openCount,
     difficulty,
@@ -724,9 +732,7 @@ export async function generateAiTest(params: AiTestGenerationParams): Promise<Ge
   else if (gNum <= 4) examModel = 'Sinif imtahanı';
   else examModel = 'Məktəbdaxili test';
 
-  const modeTitle = testMode === 'answered' ? 'OMR Sınaq İmtahanı' : 'İnteraktiv Onlayn İmtahan';
-  const title = `EDUNEX AI: ${subject} (${grade}) – ${modeTitle}`;
-
+  const title = `EDUNEX AI: ${subject} (${grade}) – Sınaq İmtahanı`;
   const summary = `${grade} fənni üzrə «${topicsToUse.join(', ')}» mövzularını əhatə edən ${totalQuestions} suallıq (${closedCount} qapalı, ${openCount} açıq) tam tədris proqramına uyğun imtahan uğurla formalaşdırıldı.`;
 
   return {
@@ -740,7 +746,7 @@ export async function generateAiTest(params: AiTestGenerationParams): Promise<Ge
     closed_questions_count: closedCount,
     open_questions_count: openCount,
     total_points: totalPoints,
-    test_mode: testMode,
+    test_mode: 'interactive',
     questions,
     answer_key: answerKey,
     topic_breakdown: topicBreakdown,
