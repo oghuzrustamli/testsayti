@@ -191,3 +191,13 @@
   transform: scale(1.08);
 }
 
+/* ==============================================================
+   MÜSTƏQİL SCROLL KONTEYNERİ (Tələb 9: PDF və OMR üçün təcrid olunmuş sürüşmə)
+   ============================================================== */
+.independent-scroll {
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  min-height: 0 !important;
+  -webkit-overflow-scrolling: touch;
+}
+

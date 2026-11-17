@@ -854,8 +854,8 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
               )}
             </div>
 
-            {/* Canvas / Word Viewer Container (Davamlı Təkərlə Aşağı-Yuxarı Sürüşdürmə) */}
-            <div className="flex-1 overflow-auto p-4 flex flex-col items-center">
+            {/* Canvas / Word Viewer Container (Müstəqil Təkərlə Aşağı-Yuxarı Sürüşdürmə - Tələb 9) */}
+            <div className="flex-1 overflow-y-auto overscroll-contain independent-scroll p-4 flex flex-col items-center min-h-0">
               {pdfLoading ? (
                 <div className="m-auto text-center text-xs text-slate-400">
                   <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-indigo-500" />
@@ -888,9 +888,9 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
             </div>
           </div>
 
-          {/* Right Column: OMR Optical Bubble Answer Sheet (3 Sütunlu Rejim - Tələb 3) */}
+          {/* Right Column: OMR Optical Bubble Answer Sheet (Müstəqil Sürüşdürmə & Bərabər Simmetrik Boşluq) */}
           <aside
-            className="w-full lg:w-[490px] xl:w-[530px] 2xl:w-[560px] bg-white flex flex-col h-[50vh] lg:h-full overflow-hidden border-l border-slate-200 shadow-lg shrink-0"
+            className="w-full lg:w-[530px] xl:w-[570px] 2xl:w-[610px] bg-white flex flex-col h-[50vh] lg:h-full overflow-hidden border-l border-slate-200 shadow-lg shrink-0 min-h-0"
           >
             {/* OMR Header */}
             <div className="p-2 sm:p-2.5 border-b border-slate-200 bg-slate-50/70 flex items-center justify-between shrink-0">
@@ -913,8 +913,8 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
               </div>
             </div>
 
-            {/* Question Rows List: 3 Sütunlu Qapalı + 2 Sütunlu Açıq Suallar */}
-            <div className="flex-1 overflow-y-auto p-1.5 scrollbar-thin">
+            {/* Question Rows List: Müstəqil Scroll Konteyneri */}
+            <div className="flex-1 overflow-y-auto overscroll-contain independent-scroll p-2 scrollbar-thin min-h-0">
               {questions.length === 0 ? (
                 <div className="p-8 text-center text-xs text-slate-400">
                   Suallar yüklənir...
@@ -939,9 +939,9 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
 
                   return (
                     <div className="flex flex-col gap-3">
-                      {/* 1. QAPALI OMR SUALLARI (DƏQİQ 3 SÜTUN, BƏRABƏR BOŞLUQ) */}
+                      {/* 1. QAPALI OMR SUALLARI (DƏQİQ 3 SÜTUN, HƏR İKİ TƏRƏFDƏ EYNİ QAYDADA BƏRABƏR BOŞLUQ) */}
                       {closedQuestions.length > 0 && (
-                        <div className="grid grid-cols-3 gap-1.5 items-stretch">
+                        <div className="grid grid-cols-3 gap-2 items-stretch">
                           {columnSlices.map((colQuestions, colIdx) => (
                             <div key={colIdx} className="omr-column-card">
                               <div className="flex flex-col gap-0.5">
@@ -953,14 +953,14 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                                   return (
                                     <div
                                       key={q.id || qNum}
-                                      className={`px-1.5 py-0.5 rounded-md border flex items-center justify-between transition-colors ${
+                                      className={`px-2 py-0.5 rounded-md border flex items-center justify-center gap-2 transition-colors ${
                                         currentSelection
                                           ? 'bg-emerald-50/60 border-emerald-300'
                                           : 'bg-white border-slate-200 hover:border-slate-300'
                                       }`}
                                     >
                                       {/* Sual nömrəsi */}
-                                      <div className="flex items-center gap-0.5 shrink-0 min-w-[22px] text-right justify-end">
+                                      <div className="flex items-center gap-0.5 shrink-0 min-w-[20px] text-right justify-end">
                                         <span className="font-mono font-bold text-[10px] text-slate-800">
                                           {qNum < 10 ? `0${qNum}` : qNum}.
                                         </span>

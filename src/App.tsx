@@ -86,6 +86,14 @@ export function App() {
     }
   };
 
+  const handleStartTest = (test: Test) => {
+    if (test.share_code) {
+      setExamShareCode(test.share_code);
+    } else {
+      setExamShareCode(test.id);
+    }
+  };
+
   // If user opened with direct link `?take=EDX-XXXX-XXXX`, show student exam taking immediately
   if (examShareCode) {
     return (
@@ -132,7 +140,10 @@ export function App() {
         onOpenAuthModal={() => setShowAuthModal(true)}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         onSelectCategory={(_catId, _itemId) => {
-          setActiveTab('my_tests');
+          setActiveTab('exams_hub');
+        }}
+        onNavigateTab={(tab) => {
+          setActiveTab(tab);
         }}
         onLogout={() => {
           api.logout();
@@ -163,8 +174,8 @@ export function App() {
           />
         )}
 
-        {/* Main Content Area - Scrollable for dashboard, interactive tests & hub */}
-        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto">
+        {/* Main Content Area - Split-view for OMR test creator, scrollable for dashboard & exams hub */}
+        <main className={`flex-1 min-w-0 min-h-0 ${activeTab === 'omr_test' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`}>
           {/* TEACHER VIEWS */}
           {currentUser.role === 'teacher' && (
             <>
@@ -197,9 +208,15 @@ export function App() {
                 />
               )}
 
-              {(activeTab === 'my_tests' || activeTab === 'shared_tests' || activeTab === 'archive') && (
+              {(activeTab === 'my_tests' || activeTab === 'exams_hub' || activeTab === 'exams_subjects' || activeTab === 'exams_grades' || activeTab === 'shared_tests' || activeTab === 'archive') && (
                 <MyTestsPage
                   user={currentUser}
+                  initialTab={
+                    activeTab === 'exams_subjects' ? 'subjects' :
+                    activeTab === 'exams_grades' ? 'grades' :
+                    activeTab === 'exams_hub' ? 'subjects' :
+                    'all'
+                  }
                   onNavigateCreate={() => {
                     setEditingTestId(null);
                     setActiveTab('create_test');
@@ -216,6 +233,9 @@ export function App() {
                   onViewResults={(testId) => {
                     setResultsFilterTestId(testId);
                     setActiveTab('results');
+                  }}
+                  onStartTest={(test) => {
+                    handleStartTest(test);
                   }}
                 />
               )}

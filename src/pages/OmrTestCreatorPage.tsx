@@ -1092,8 +1092,8 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
             )}
           </div>
 
-          {/* Document Content View Area */}
-          <div className="flex-1 overflow-auto p-4 flex flex-col items-center">
+          {/* Document Content View Area (Müstəqil Sürüşdürmə - Tələb 9) */}
+          <div className="flex-1 overflow-y-auto overscroll-contain independent-scroll p-4 flex flex-col items-center min-h-0">
             {docLoading && (
               <div className="m-auto flex flex-col items-center justify-center p-12 text-slate-500 gap-2">
                 <RefreshCw className="w-6 h-6 animate-spin text-indigo-600" />
@@ -1341,8 +1341,8 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
             </div>
           </div>
 
-          {/* OMR Question Rows: DƏQİQ 3 SÜTUNLU LAYOUT (Tələb 4, 5, 7) */}
-          <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
+          {/* OMR Question Rows: DƏQİQ 3 SÜTUNLU LAYOUT (Müstəqil Sürüşdürmə - Tələb 9) */}
+          <div className="flex-1 overflow-y-auto overscroll-contain independent-scroll p-2 scrollbar-thin min-h-0">
             {(() => {
               const numCols = 3;
               const perCol = Math.ceil(omrRows.length / numCols);
@@ -1652,7 +1652,7 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
             {/* Modal Body: Left Document + Right OMR */}
             <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-slate-100">
               {/* Left Doc in preview */}
-              <div className="flex-1 overflow-auto p-4 flex justify-center items-start border-r border-slate-200 bg-slate-200">
+              <div className="flex-1 overflow-y-auto overscroll-contain independent-scroll p-4 flex justify-center items-start border-r border-slate-200 bg-slate-200 min-h-0">
                 {documentType === 'docx' ? (
                   <div className="bg-white p-8 rounded-xl shadow-md max-w-2xl w-full text-slate-800 prose prose-slate">
                     <div dangerouslySetInnerHTML={{ __html: wordHtmlContent }} />
@@ -1663,7 +1663,7 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
               </div>
 
               {/* Right OMR bubbles in preview (3 Sütun Qapalı + 2 Sütun Açıq Suallar) */}
-              <div className="w-full lg:w-[490px] xl:w-[530px] 2xl:w-[560px] bg-white flex flex-col p-3 overflow-y-auto shrink-0 border-l border-slate-200">
+              <div className="w-full lg:w-[520px] xl:w-[560px] 2xl:w-[600px] bg-white flex flex-col p-3 overflow-y-auto overscroll-contain independent-scroll shrink-0 border-l border-slate-200 min-h-0">
                 <div className="mb-2 pb-2 border-b border-slate-100 flex items-center justify-between">
                   <h4 className="text-xs font-black text-slate-800">Optik Cavab Forması</h4>
                   <span className="text-[11px] font-bold text-slate-500">
