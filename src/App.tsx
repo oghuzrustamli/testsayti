@@ -175,8 +175,8 @@ export function App() {
           />
         )}
 
-        {/* Main Content Area - Split-view for OMR test creator, scrollable for dashboard & exams hub */}
-        <main className={`flex-1 min-w-0 min-h-0 ${activeTab === 'omr_test' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`}>
+        {/* Main Content Area - Split-view for OMR & AI test creator, scrollable for dashboard & exams hub */}
+        <main className={`flex-1 min-w-0 min-h-0 ${(activeTab === 'omr_test' || activeTab === 'ai_test') ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`}>
           {/* TEACHER VIEWS */}
           {currentUser.role === 'teacher' && (
             <>

@@ -1,5 +1,5 @@
 // src/pages/AiTestCreatorPage.tsx
-// Redesigned EDUNEX AI Test Generator: Clean, powerful, topic-accurate with live OMR & Interactive preview
+// Redesigned EDUNEX AI Test Generator: Clean, powerful, topic-accurate with independent scrolling & live OMR card
 import React, { useState, useEffect } from 'react';
 import { User, Test, Question, QuestionOption } from '../types';
 import { CURRICULUM_DATA, getTopicsFor } from '../lib/curriculumData';
@@ -70,6 +70,28 @@ const ALL_SUBJECTS = [
   'Fransız dili',
   'Məntiq'
 ];
+
+// Helper to sanitize Azerbaijani characters for standard jsPDF fonts
+function sanitizeForPdf(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/ə/g, 'e')
+    .replace(/Ə/g, 'E')
+    .replace(/ı/g, 'i')
+    .replace(/İ/g, 'I')
+    .replace(/ö/g, 'o')
+    .replace(/Ö/g, 'O')
+    .replace(/ü/g, 'u')
+    .replace(/Ü/g, 'U')
+    .replace(/ğ/g, 'g')
+    .replace(/Ğ/g, 'G')
+    .replace(/ş/g, 's')
+    .replace(/Ş/g, 'S')
+    .replace(/ç/g, 'c')
+    .replace(/Ç/g, 'C')
+    .replace(/[«»]/g, '"')
+    .replace(/[–—]/g, '-');
+}
 
 export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
   user,
@@ -176,14 +198,18 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
     }
   };
 
-  // Change answer key in OMR bubble sheet
-  const handleOmrKeyChange = (qNum: number, letter: string) => {
-    setOmrAnswerKey(prev => ({ ...prev, [qNum]: letter }));
+  // Change answer key in OMR bubble sheet or open questions
+  const handleOmrKeyChange = (qNum: number, letterOrAns: string) => {
+    setOmrAnswerKey(prev => ({ ...prev, [qNum]: letterOrAns }));
     setEditableQuestions(prev =>
       prev.map((q, idx) => {
         if (idx + 1 === qNum) {
-          const nextOpts = q.options.map(o => ({ ...o, is_correct: o.id === letter }));
-          return { ...q, options: nextOpts, correct_answer: letter };
+          if (q.question_type === 'single_choice') {
+            const nextOpts = q.options.map(o => ({ ...o, is_correct: o.id === letterOrAns }));
+            return { ...q, options: nextOpts, correct_answer: letterOrAns };
+          } else {
+            return { ...q, correct_answer: letterOrAns, situation_model_answer: letterOrAns };
+          }
         }
         return q;
       })
@@ -194,129 +220,205 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
   const handleDownloadQuestionBookletPdf = () => {
     const doc = new jsPDF({ format: 'a4', unit: 'mm' });
     const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 15;
-    let y = 18;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 14;
+    let y = 16;
 
     // Header
-    doc.setFontSize(16);
+    doc.setFontSize(15);
     doc.setFont('helvetica', 'bold');
     doc.text('EDUNEX SINAQ IMTAHANI (AI TEST)', margin, y);
-    y += 7;
+    y += 6;
 
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Fənn: ${selectedSubject}  |  Sinif: ${selectedGrade}  |  Müddət: ${totalCount * 2} dəq  |  Suallar: ${totalCount}`, margin, y);
-    y += 5;
+    const safeSubject = sanitizeForPdf(selectedSubject);
+    const safeGrade = sanitizeForPdf(selectedGrade);
+    doc.text(`Fenn: ${safeSubject}  |  Sinif: ${safeGrade}  |  Muddet: ${totalCount * 2} deq  |  Cemi Sual: ${totalCount}`, margin, y);
+    y += 4.5;
 
-    const topicSummary = selectedTopics.slice(0, 3).join(', ') + (selectedTopics.length > 3 ? ` və digər ${selectedTopics.length - 3} mövzu` : '');
-    doc.text(`Mövzu: ${topicSummary}`, margin, y);
-    y += 7;
+    const topicSummary = sanitizeForPdf(selectedTopics.slice(0, 3).join(', ') + (selectedTopics.length > 3 ? ` ve diger ${selectedTopics.length - 3} movzu` : ''));
+    doc.text(`Movzular: ${topicSummary}`, margin, y);
+    y += 6;
 
-    doc.setDrawColor(200, 200, 200);
+    doc.setDrawColor(190, 190, 190);
     doc.line(margin, y, pageWidth - margin, y);
-    y += 8;
+    y += 7;
 
     editableQuestions.forEach((q, idx) => {
-      if (y > 265) {
+      const isClosed = q.question_type === 'single_choice';
+      const estHeight = isClosed ? 35 : 30;
+
+      if (y + estHeight > pageHeight - margin) {
         doc.addPage();
-        y = 20;
+        y = 15;
       }
 
-      doc.setFontSize(10);
+      doc.setFontSize(9.5);
       doc.setFont('helvetica', 'bold');
-      const cleanQText = q.question_text.replace(/\$/g, '');
+      const cleanQText = sanitizeForPdf(q.question_text.replace(/\$/g, ''));
       const qLines = doc.splitTextToSize(cleanQText, pageWidth - margin * 2);
       doc.text(qLines, margin, y);
-      y += qLines.length * 5 + 2;
+      y += qLines.length * 4.5 + 2;
 
-      if (q.question_type === 'single_choice' && q.options.length > 0) {
+      if (isClosed && q.options.length > 0) {
         doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
+        doc.setFontSize(8.5);
         q.options.forEach(opt => {
-          const optText = `${opt.id}) ${opt.text.replace(/\$/g, '')}`;
+          const optText = `${opt.id}) ${sanitizeForPdf(opt.text.replace(/\$/g, ''))}`;
           const optLines = doc.splitTextToSize(optText, pageWidth - margin * 2 - 8);
           doc.text(optLines, margin + 4, y);
-          y += optLines.length * 4.5 + 1;
+          y += optLines.length * 4.2 + 1;
         });
-        y += 3;
+        y += 2.5;
       } else {
-        // Open question
+        // Open question response box in booklet
         doc.setFont('helvetica', 'italic');
-        doc.setFontSize(8.5);
+        doc.setFontSize(8);
         doc.setTextColor(100, 100, 100);
-        doc.text('[Açıq sual - Cavabınızı və həll yolunuzu qeyd edin]', margin + 4, y);
+        doc.text('[Aciq Sual - Hell yolu ve son cavabinizi qeyd edin]:', margin + 4, y);
         doc.setTextColor(0, 0, 0);
-        y += 7;
+        y += 4;
+
+        doc.setDrawColor(200, 200, 200);
+        doc.rect(margin + 4, y, pageWidth - margin * 2 - 8, 14);
+        y += 18;
       }
     });
 
-    doc.save(`${selectedSubject}_${selectedGrade}_Test_Kitabcasi.pdf`);
+    doc.save(`${safeSubject}_${safeGrade}_Sual_Kitabcasi.pdf`);
   };
 
-  // Generate and download A4 OMR Answer Sheet PDF using jsPDF
+  // Generate and download A4 OMR Answer Sheet PDF using jsPDF (Tələb 4)
   const handleDownloadOmrAnswerSheetPdf = () => {
     const doc = new jsPDF({ format: 'a4', unit: 'mm' });
     const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 15;
-    let y = 18;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 14;
+    let y = 14;
 
-    doc.setFontSize(15);
+    // Header Title
+    doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('EDUNEX - OPTIK CAVAB KARTI', margin, y);
-    y += 6;
+    doc.text('EDUNEX - OMR OPTIK CAVAB KARTI', margin, y);
+    y += 5.5;
 
-    doc.setFontSize(9.5);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Imtahan: ${testTitle}`, margin, y);
-    y += 5;
-    doc.text(`Fenn: ${selectedSubject}  |  Sinif: ${selectedGrade}  |  Sual sayi: ${totalCount}`, margin, y);
-    y += 7;
-
-    doc.setDrawColor(180, 180, 180);
-    doc.line(margin, y, pageWidth - margin, y);
-    y += 8;
-
-    // Student identity box
-    doc.rect(margin, y, pageWidth - margin * 2, 16);
+    // Metadata
     doc.setFontSize(8.5);
-    doc.text('Sagirdin Adi ve Soyadi: ___________________________________     Imza: ____________', margin + 4, y + 6);
-    doc.text('Mekteb: _______________________   Sinif / Qrup: __________   Tarix: __.__.2026', margin + 4, y + 12);
-    y += 22;
+    doc.setFont('helvetica', 'normal');
+    const safeTitle = sanitizeForPdf(testTitle);
+    const safeSubject = sanitizeForPdf(selectedSubject);
+    const safeGrade = sanitizeForPdf(selectedGrade);
+    doc.text(`Imtahan: ${safeTitle}`, margin, y);
+    y += 4.5;
+    doc.text(`Fenn: ${safeSubject}  |  Sinif: ${safeGrade}  |  Cemi Sual: ${totalCount} (${closedCount} qapali + ${openCount} aciq)`, margin, y);
+    y += 5.5;
 
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('CAVABLAR (Daireleri qaralayin):', margin, y);
-    y += 8;
+    // Student Identity Box
+    doc.setDrawColor(160, 160, 160);
+    doc.setLineWidth(0.3);
+    doc.rect(margin, y, pageWidth - margin * 2, 14);
+    doc.setFontSize(8);
+    doc.text('Sagirdin Adi ve Soyadi: _____________________________________________    Sinif: _________    Tarix: __.__.2026', margin + 3, y + 5);
+    doc.text('Is nomresi (Sagird Kodu): [  ][  ][  ][  ][  ][  ]          Imza: _________________    Toplanan Bal: ________', margin + 3, y + 10.5);
+    y += 19;
 
-    // 3 Columns of bubbles
+    // 1. QAPALI SUALLAR (DƏQİQ 3 SÜTUNLU OMR DUBLE BUBBLES)
     const closedRows = editableQuestions.filter(q => q.question_type === 'single_choice');
-    const cols = 3;
-    const perCol = Math.ceil(closedRows.length / cols);
-    const colWidth = (pageWidth - margin * 2) / cols;
-
-    for (let i = 0; i < closedRows.length; i++) {
-      const colIdx = Math.floor(i / perCol);
-      const rowInCol = i % perCol;
-      const x = margin + colIdx * colWidth;
-      const rowY = y + rowInCol * 7.5;
-
-      const qNum = i + 1;
-      const numLabel = qNum < 10 ? `0${qNum}` : `${qNum}`;
-      doc.setFontSize(8.5);
+    if (closedRows.length > 0) {
+      doc.setFontSize(9.5);
       doc.setFont('helvetica', 'bold');
-      doc.text(`${numLabel}.`, x, rowY + 3);
+      doc.text(`QAPALI SUALLAR (1 - ${closedRows.length}) - Daireleri tam qaralayin:`, margin, y);
+      y += 5.5;
 
-      ['A', 'B', 'C', 'D', 'E'].forEach((letter, bIdx) => {
-        const circleX = x + 10 + bIdx * 8;
-        const circleY = rowY + 2;
-        doc.circle(circleX, circleY, 2.5, 'S');
+      const cols = 3;
+      const perCol = Math.ceil(closedRows.length / cols);
+      const colWidth = (pageWidth - margin * 2) / cols;
+
+      for (let i = 0; i < closedRows.length; i++) {
+        const colIdx = Math.floor(i / perCol);
+        const rowInCol = i % perCol;
+        const x = margin + colIdx * colWidth;
+        const rowY = y + rowInCol * 6.8;
+
+        const qNum = i + 1;
+        const numLabel = qNum < 10 ? `0${qNum}` : `${qNum}`;
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${numLabel}.`, x, rowY + 3);
+
+        ['A', 'B', 'C', 'D', 'E'].forEach((letter, bIdx) => {
+          const circleX = x + 8 + bIdx * 6.5;
+          const circleY = rowY + 2.2;
+          doc.setDrawColor(80, 80, 80);
+          doc.circle(circleX, circleY, 2.0, 'S');
+          doc.setFontSize(6.5);
+          doc.setFont('helvetica', 'normal');
+          doc.text(letter, circleX - 0.9, circleY + 0.8);
+        });
+      }
+
+      y += perCol * 6.8 + 6;
+    }
+
+    // 2. AÇIQ SUALLAR (YAZILI CAVAB XANALARI - TƏLƏB 3 & 4)
+    const openRows = editableQuestions.filter(q => q.question_type !== 'single_choice');
+    if (openRows.length > 0) {
+      if (y + 35 > pageHeight - margin) {
+        doc.addPage();
+        y = 15;
+      }
+
+      doc.setFontSize(9.5);
+      doc.setFont('helvetica', 'bold');
+      const startNum = closedRows.length + 1;
+      const endNum = closedRows.length + openRows.length;
+      doc.text(`ACIQ VE YAZILI CAVABLI SUALLAR (${startNum} - ${endNum}) - Cavabinizi ayrilmis xanaya yazin:`, margin, y);
+      y += 5;
+
+      openRows.forEach((q, idx) => {
+        const qNum = closedRows.length + idx + 1;
+        const boxHeight = 16; // 16mm per open question box
+
+        if (y + boxHeight + 4 > pageHeight - margin) {
+          doc.addPage();
+          y = 15;
+        }
+
+        // Outer Box
+        doc.setDrawColor(140, 140, 140);
+        doc.setFillColor(252, 252, 252);
+        doc.roundedRect(margin, y, pageWidth - margin * 2, boxHeight, 1.5, 1.5, 'FD');
+
+        // Question Number & Label
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${qNum}. Aciq Sual:`, margin + 3, y + 4.5);
+
+        // Score box on top-right of the box
         doc.setFontSize(7.5);
         doc.setFont('helvetica', 'normal');
-        doc.text(letter, circleX - 1.2, circleY + 1);
+        doc.rect(pageWidth - margin - 28, y + 1.5, 25, 4.5);
+        doc.text('Bal: [   / 4 ]', pageWidth - margin - 26, y + 4.5);
+
+        // Writing guidelines inside box
+        doc.setDrawColor(210, 210, 210);
+        doc.setLineDashPattern([1, 1], 0);
+        doc.line(margin + 3, y + 9.5, pageWidth - margin - 3, y + 9.5);
+        doc.line(margin + 3, y + 13.5, pageWidth - margin - 3, y + 13.5);
+        doc.setLineDashPattern([], 0); // reset dash
+
+        y += boxHeight + 3;
       });
     }
 
-    doc.save(`${selectedSubject}_${selectedGrade}_Optik_Cavab_Karti.pdf`);
+    // Footer
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(150, 150, 150);
+    doc.text('EDUNEX Quiz Creator - OMR Test Sistemi - DIM Standartlarina Uygun Cavab Blanki', margin, pageHeight - 7);
+
+    doc.save(`${safeSubject}_${safeGrade}_OMR_Cavab_Karti.pdf`);
   };
 
   // Save Test and Send to Existing Module
@@ -376,287 +478,268 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
     }
   };
 
+  const closedRows = editableQuestions.filter(q => q.question_type === 'single_choice');
+  const openRows = editableQuestions.filter(q => q.question_type !== 'single_choice');
+
   return (
-    <div className="p-4 sm:p-8 max-w-7xl mx-auto w-full flex flex-col gap-6 animate-in fade-in">
-      {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onBack}
-            className="p-2 border border-slate-200 hover:bg-slate-100 rounded-xl text-slate-600 transition-colors cursor-pointer"
-            title="Geri qayıt"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex items-center gap-1 shadow-2xs">
-                <Sparkles className="w-3.5 h-3.5" /> EDUNEX AI Test Generator
-              </span>
-              <span className="text-xs text-slate-400 font-semibold">• Tam Əhatəli Proqram</span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900">
-              AI ilə Test Yarat
-            </h1>
-            <p className="text-xs text-slate-500">
-              Fənn, sinif və mövzuları seçin; qapalı və açıq sualların sayını təyin edin.
-            </p>
-          </div>
-        </div>
-
-        {/* Step Indicator */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-bold text-slate-600">
-          <span className={`px-3 py-1 rounded-lg ${currentStep === 1 ? 'bg-white text-indigo-700 shadow-2xs' : ''}`}>
-            1. Seçimlər
-          </span>
-          <span className="text-slate-300">→</span>
-          <span className={`px-3 py-1 rounded-lg ${currentStep === 2 ? 'bg-white text-indigo-700 shadow-2xs' : ''}`}>
-            2. Hazırlanır
-          </span>
-          <span className="text-slate-300">→</span>
-          <span className={`px-3 py-1 rounded-lg ${currentStep === 3 ? 'bg-white text-indigo-700 shadow-2xs' : ''}`}>
-            3. Yoxlama & Kart
-          </span>
-        </div>
-      </div>
-
-      {saveSuccessMsg && (
-        <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-2xl flex items-center gap-2 font-bold shadow-xs">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>{saveSuccessMsg}</span>
-        </div>
-      )}
-
+    <div className="flex-1 w-full min-h-0 flex flex-col overflow-hidden bg-slate-50">
       {/* ==============================================================
-          MƏRHƏLƏ 1: SADƏLƏŞDİRİLMİŞ VƏ AYDIN SEÇİMLƏR
+          MƏRHƏLƏ 1: PARAMETRLƏRİN SEÇİLMƏSİ (SCROLLABLE FORM)
           ============================================================== */}
       {currentStep === 1 && (
-        <div className="flex flex-col gap-5">
-          {/* SƏTİR 1: Sinif, Fənn və Test Növü */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* 1. SİNFİ SEÇ */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs flex flex-col justify-between">
-              <div>
-                <label className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-2">
-                  <GraduationCap className="w-4 h-4 text-indigo-600" />
-                  1. Sinfi Seçin:
-                </label>
-                <select
-                  value={selectedGrade}
-                  onChange={(e) => setSelectedGrade(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs bg-slate-50 hover:bg-white border border-slate-300 rounded-xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 cursor-pointer"
-                >
-                  {ALL_GRADES.map(g => (
-                    <option key={g} value={g}>{g}</option>
-                  ))}
-                </select>
-              </div>
-              <p className="text-[11px] text-slate-400 mt-3">
-                DİM proqramı və dərslik standartı seçilmiş sinfin səviyyəsinə uyğunlaşdırılır.
-              </p>
-            </div>
-
-            {/* 2. FƏNNİ SEÇ (SƏLİQƏLİ AÇILAN SEÇİM MENYUSU) */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs flex flex-col justify-between">
-              <div>
-                <label className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-2">
-                  <BookOpen className="w-4 h-4 text-indigo-600" />
-                  2. Fənni Seçin:
-                </label>
-                <select
-                  value={selectedSubject}
-                  onChange={(e) => setSelectedSubject(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs bg-slate-50 hover:bg-white border border-slate-300 rounded-xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 cursor-pointer"
-                >
-                  {ALL_SUBJECTS.map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-              <p className="text-[11px] text-slate-400 mt-3">
-                Fənn dəyişdikdə həmin fənnin və sinfin rəsmi mövzuları dərhal aşağıda açılır.
-              </p>
-            </div>
-
-            {/* 3. TEST NÖVÜNÜ SEÇ (İnteraktiv və ya OMR) */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs flex flex-col justify-between">
-              <label className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-2">
-                <Sliders className="w-4 h-4 text-indigo-600" />
-                3. Test Növünü Seçin:
-              </label>
-              <div className="grid grid-cols-2 gap-2">
+        <div className="flex-1 w-full min-h-0 overflow-y-auto p-4 sm:p-8">
+          <div className="max-w-5xl mx-auto flex flex-col gap-6 animate-in fade-in">
+            {/* Top Header */}
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
+              <div className="flex items-center gap-3">
                 <button
-                  type="button"
-                  onClick={() => setTestMode('answered')}
-                  className={`p-3 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1 ${
-                    testMode === 'answered'
-                      ? 'bg-amber-50 border-amber-500 text-amber-950 font-black shadow-xs ring-1 ring-amber-400'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
+                  onClick={onBack}
+                  className="p-2 border border-slate-200 hover:bg-slate-100 rounded-xl text-slate-600 transition-colors cursor-pointer"
+                  title="Geri qayıt"
                 >
-                  <FileText className={`w-5 h-5 ${testMode === 'answered' ? 'text-amber-600' : 'text-slate-400'}`} />
-                  <span className="text-xs font-bold">OMR Test</span>
-                  <span className="text-[10px] text-slate-400">Optik Cavab Kartı</span>
+                  <ArrowLeft className="w-5 h-5" />
                 </button>
-
-                <button
-                  type="button"
-                  onClick={() => setTestMode('interactive')}
-                  className={`p-3 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1 ${
-                    testMode === 'interactive'
-                      ? 'bg-indigo-50 border-indigo-600 text-indigo-950 font-black shadow-xs ring-1 ring-indigo-400'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
-                >
-                  <Sparkles className={`w-5 h-5 ${testMode === 'interactive' ? 'text-indigo-600' : 'text-slate-400'}`} />
-                  <span className="text-xs font-bold">İnteraktiv</span>
-                  <span className="text-[10px] text-slate-400">Canlı Online Test</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* SƏTİR 2: MÖVZULARIN SEÇİLMƏSİ (Səliqəli siyahı + Hamısını seç) */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col gap-3">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <span className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xs">
-                  4
-                </span>
                 <div>
-                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">
-                    Mövzuları Seçin: {selectedSubject} • {selectedGrade}
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex items-center gap-1 shadow-2xs">
+                      <Sparkles className="w-3.5 h-3.5" /> EDUNEX AI Test Generator
+                    </span>
+                    <span className="text-xs text-slate-400 font-semibold">• Tam Əhatəli Proqram</span>
+                  </div>
+                  <h1 className="text-xl sm:text-2xl font-black text-slate-900">
+                    AI ilə Test Yarat
+                  </h1>
+                </div>
+              </div>
+            </div>
+
+            {/* 1. SİNİF, FƏNN VƏ TEST NÖVÜ SEÇİMİ */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs flex flex-col gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* 1.1 Sinif Seçimi */}
+                <div>
+                  <label className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-2">
+                    <GraduationCap className="w-4 h-4 text-indigo-600" />
+                    1. Sinif Seçin:
+                  </label>
+                  <select
+                    value={selectedGrade}
+                    onChange={(e) => setSelectedGrade(e.target.value)}
+                    className="w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-2xl font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 cursor-pointer transition-all"
+                  >
+                    {ALL_GRADES.map(g => (
+                      <option key={g} value={g}>{g}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 1.2 Fənn Seçimi (Açılan Siyahı - Tələb 1) */}
+                <div>
+                  <label className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-2">
+                    <BookOpen className="w-4 h-4 text-indigo-600" />
+                    2. Fənni Seçin (Açılan Menyudan):
+                  </label>
+                  <select
+                    value={selectedSubject}
+                    onChange={(e) => setSelectedSubject(e.target.value)}
+                    className="w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-2xl font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 cursor-pointer transition-all"
+                  >
+                    {ALL_SUBJECTS.map(s => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* 1.3 Test Növü Seçimi: OMR vs İnteraktiv */}
+              <div>
+                <label className="text-xs font-black uppercase tracking-wider text-slate-700 block mb-2">
+                  3. Test Növünü Seçin:
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setTestMode('answered')}
+                    className={`p-4 rounded-2xl border-2 text-left transition-all flex items-start gap-3 cursor-pointer ${
+                      testMode === 'answered'
+                        ? 'border-amber-500 bg-amber-50/50 shadow-md ring-2 ring-amber-200'
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className={`p-2.5 rounded-xl ${testMode === 'answered' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <strong className="text-sm font-black text-slate-900 block">
+                        OMR Test (Optik Cavab Kartı ilə)
+                      </strong>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Kitabça PDF-i, A4 standart Optik Cavab Kartı və sürətli OMR qiymətləndirmə.
+                      </p>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setTestMode('interactive')}
+                    className={`p-4 rounded-2xl border-2 text-left transition-all flex items-start gap-3 cursor-pointer ${
+                      testMode === 'interactive'
+                        ? 'border-indigo-600 bg-indigo-50/50 shadow-md ring-2 ring-indigo-200'
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className={`p-2.5 rounded-xl ${testMode === 'interactive' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <strong className="text-sm font-black text-slate-900 block">
+                        İnteraktiv Test (Onlayn İmtahan)
+                      </strong>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Şagirdlərin birbaşa telefonda və ya kompüterdə daxil olub cavablandıracağı onlayn sınaq.
+                      </p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. MÖVZULARIN SEÇİLMƏSİ (Səliqəli siyahı + Hamısını seç - Tələb 1) */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs flex flex-col gap-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                    <Sliders className="w-4 h-4 text-indigo-600" />
+                    4. Mövzuları Seçin ({selectedSubject} • {selectedGrade}):
                   </h3>
-                  <span className="text-[11px] text-slate-500">
-                    Seçilib: <strong className="text-indigo-600 font-bold">{selectedTopics.length} / {availableTopics.length} mövzu</strong>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Rəsmi tədris proqramına uyğun mövzular. Bir, bir neçə və ya bütün mövzuları seçə bilərsiniz.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSelectAllTopics}
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <CheckSquare className="w-3.5 h-3.5" />
+                    <span>{selectedTopics.length === availableTopics.length ? 'Seçimi təmizlə' : 'Hamısını seç'}</span>
+                  </button>
+
+                  <span className="text-xs font-black px-2.5 py-1 rounded-xl bg-slate-100 text-slate-700">
+                    {selectedTopics.length} / {availableTopics.length} seçilib
                   </span>
                 </div>
               </div>
 
-              {/* «Hamısını seç» düyməsi */}
+              {/* Topics Grid: Non-overlapping, clean badges */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-72 overflow-y-auto pr-1">
+                {availableTopics.map((topic, idx) => {
+                  const isChecked = selectedTopics.includes(topic);
+                  return (
+                    <button
+                      key={topic}
+                      type="button"
+                      onClick={() => handleToggleTopic(topic)}
+                      className={`p-3 rounded-2xl border text-left text-xs font-bold transition-all flex items-start gap-2.5 cursor-pointer ${
+                        isChecked
+                          ? 'border-indigo-600 bg-indigo-50/70 text-indigo-900 shadow-2xs ring-1 ring-indigo-200'
+                          : 'border-slate-200 hover:border-slate-300 bg-slate-50/50 text-slate-700'
+                      }`}
+                    >
+                      <div className="pt-0.5 shrink-0">
+                        {isChecked ? (
+                          <CheckSquare className="w-4 h-4 text-indigo-600 fill-indigo-100" />
+                        ) : (
+                          <Square className="w-4 h-4 text-slate-400" />
+                        )}
+                      </div>
+                      <span className="leading-snug">
+                        <span className="text-[10px] text-slate-400 font-mono block mb-0.5">Mövzu {idx + 1}</span>
+                        {topic}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 3. SUAL SAYI VƏ ÇƏTİNLİK SƏVİYYƏSİ (Tələb 2 & 3) */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs flex flex-col gap-5">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
+                5. Sual Sayı və Çətinlik Parametrləri:
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Qapalı suallar */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                    <span>Qapalı Sualların Sayı:</span>
+                    <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">Variantlı</span>
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={closedCount}
+                    onChange={(e) => setClosedCount(Math.max(0, parseInt(e.target.value) || 0))}
+                    className="w-full px-3 py-2 text-base font-black text-slate-900 bg-white border border-slate-300 rounded-xl focus:border-indigo-600 focus:outline-none text-center"
+                  />
+                  <span className="text-[10px] text-slate-400">A, B, C, D, E bəndli klassik test</span>
+                </div>
+
+                {/* Açıq suallar */}
+                <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200 flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-amber-900 flex items-center justify-between">
+                    <span>Açıq Sualların Sayı:</span>
+                    <span className="text-[10px] font-black text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md">Yazılı/Ətraflı</span>
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={50}
+                    value={openCount}
+                    onChange={(e) => setOpenCount(Math.max(0, parseInt(e.target.value) || 0))}
+                    className="w-full px-3 py-2 text-base font-black text-amber-900 bg-white border border-amber-300 rounded-xl focus:border-amber-600 focus:outline-none text-center"
+                  />
+                  <span className="text-[10px] text-amber-700">Cavab, həll yolu və meyarlı (0 ola bilər)</span>
+                </div>
+
+                {/* Çətinlik Səviyyəsi */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-700">
+                    Çətinlik Səviyyəsi:
+                  </label>
+                  <select
+                    value={difficulty}
+                    onChange={(e) => setDifficulty(e.target.value as any)}
+                    className="w-full px-3 py-2.5 text-xs font-bold bg-white border border-slate-300 rounded-xl text-slate-800 focus:border-indigo-600 focus:outline-none cursor-pointer"
+                  >
+                    <option value="mixed">Qarışıq (Standart DİM balansı)</option>
+                    <option value="easy">Asan (Baza biliklər)</option>
+                    <option value="medium">Orta (Tətbiq və hesablama)</option>
+                    <option value="hard">Çətin (Lisey və olimpiada)</option>
+                  </select>
+                  <span className="text-[10px] text-slate-400 mt-1 block">
+                    Cəmi sual: <strong className="text-indigo-600 font-black">{totalCount} sual</strong> ({totalCount * 2} dəqiqə)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Button: AI İlə Test Hazırla */}
+            <div className="flex justify-end pt-2 pb-6">
               <button
                 type="button"
-                onClick={handleSelectAllTopics}
-                className="px-3.5 py-1.5 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                onClick={handleGenerate}
+                className="px-8 py-4 bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 hover:from-indigo-700 hover:to-violet-800 text-white font-black text-sm rounded-2xl shadow-xl shadow-indigo-200 flex items-center gap-2.5 transition-all cursor-pointer transform hover:scale-[1.01] active:scale-[0.99]"
               >
-                {selectedTopics.length === availableTopics.length ? (
-                  <>
-                    <CheckSquare className="w-4 h-4 text-indigo-600" />
-                    <span>Seçimi Təmizlə</span>
-                  </>
-                ) : (
-                  <>
-                    <Square className="w-4 h-4 text-indigo-600" />
-                    <span>Hamısını Seç ({availableTopics.length} mövzu)</span>
-                  </>
-                )}
+                <Sparkles className="w-5 h-5 fill-white" />
+                <span>AI ilə Test Hazırla ({totalCount} Sual: {closedCount} qapalı + {openCount} açıq)</span>
+                <ArrowRight className="w-4 h-4 ml-1" />
               </button>
             </div>
-
-            {/* Mövzuların səliqəli çoxsütunlu siyahısı (bir-birinin üstünə düşmür) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-72 overflow-y-auto pr-1 scrollbar-thin">
-              {availableTopics.map((top, idx) => {
-                const isSelected = selectedTopics.includes(top);
-                return (
-                  <div
-                    key={idx}
-                    onClick={() => handleToggleTopic(top)}
-                    className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-start gap-2.5 ${
-                      isSelected
-                        ? 'bg-indigo-50/70 border-indigo-400 text-slate-900 shadow-2xs font-semibold'
-                        : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => {}}
-                      className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 cursor-pointer accent-indigo-600 mt-0.5 shrink-0"
-                    />
-                    <span className="text-xs leading-snug">{top}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* SƏTİR 3: Qapalı, Açıq Sual Sayları və Çətinlik */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col gap-4">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-              <Sliders className="w-4 h-4 text-indigo-600" />
-              Sual Sayı və Çətinlik Parametrləri
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Qapalı Sualların Sayı */}
-              <div className="p-4 bg-slate-50/70 rounded-2xl border border-slate-200">
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Qapalı Sualların Sayı (A, B, C, D, E):
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  max={60}
-                  value={closedCount}
-                  onChange={(e) => setClosedCount(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-xl font-black text-slate-900 focus:outline-none focus:border-indigo-600"
-                />
-                <span className="text-[10px] text-slate-400 mt-1 block">
-                  Seçilmiş mövzular üzrə bərabər paylanır.
-                </span>
-              </div>
-
-              {/* Açıq Sualların Sayı (0 ola bilər) */}
-              <div className="p-4 bg-slate-50/70 rounded-2xl border border-slate-200">
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Açıq Sualların Sayı (Həll/Yazılı cavab):
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  max={30}
-                  value={openCount}
-                  onChange={(e) => setOpenCount(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-xl font-black text-slate-900 focus:outline-none focus:border-indigo-600"
-                />
-                <span className="text-[10px] text-slate-400 mt-1 block">
-                  0 daxil edildikdə yalnız qapalı test tərtib olunur.
-                </span>
-              </div>
-
-              {/* Çətinlik Səviyyəsi */}
-              <div className="p-4 bg-slate-50/70 rounded-2xl border border-slate-200">
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Çətinlik Səviyyəsi:
-                </label>
-                <select
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value as any)}
-                  className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-bold text-slate-800 focus:outline-none cursor-pointer"
-                >
-                  <option value="mixed">Qarışıq (Standart DİM balansı)</option>
-                  <option value="easy">Asan (Baza biliklər)</option>
-                  <option value="medium">Orta (Məktəb proqramı)</option>
-                  <option value="hard">Çətin (Lisey və olimpiada)</option>
-                </select>
-                <span className="text-[10px] text-slate-400 mt-1 block">
-                  Cəmi sual: <strong className="text-indigo-600 font-black">{totalCount} sual</strong> ({totalCount * 2} dəqiqə)
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Button: AI İlə Test Hazırla */}
-          <div className="flex justify-end pt-2">
-            <button
-              type="button"
-              onClick={handleGenerate}
-              className="px-8 py-4 bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 hover:from-indigo-700 hover:to-violet-800 text-white font-black text-sm rounded-2xl shadow-xl shadow-indigo-200 flex items-center gap-2.5 transition-all cursor-pointer transform hover:scale-[1.01] active:scale-[0.99]"
-            >
-              <Sparkles className="w-5 h-5 fill-white" />
-              <span>AI ilə Test Hazırla ({totalCount} Sual: {closedCount} qapalı + {openCount} açıq)</span>
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </button>
           </div>
         </div>
       )}
@@ -665,44 +748,45 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
           MƏRHƏLƏ 2: GENERASİYA ANİMASİYASI
           ============================================================== */}
       {currentStep === 2 && (
-        <div className="p-12 sm:p-16 bg-white border border-slate-200 rounded-3xl shadow-md flex flex-col items-center justify-center text-center max-w-xl mx-auto my-8">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-xl shadow-indigo-200 animate-bounce mb-6">
-            <Bot className="w-10 h-10" />
+        <div className="flex-1 w-full min-h-0 overflow-y-auto p-4 sm:p-8 flex items-center justify-center">
+          <div className="p-12 sm:p-16 bg-white border border-slate-200 rounded-3xl shadow-md flex flex-col items-center justify-center text-center max-w-xl mx-auto my-8">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-xl shadow-indigo-200 animate-bounce mb-6">
+              <Bot className="w-10 h-10" />
+            </div>
+
+            <h3 className="text-lg font-black text-slate-900 mb-2">
+              EDUNEX AI Sualları Tərtib Edir...
+            </h3>
+            <p className="text-xs text-indigo-700 font-bold mb-4 font-mono animate-pulse">
+              {progressMsg}
+            </p>
+
+            <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden max-w-sm mb-4">
+              <div className="bg-gradient-to-r from-indigo-600 to-violet-600 h-2 rounded-full w-4/5 animate-pulse" />
+            </div>
+
+            <p className="text-[11px] text-slate-400">
+              {selectedGrade} • {selectedSubject} • {selectedTopics.length} mövzu • Cəmi {totalCount} sual
+            </p>
           </div>
-
-          <h3 className="text-lg font-black text-slate-900 mb-2">
-            EDUNEX AI Sualları Tərtib Edir...
-          </h3>
-          <p className="text-xs text-indigo-700 font-bold mb-4 font-mono animate-pulse">
-            {progressMsg}
-          </p>
-
-          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden max-w-sm mb-4">
-            <div className="bg-gradient-to-r from-indigo-600 to-violet-600 h-2 rounded-full w-4/5 animate-pulse" />
-          </div>
-
-          <p className="text-[11px] text-slate-400">
-            {selectedGrade} • {selectedSubject} • {selectedTopics.length} mövzu • Cəmi {totalCount} sual
-          </p>
         </div>
       )}
 
       {/* ==============================================================
-          MƏRHƏLƏ 3: YOXLAMA, CANLI OMR CAVAB KARTI VƏ YADDA SAXLAMA
+          MƏRHƏLƏ 3: YOXLAMA, İKİ MÜSTƏQİL SCROLL SAHƏSİ VƏ CAVAB KARTI
           ============================================================== */}
       {currentStep === 3 && generatedResult && (
-        <div className="flex flex-col gap-6">
-          {/* Top Bar: Title & Controls */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs flex flex-wrap items-center justify-between gap-4">
-            <div className="flex-1 min-w-[280px]">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                Testin Adı (Redaktə edə bilərsiniz):
-              </label>
+        <div className="flex-1 w-full min-h-0 flex flex-col overflow-hidden">
+          {/* Top Fixed Header Bar */}
+          <div className="shrink-0 bg-white border-b border-slate-200 px-4 sm:px-6 py-2.5 shadow-xs flex flex-wrap items-center justify-between gap-3 z-10">
+            <div className="flex-1 min-w-[260px] max-w-xl">
               <input
                 type="text"
                 value={testTitle}
                 onChange={(e) => setTestTitle(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl font-black text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-600"
+                className="w-full px-3 py-1.5 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl font-black text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-600"
+                placeholder="Testin adı..."
+                title="Testin adı (Redaktə edə bilərsiniz)"
               />
             </div>
 
@@ -710,29 +794,29 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
               <button
                 type="button"
                 onClick={() => setCurrentStep(1)}
-                className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-colors cursor-pointer"
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-colors cursor-pointer"
               >
-                ← Parametrlərə Qayıt
+                ← Parametrlər
               </button>
 
               <button
                 type="button"
                 onClick={handleDownloadQuestionBookletPdf}
-                className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 flex items-center gap-1.5 transition-colors cursor-pointer"
                 title="A4 formatında Sual Kitabçasını PDF olaraq yüklə"
               >
-                <Printer className="w-4 h-4 text-slate-600" />
-                <span>Sual Kitabçası (PDF)</span>
+                <Printer className="w-3.5 h-3.5 text-slate-600" />
+                <span className="hidden sm:inline">Sual Kitabçası (PDF)</span>
               </button>
 
               {testMode === 'answered' && (
                 <button
                   type="button"
                   onClick={handleDownloadOmrAnswerSheetPdf}
-                  className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs rounded-xl border border-amber-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs rounded-xl border border-amber-200 flex items-center gap-1.5 transition-colors cursor-pointer"
                   title="A4 formatında OMR Optik Cavab Kartını PDF olaraq yüklə"
                 >
-                  <Download className="w-4 h-4 text-amber-600" />
+                  <Download className="w-3.5 h-3.5 text-amber-600" />
                   <span>A4 Cavab Kartı (PDF)</span>
                 </button>
               )}
@@ -742,55 +826,51 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                   type="button"
                   disabled={saving}
                   onClick={() => handleSaveAndExport('answered')}
-                  className="px-5 py-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-black text-xs rounded-xl shadow-md shadow-amber-100 flex items-center gap-1.5 transition-all cursor-pointer"
+                  className="px-4 py-1.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-black text-xs rounded-xl shadow-md shadow-amber-100 flex items-center gap-1.5 transition-all cursor-pointer"
                 >
-                  <FileText className="w-4 h-4" />
-                  <span>{saving ? 'Yadda saxlanılır...' : 'OMR Moduluna Ötür & Yadda Saxla'}</span>
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>{saving ? 'Saxlanılır...' : 'OMR Moduluna Ötür & Saxla'}</span>
                 </button>
               ) : (
                 <button
                   type="button"
                   disabled={saving}
                   onClick={() => handleSaveAndExport('interactive')}
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-md shadow-indigo-100 flex items-center gap-1.5 transition-all cursor-pointer"
+                  className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-md shadow-indigo-100 flex items-center gap-1.5 transition-all cursor-pointer"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  <span>{saving ? 'Yadda saxlanılır...' : 'İnteraktiv Testi Yadda Saxla & Yayımla'}</span>
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{saving ? 'Saxlanılır...' : 'İnteraktiv Testi Saxla'}</span>
                 </button>
               )}
             </div>
           </div>
 
-          {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3 bg-white border border-slate-200 rounded-2xl text-center shadow-2xs">
-              <span className="text-[10px] text-slate-400 font-bold block">Fənn & Sinif</span>
-              <strong className="text-xs text-slate-800">{selectedSubject} • {selectedGrade}</strong>
+          {/* Quick Metrics Bar (Shrink-0) */}
+          <div className="shrink-0 px-4 sm:px-6 py-1.5 bg-slate-100/70 border-b border-slate-200/80 flex items-center justify-between text-xs text-slate-600">
+            <div className="flex items-center gap-3">
+              <span><strong>Fənn:</strong> {selectedSubject} ({selectedGrade})</span>
+              <span className="text-slate-300">•</span>
+              <span><strong>Suallar:</strong> {closedCount} qapalı + {openCount} açıq ({totalCount} cəmi)</span>
+              <span className="text-slate-300">•</span>
+              <span><strong>Mövzular:</strong> {selectedTopics.length} mövzu əhatə olundu</span>
             </div>
-            <div className="p-3 bg-white border border-slate-200 rounded-2xl text-center shadow-2xs">
-              <span className="text-[10px] text-slate-400 font-bold block">Suallar</span>
-              <strong className="text-xs text-indigo-700">{closedCount} qapalı + {openCount} açıq ({totalCount})</strong>
-            </div>
-            <div className="p-3 bg-white border border-slate-200 rounded-2xl text-center shadow-2xs">
-              <span className="text-[10px] text-slate-400 font-bold block">Əhatə Olunan Mövzu</span>
-              <strong className="text-xs text-slate-800">{selectedTopics.length} mövzu</strong>
-            </div>
-            <div className="p-3 bg-white border border-slate-200 rounded-2xl text-center shadow-2xs">
-              <span className="text-[10px] text-slate-400 font-bold block">Rejim</span>
-              <strong className={`text-xs ${testMode === 'answered' ? 'text-amber-600' : 'text-emerald-600'}`}>
-                {testMode === 'answered' ? 'OMR Cavab Kartı' : 'İnteraktiv Onlayn'}
-              </strong>
-            </div>
+            {saveSuccessMsg && (
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md animate-fade-in">
+                ✓ {saveSuccessMsg}
+              </span>
+            )}
           </div>
 
-          {/* SPLIT VIEW: Left = Suallar və Redaktə, Right = OMR Cavab Kartı (Tələb 5) */}
-          <div className={`grid gap-6 items-start ${testMode === 'answered' ? 'grid-cols-1 lg:grid-cols-12' : 'grid-cols-1'}`}>
-            {/* SOL TƏRƏF: Sualların Siyahısı və Redaktəsi */}
-            <div className={`${testMode === 'answered' ? 'lg:col-span-8' : 'w-full'} flex flex-col gap-4`}>
-              <div className="flex items-center justify-between">
+          {/* SPLIT SCREEN CONTAINER: 2 MÜSTƏQİL SCROLL KONTEYNERİ (Tələb 1 & 2) */}
+          <div className="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden gap-4 p-3 sm:p-4 w-full max-w-[1600px] mx-auto">
+            {/* ==============================================================
+                SOL TƏRƏF: YALNIZ SUALLAR (MÜSTƏQİL SCROLL - TƏLƏB 1)
+                ============================================================== */}
+            <div className="flex-1 h-full min-h-0 overflow-y-auto overscroll-contain independent-scroll pr-1 flex flex-col gap-3.5">
+              <div className="flex items-center justify-between sticky top-0 bg-slate-50/95 backdrop-blur-xs py-1 z-10">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
                   <BookOpen className="w-4 h-4 text-indigo-600" />
-                  Hazırlanmış Suallar ({editableQuestions.length})
+                  Sual Kitabçası ({editableQuestions.length} Sual)
                 </h3>
                 <span className="text-[11px] text-slate-400 font-semibold">
                   Mətn və variantları yerindəcə klikləyərək redaktə edə bilərsiniz
@@ -804,7 +884,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                 return (
                   <div
                     key={q.id}
-                    className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs hover:border-indigo-300 transition-all flex flex-col gap-3"
+                    className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-xs hover:border-indigo-300 transition-all flex flex-col gap-3 shrink-0"
                   >
                     {/* Header: Sual № və Mövzu Nişanı */}
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
@@ -851,31 +931,53 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                       </div>
                     )}
 
-                    {/* Qapalı Sual Variantları */}
-                    {isClosed && (
+                    {/* Qapalı Suallar üçün Variantlar (A-E) */}
+                    {isClosed && q.options.length > 0 && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                         {q.options.map((opt) => {
-                          const isCorrect = q.correct_answer === opt.id;
+                          const isCorrect = (omrAnswerKey[idx + 1] || q.correct_answer) === opt.id;
                           return (
                             <div
                               key={opt.id}
-                              onClick={() => handleOmrKeyChange(idx + 1, opt.id)}
-                              className={`p-2.5 rounded-xl border flex items-center gap-2 transition-all cursor-pointer ${
+                              className={`p-2.5 rounded-xl border text-xs font-medium flex items-center gap-2 transition-colors ${
                                 isCorrect
-                                  ? 'bg-emerald-50/80 border-emerald-400 text-emerald-950 font-bold shadow-2xs'
-                                  : 'bg-slate-50/60 border-slate-200 text-slate-800 hover:bg-slate-100'
+                                  ? 'bg-emerald-50/70 border-emerald-500 text-emerald-950 font-bold ring-1 ring-emerald-300'
+                                  : 'bg-slate-50/60 border-slate-200 text-slate-800'
                               }`}
                             >
-                              <span className={`w-6 h-6 rounded-lg text-xs font-black flex items-center justify-center shrink-0 ${
-                                isCorrect ? 'bg-emerald-600 text-white' : 'bg-white border border-slate-300 text-slate-700'
+                              <span className={`w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center shrink-0 ${
+                                isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'
                               }`}>
                                 {opt.id}
                               </span>
-                              <div className="flex-1 text-xs">
-                                <MathRenderer content={opt.text} />
-                              </div>
+
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={opt.text}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setEditableQuestions(prev =>
+                                      prev.map(item =>
+                                        item.id === q.id
+                                          ? {
+                                              ...item,
+                                              options: item.options.map(o => o.id === opt.id ? { ...o, text: val } : o)
+                                            }
+                                          : item
+                                      )
+                                    );
+                                  }}
+                                  className="flex-1 px-2 py-1 bg-white border border-slate-300 rounded-lg text-xs font-normal focus:outline-none focus:border-indigo-500"
+                                />
+                              ) : (
+                                <span className="flex-1 leading-snug">
+                                  <MathRenderer content={opt.text} />
+                                </span>
+                              )}
+
                               {isCorrect && (
-                                <Check className="w-4 h-4 text-emerald-600 shrink-0 ml-auto" />
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                               )}
                             </div>
                           );
@@ -883,23 +985,26 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                       </div>
                     )}
 
-                    {/* Açıq Sual İzahı və Qiymətləndirmə Meyarları */}
+                    {/* Açıq Sual üçün Etalon Cavab və Qiymətləndirmə Meyarları */}
                     {!isClosed && (
-                      <div className="p-3 bg-amber-50/60 border border-amber-200 rounded-2xl flex flex-col gap-2 text-xs">
-                        <div>
-                          <strong className="text-amber-900 block font-bold">Gözlənilən Düzgün Cavab:</strong>
-                          <span className="font-mono text-emerald-800 font-black">{q.correct_answer}</span>
+                      <div className="p-3 bg-amber-50/50 rounded-2xl border border-amber-200 flex flex-col gap-2 text-xs">
+                        <div className="flex items-center justify-between pb-1.5 border-b border-amber-200/60">
+                          <span className="font-bold text-amber-900">Etalon Düzgün Cavab / Açar:</span>
+                          <span className="font-mono font-black text-amber-900 bg-white px-2 py-0.5 rounded border border-amber-300">
+                            {omrAnswerKey[idx + 1] || q.correct_answer}
+                          </span>
                         </div>
+
                         {q.situation_text && (
-                          <div>
-                            <strong className="text-amber-900 block font-bold">Qiymətləndirmə Meyarları:</strong>
-                            <p className="text-[11px] text-slate-700 whitespace-pre-line mt-0.5">{q.situation_text}</p>
+                          <div className="text-[11px] text-slate-700 bg-white/80 p-2.5 rounded-xl border border-amber-200 leading-relaxed font-sans">
+                            <strong className="text-amber-800 block mb-0.5">Qiymətləndirmə Meyarları:</strong>
+                            <span className="whitespace-pre-line">{q.situation_text}</span>
                           </div>
                         )}
                       </div>
                     )}
 
-                    {/* Explanation */}
+                    {/* İzah */}
                     {q.explanation && (
                       <div className="text-[11px] text-slate-500 bg-slate-50 p-2 rounded-xl border border-slate-100">
                         <span className="font-bold text-indigo-700">İzah: </span>
@@ -911,10 +1016,13 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
               })}
             </div>
 
-            {/* SAĞ TƏRƏF: REAL OPTİK CAVAB KARTI (Yalnız OMR Rejimində - Tələb 5) */}
+            {/* ==============================================================
+                SAĞ TƏRƏF: OMR CAVAB KARTI (MÜSTƏQİL SCROLL VƏ SABİTLİK - TƏLƏB 2 & 3)
+                ============================================================== */}
             {testMode === 'answered' && (
-              <div className="lg:col-span-4 sticky top-20 bg-white border border-slate-200 rounded-3xl p-5 shadow-lg flex flex-col gap-4">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="w-full lg:w-[420px] xl:w-[460px] h-full min-h-0 shrink-0 flex flex-col bg-white border border-slate-200 rounded-3xl shadow-lg overflow-hidden">
+                {/* Header (Shrink-0) */}
+                <div className="shrink-0 p-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
                   <div>
                     <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -929,58 +1037,157 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                   </span>
                 </div>
 
-                {/* 3 Sütunlu OMR Dairələri */}
-                <div className="flex flex-col gap-1 max-h-[60vh] overflow-y-auto pr-1 scrollbar-thin">
-                  {editableQuestions.map((q, idx) => {
-                    const qNum = idx + 1;
-                    const isClosed = q.question_type === 'single_choice';
-                    const activeLetter = omrAnswerKey[qNum] || q.correct_answer;
+                {/* Scrollable Content (Müstəqil Scroll Container - Tələb 2 & 3) */}
+                <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain independent-scroll p-3 flex flex-col gap-3.5">
+                  {/* 1. QAPALI SUALLAR - DƏQİQ 3 SÜTUNLU STANDART OMR CƏDVƏLİ */}
+                  {closedRows.length > 0 && (
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider block">
+                        Qapalı Suallar (1 - {closedRows.length})
+                      </span>
 
-                    return (
-                      <div
-                        key={q.id}
-                        className="px-2 py-1 rounded-xl border border-slate-100 hover:border-slate-300 flex items-center justify-between transition-colors text-xs"
-                      >
-                        {/* Number */}
-                        <span className="font-mono font-bold text-[11px] text-slate-700 min-w-[24px]">
-                          {qNum < 10 ? `0${qNum}` : qNum}.
-                        </span>
+                      {(() => {
+                        const numCols = 3;
+                        const perCol = Math.ceil(closedRows.length / numCols);
+                        const columnSlices = Array.from({ length: numCols }, (_, colIdx) =>
+                          closedRows.slice(colIdx * perCol, (colIdx + 1) * perCol)
+                        );
 
-                        {isClosed ? (
-                          /* A, B, C, D, E Bubbles */
-                          <div className="flex items-center gap-1.5" role="radiogroup">
-                            {['A', 'B', 'C', 'D', 'E'].map(l => {
-                              const isSel = activeLetter === l;
-                              return (
-                                <button
-                                  key={l}
-                                  type="button"
-                                  onClick={() => handleOmrKeyChange(qNum, l)}
-                                  className={`w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center transition-all cursor-pointer ${
-                                    isSel
-                                      ? 'bg-emerald-600 text-white font-black shadow-xs scale-105 ring-2 ring-emerald-300'
-                                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                  }`}
-                                  title={`Sual ${qNum}: Variant ${l}`}
-                                >
-                                  {l}
-                                </button>
-                              );
-                            })}
+                        return (
+                          <div className="grid grid-cols-3 gap-1.5 items-stretch">
+                            {columnSlices.map((colRows, colIdx) => (
+                              <div key={colIdx} className="omr-column-card">
+                                <div className="flex flex-col gap-0.5">
+                                  {colRows.map((q) => {
+                                    const qNum = q.order_index || 1;
+                                    const currentAns = omrAnswerKey[qNum] || q.correct_answer;
+                                    return (
+                                      <div
+                                        key={q.id}
+                                        className={`px-1.5 py-0.5 rounded-md border flex items-center justify-between transition-colors ${
+                                          currentAns ? 'bg-emerald-50/60 border-emerald-400' : 'bg-white border-slate-200 hover:border-slate-300'
+                                        }`}
+                                      >
+                                        <div className="flex items-center gap-0.5 shrink-0 min-w-[20px] text-right justify-end">
+                                          <span className="font-mono font-bold text-[10px] text-slate-800">
+                                            {qNum < 10 ? `0${qNum}` : qNum}.
+                                          </span>
+                                          {currentAns && (
+                                            <span className="text-[8px] font-black text-emerald-700 bg-emerald-100 px-0.5 rounded leading-none">
+                                              {currentAns}
+                                            </span>
+                                          )}
+                                        </div>
+
+                                        <div className="omr-bubble-row shrink-0 flex items-center gap-[2px]">
+                                          {['A', 'B', 'C', 'D', 'E'].map((l) => (
+                                            <button
+                                              key={l}
+                                              type="button"
+                                              onClick={() => handleOmrKeyChange(qNum, l)}
+                                              className={`w-[18px] h-[18px] rounded-full text-[9px] font-bold flex items-center justify-center transition-all cursor-pointer ${
+                                                currentAns === l
+                                                  ? 'bg-emerald-600 text-white font-black shadow-2xs scale-105'
+                                                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                              }`}
+                                              title={`Sual ${qNum}: Variant ${l}`}
+                                            >
+                                              {l}
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        ) : (
-                          /* Open Question Numeric Badge */
-                          <span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 truncate max-w-[140px]">
-                            Açıq: {q.correct_answer}
-                          </span>
-                        )}
+                        );
+                      })()}
+                    </div>
+                  )}
+
+                  {/* 2. AÇIQ SUALLAR - YAZILI CAVAB XANALARI (MÖVCUD İŞLƏK OMR MEXANİZMİ - TƏLƏB 3) */}
+                  {openRows.length > 0 && (
+                    <div className="pt-2.5 border-t border-slate-200 flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black text-slate-800 uppercase tracking-wider flex items-center gap-1">
+                          <Edit3 className="w-3.5 h-3.5 text-amber-600" />
+                          Açıq Cavablı Suallar ({closedRows.length + 1} - {editableQuestions.length})
+                        </span>
+                        <span className="text-[8.5px] font-black text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200">
+                          Yazılı Cavab Sahələri
+                        </span>
                       </div>
-                    );
-                  })}
+
+                      <div className="flex flex-col gap-2">
+                        {openRows.map((q, oIdx) => {
+                          const qNum = closedRows.length + oIdx + 1;
+                          const currentAns = omrAnswerKey[qNum] !== undefined ? omrAnswerKey[qNum] : q.correct_answer;
+
+                          return (
+                            <div
+                              key={q.id}
+                              className="p-2.5 rounded-xl border border-amber-200 bg-amber-50/40 flex flex-col gap-1.5 shadow-2xs hover:border-amber-300 transition-colors"
+                            >
+                              {/* Header: Sual № və bal */}
+                              <div className="flex items-center justify-between text-xs pb-1 border-b border-amber-200/60">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-mono font-black text-slate-900 bg-white border border-amber-300 w-5 h-5 rounded-md flex items-center justify-center text-[10px] shadow-2xs">
+                                    {qNum}.
+                                  </span>
+                                  <span className="font-extrabold text-[8.5px] text-amber-900 bg-amber-100 px-1.5 py-0.2 rounded">
+                                    Açıq Sual
+                                  </span>
+                                  {q.topic && (
+                                    <span className="text-[9px] text-slate-500 font-medium truncate max-w-[150px]">
+                                      {q.topic}
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-[9px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.2 rounded">
+                                  {q.points || 4} bal
+                                </span>
+                              </div>
+
+                              {/* Sual Mətni */}
+                              <div className="text-[11px] font-bold text-slate-800 leading-snug">
+                                <MathRenderer content={q.question_text} />
+                              </div>
+
+                              {/* Yazılı Cavab Sahəsi */}
+                              <div className="flex flex-col gap-0.5">
+                                <label className="text-[9px] font-bold text-slate-600 flex items-center justify-between">
+                                  <span>Düzgün Cavab (Açar):</span>
+                                  <span className="text-[8px] text-slate-400 font-normal">Şagird cavab sahəsi</span>
+                                </label>
+                                <input
+                                  type="text"
+                                  value={currentAns}
+                                  onChange={(e) => handleOmrKeyChange(qNum, e.target.value)}
+                                  placeholder="Düzgün cavabı daxil edin..."
+                                  className="w-full px-2 py-1 text-[11px] font-mono font-bold bg-white border border-amber-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 text-slate-900 shadow-2xs"
+                                />
+                              </div>
+
+                              {/* Qiymətləndirmə Meyarları */}
+                              {q.situation_text && (
+                                <div className="text-[9px] text-slate-600 bg-white/90 p-1.5 rounded-lg border border-amber-200/80 leading-relaxed font-sans">
+                                  <span className="font-bold text-amber-800 block mb-0.5">Qiymətləndirmə Meyarları:</span>
+                                  <span className="whitespace-pre-line">{q.situation_text}</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* OMR Card Footer Actions */}
-                <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+                {/* Footer (Shrink-0) */}
+                <div className="shrink-0 p-3 border-t border-slate-100 bg-slate-50/80 flex flex-col gap-2">
                   <button
                     type="button"
                     onClick={handleDownloadOmrAnswerSheetPdf}
