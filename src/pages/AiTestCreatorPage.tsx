@@ -482,12 +482,12 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
   const openRows = editableQuestions.filter(q => q.question_type !== 'single_choice');
 
   return (
-    <div className="w-full min-h-full flex flex-col bg-slate-50">
+    <div className="w-full h-full flex flex-col overflow-hidden bg-slate-50">
       {/* ==============================================================
           MƏRHƏLƏ 1: PARAMETRLƏRİN SEÇİLMƏSİ (SCROLLABLE FORM)
           ============================================================== */}
       {currentStep === 1 && (
-        <div className="p-4 sm:p-8 max-w-5xl mx-auto w-full flex flex-col gap-6 animate-in fade-in">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 max-w-5xl mx-auto w-full flex flex-col gap-6 animate-in fade-in">
           {/* Top Header */}
           <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
             <div className="flex items-center gap-3">
@@ -746,8 +746,8 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
           MƏRHƏLƏ 2: GENERASİYA ANİMASİYASI
           ============================================================== */}
       {currentStep === 2 && (
-        <div className="p-8 sm:p-16 max-w-xl mx-auto my-8 flex items-center justify-center">
-          <div className="p-8 sm:p-12 bg-white border border-slate-200 rounded-3xl shadow-md flex flex-col items-center justify-center text-center w-full">
+        <div className="flex-1 flex items-center justify-center p-8 sm:p-16">
+          <div className="p-8 sm:p-12 bg-white border border-slate-200 rounded-3xl shadow-md flex flex-col items-center justify-center text-center max-w-xl w-full">
             <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-xl shadow-indigo-200 animate-bounce mb-6">
               <Bot className="w-10 h-10" />
             </div>
@@ -774,9 +774,9 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
           MƏRHƏLƏ 3: YOXLAMA, SABİT STICKY CAVAB KARTI VƏ SƏRBƏST SÜRÜŞMƏ
           ============================================================== */}
       {currentStep === 3 && generatedResult && (
-        <div className="p-3 sm:p-6 max-w-[1600px] mx-auto w-full flex flex-col gap-4 animate-in fade-in">
-          {/* Top Sticky Header Bar */}
-          <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl p-3 sm:p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+        <div className="h-full w-full flex flex-col overflow-hidden animate-in fade-in">
+          {/* Top Fixed Header Bar */}
+          <div className="shrink-0 bg-white border-b border-slate-200 px-4 py-3 shadow-xs flex flex-wrap items-center justify-between gap-3 z-10">
             <div className="flex-1 min-w-[260px] max-w-xl">
               <input
                 type="text"
@@ -844,7 +844,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
           </div>
 
           {/* Quick Metrics Bar */}
-          <div className="bg-slate-100/90 border border-slate-200/80 rounded-xl px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-700">
+          <div className="shrink-0 bg-slate-100/90 border-b border-slate-200/80 px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-700">
             <div className="flex items-center gap-3">
               <span><strong>Fənn:</strong> {selectedSubject} ({selectedGrade})</span>
               <span className="text-slate-300">•</span>
@@ -860,9 +860,9 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
           </div>
 
           {/* SPLIT LAYOUT: LEFT QUESTIONS + RIGHT STICKY OMR CARD */}
-          <div className={`grid gap-6 items-start ${testMode === 'answered' ? 'grid-cols-1 lg:grid-cols-12' : 'grid-cols-1'}`}>
+          <div className={`flex-1 min-h-0 grid gap-5 p-4 overflow-hidden ${testMode === 'answered' ? 'grid-cols-1 lg:grid-cols-12' : 'grid-cols-1'}`}>
             {/* SOL TƏRƏF: YALNIZ SUALLAR (Sərbəst aşağı-yuxarı sürüşür) */}
-            <div className={`${testMode === 'answered' ? 'lg:col-span-8' : 'w-full'} flex flex-col gap-4`}>
+            <div className={`${testMode === 'answered' ? 'lg:col-span-8' : 'w-full'} h-full overflow-y-auto pr-2 flex flex-col gap-4`}>
               <div className="flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-3 shadow-2xs">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
                   <BookOpen className="w-4 h-4 text-indigo-600" />
@@ -1016,7 +1016,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                 SAĞ TƏRƏF: OMR CAVAB KARTI (MÜSTƏQİL SCROLL VƏ SABİTLİK - TƏLƏB 2 & 3)
                 ============================================================== */}
             {testMode === 'answered' && (
-              <div className="lg:col-span-4 sticky top-20 max-h-[calc(100vh-100px)] flex flex-col bg-white border border-slate-200 rounded-3xl shadow-xl overflow-hidden z-20">
+              <div className="lg:col-span-4 h-full flex flex-col bg-white border border-slate-200 rounded-3xl shadow-xl overflow-hidden">
                 {/* Header (Shrink-0) */}
                 <div className="shrink-0 p-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
                   <div>

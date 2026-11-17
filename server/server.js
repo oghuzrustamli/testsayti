@@ -361,6 +361,14 @@ app.post('/api/tests', (req, res) => {
   const testId = 'tst-' + Math.random().toString(36).substring(2, 9);
   const now = new Date().toISOString();
 
+  // Validate teacher_id exists in Users table to avoid FOREIGN KEY failure
+  let validTeacherId = teacher_id;
+  const teacherExists = validTeacherId ? db.prepare('SELECT id FROM Users WHERE id = ?').get(validTeacherId) : null;
+  if (!teacherExists) {
+    const fallbackTeacher = db.prepare("SELECT id FROM Users WHERE role = 'teacher' LIMIT 1").get();
+    validTeacherId = fallbackTeacher ? fallbackTeacher.id : 'usr-teacher-1';
+  }
+
   db.prepare(`
     INSERT INTO Tests (
       id, teacher_id, title, exam_model, grade_group, subject, topic,
@@ -371,7 +379,7 @@ app.post('/api/tests', (req, res) => {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     testId,
-    teacher_id || 'usr-teacher-1',
+    validTeacherId,
     title,
     exam_model,
     grade_group || '',
@@ -414,7 +422,7 @@ app.post('/api/tests', (req, res) => {
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
           qId,
-          teacher_id || 'usr-teacher-1',
+          validTeacherId,
           exam_model,
           subject,
           topic || '',
@@ -951,10 +959,19 @@ app.post('/api/share/toggle', (req, res) => {
 
 // Student starts exam
 app.post('/api/exam/start', (req, res) => {
-  const { test_id, student_name, student_surname, class_name } = req.body;
-  if (!test_id || !student_name || !student_surname) {
+  const { test_id, student_name, student_surname, class_name, student_class } = req.body;
+  if (!test_id || !student_name) {
     return res.status(400).json({ error: 'Ad və soyad daxil edilməlidir' });
   }
+
+  let fName = (student_name || '').trim();
+  let lName = (student_surname || '').trim();
+  if (!lName && fName.includes(' ')) {
+    const parts = fName.split(' ');
+    fName = parts[0];
+    lName = parts.slice(1).join(' ');
+  }
+  if (!lName) lName = '-';
 
   const test = db.prepare('SELECT * FROM Tests WHERE id = ?').get(test_id);
   if (!test) return res.status(404).json({ error: 'Test tapılmadı' });
@@ -967,29 +984,30 @@ app.post('/api/exam/start', (req, res) => {
       id, test_id, student_name, student_surname, class_name,
       started_at, status
     ) VALUES (?, ?, ?, ?, ?, ?, 'in_progress')
-  `).run(sessionId, test_id, student_name.trim(), student_surname.trim(), class_name || 'Qrup', now);
+  `).run(sessionId, test_id, fName, lName, class_name || student_class || 'Qrup', now);
 
-  logAudit(null, `${student_name} ${student_surname}`, 'İmtahan Başladı', `Test: ${test.title}`, req);
+  logAudit(null, `${fName} ${lName}`, 'İmtahan Başladı', `Test: ${test.title}`, req);
   res.status(201).json({ session_id: sessionId, started_at: now });
 });
 
 // Student auto-save answer
 app.post('/api/exam/answer', (req, res) => {
-  const { session_id, question_id, selected_answer } = req.body;
+  const { session_id, question_id, selected_answer, answer } = req.body;
   if (!session_id || !question_id) {
     return res.status(400).json({ error: 'Sessiya və sual ID tələb olunur' });
   }
 
+  const ansVal = selected_answer !== undefined ? selected_answer : (answer || '');
   const now = new Date().toISOString();
-  const existing = db.prepare('SELECT id FROM StudentAnswers WHERE session_id = ? AND question_id = ?').get(session_id, question_id);
+  const existing = db.prepare('SELECT id FROM StudentAnswers WHERE session_id = ? AND question_id = ?').get(String(session_id), String(question_id));
 
   if (existing) {
-    db.prepare('UPDATE StudentAnswers SET selected_answer = ?, answered_at = ? WHERE id = ?').run(selected_answer, now, existing.id);
+    db.prepare('UPDATE StudentAnswers SET selected_answer = ?, answered_at = ? WHERE id = ?').run(String(ansVal), now, existing.id);
   } else {
     db.prepare(`
       INSERT INTO StudentAnswers (id, session_id, question_id, selected_answer, answered_at)
       VALUES (?, ?, ?, ?, ?)
-    `).run('ans-' + Math.random().toString(36).substring(2, 9), session_id, question_id, selected_answer, now);
+    `).run('ans-' + Math.random().toString(36).substring(2, 9), String(session_id), String(question_id), String(ansVal), now);
   }
 
   res.json({ success: true, saved_at: now });

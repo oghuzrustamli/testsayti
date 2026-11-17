@@ -118,21 +118,9 @@ export function App() {
     );
   }
 
-  // Answered Test View
-  if (viewingAnsweredTestId) {
-    return (
-      <AnsweredTestPage
-        testId={viewingAnsweredTestId}
-        onBack={() => setViewingAnsweredTestId(null)}
-        onPrint={(t) => setPrintingTest(t)}
-        onShare={(t) => setSharingTest(t)}
-      />
-    );
-  }
-
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
-      {/* Top Navigation */}
+    <div className="h-screen w-full flex flex-col overflow-hidden bg-slate-50 font-sans">
+      {/* Top Navigation - Immovably Fixed at the top across all pages */}
       <Navbar
         currentUser={currentUser}
         onSwitchRole={handleSwitchRole}
@@ -141,9 +129,11 @@ export function App() {
         onOpenAuthModal={() => setShowAuthModal(true)}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         onSelectCategory={(_catId, _itemId) => {
+          if (viewingAnsweredTestId) setViewingAnsweredTestId(null);
           setActiveTab('exams_hub');
         }}
         onNavigateTab={(tab) => {
+          if (viewingAnsweredTestId) setViewingAnsweredTestId(null);
           setActiveTab(tab);
         }}
         onLogout={() => {
@@ -152,19 +142,20 @@ export function App() {
         }}
       />
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 min-h-0 flex overflow-hidden relative">
         {/* Sidebar - Fixed on the left */}
         <Sidebar
           role={currentUser.role}
           activeTab={activeTab}
           onSelectTab={(tab) => {
+            if (viewingAnsweredTestId) setViewingAnsweredTestId(null);
             setActiveTab(tab);
             setSidebarOpen(false);
             if (tab === 'create_test') {
               setEditingTestId(null);
             }
           }}
-          className={`${sidebarOpen ? 'fixed inset-y-0 left-0 z-40 shadow-2xl' : 'hidden lg:flex'} shrink-0 h-[calc(100vh-64px)] sticky top-16 left-0 overflow-y-auto`}
+          className={`${sidebarOpen ? 'fixed inset-y-0 left-0 z-40 shadow-2xl' : 'hidden lg:flex'} shrink-0 h-full overflow-y-auto`}
         />
 
         {/* Backdrop for mobile sidebar */}
@@ -175,11 +166,20 @@ export function App() {
           />
         )}
 
-        {/* Main Content Area - Split-view for OMR test creator, scrollable for dashboard, exams hub & AI test creator */}
-        <main className={`flex-1 min-w-0 min-h-0 ${activeTab === 'omr_test' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`}>
-          {/* TEACHER VIEWS */}
-          {currentUser.role === 'teacher' && (
+        {/* Main Content Area - Split-view for OMR & AI test creators, scrollable for dashboard, exams hub & other pages */}
+        <main className={`flex-1 min-w-0 min-h-0 ${activeTab === 'omr_test' || activeTab === 'ai_test' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto overflow-x-hidden'}`}>
+          {viewingAnsweredTestId ? (
+            <AnsweredTestPage
+              testId={viewingAnsweredTestId}
+              onBack={() => setViewingAnsweredTestId(null)}
+              onPrint={(t) => setPrintingTest(t)}
+              onShare={(t) => setSharingTest(t)}
+            />
+          ) : (
             <>
+              {/* TEACHER VIEWS */}
+              {currentUser.role === 'teacher' && (
+                <>
               {activeTab === 'dashboard' && (
                 <TeacherDashboard
                   user={currentUser}
@@ -349,7 +349,9 @@ export function App() {
           {currentUser.role === 'admin' && (
             <AdminPage currentUser={currentUser} />
           )}
-        </main>
+        </>
+      )}
+    </main>
       </div>
 
       {/* Share Test Modal */}

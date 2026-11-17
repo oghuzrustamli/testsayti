@@ -175,7 +175,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* ==============================================================
           ƏSAS MENYU: AI İLƏ TEST YARAT + SINAQ İMTAHANLARI + 4 ƏSAS İMTAHAN MODELİ
           ============================================================== */}
-      <nav ref={dropdownRef} className="hidden xl:flex items-center gap-2 relative">
+      <nav ref={dropdownRef} className="hidden lg:flex items-center gap-1.5 xl:gap-2 relative">
         {/* AI ilə test yarat Direct Button */}
         <button
           type="button"
