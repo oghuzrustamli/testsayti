@@ -227,8 +227,8 @@ export function exportRegionalStatsToExcel(
     'Təbiət / Həyat (%)': `${d.subjectScores?.['Təbiət / Həyat bilgisi'] || '-'}%`,
     'Tarix (%)': `${d.subjectScores?.['Tarix'] || '-'}%`,
     'Fizika (%)': `${d.subjectScores?.['Fizika'] || '-'}%`,
-    'Ən Yüksək Məktəb': d.topSchool,
-    'Ən Aşağı Məktəb': d.lowestSchool,
+    'Ən Yüksək Məktəb': typeof d.topSchool === 'object' ? `${d.topSchool?.name || ''} (${d.topSchool?.score || 0}%)` : d.topSchool,
+    'Ən Aşağı Məktəb': typeof d.lowestSchool === 'object' ? `${d.lowestSchool?.name || ''} (${d.lowestSchool?.score || 0}%)` : d.lowestSchool,
     'İnkişaf Dinamikası': `${d.dynamics?.changePct > 0 ? '+' : ''}${d.dynamics?.changePct || 0}%`
   }));
 

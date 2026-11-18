@@ -985,9 +985,19 @@ app.post('/api/share/toggle', (req, res) => {
 
 // Student starts exam
 app.post('/api/exam/start', (req, res) => {
-  const { test_id, student_name, student_surname, class_name, student_class, district, school, grade, monitoring_period } = req.body;
+  const { test_id, student_name, student_surname, class_name, student_class, district, school, grade, utis_code, monitoring_period } = req.body;
   if (!test_id || !student_name) {
     return res.status(400).json({ error: 'Ad və soyad daxil edilməlidir' });
+  }
+
+  const cleanUtis = (utis_code || '').trim();
+  if (cleanUtis) {
+    try {
+      const existing = db.prepare('SELECT id, status FROM TestSessions WHERE test_id = ? AND utis_code = ?').get(test_id, cleanUtis);
+      if (existing) {
+        return res.status(400).json({ error: 'Bu UTİS kodu ilə artıq bu testdə iştirak qeydə alınıb.' });
+      }
+    } catch (e) {}
   }
 
   let fName = (student_name || '').trim();
@@ -1008,9 +1018,9 @@ app.post('/api/exam/start', (req, res) => {
   db.prepare(`
     INSERT INTO TestSessions (
       id, test_id, student_name, student_surname, class_name,
-      district, school, grade, monitoring_period,
+      district, school, grade, utis_code, monitoring_period,
       started_at, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'in_progress')
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'in_progress')
   `).run(
     sessionId,
     test_id,
@@ -1020,11 +1030,12 @@ app.post('/api/exam/start', (req, res) => {
     district || null,
     school || null,
     grade || null,
+    cleanUtis || null,
     monitoring_period || 'I Monitorinq',
     now
   );
 
-  logAudit(null, `${fName} ${lName}`, 'İmtahan Başladı', `Test: ${test.title} (${district || 'Bölgə təyin edilməyib'})`, req);
+  logAudit(null, `${fName} ${lName}`, 'İmtahan Başladı', `Test: ${test.title} (${district || 'Bölgə təyin edilməyib'} - ${school || 'Məktəb təyin edilməyib'})`, req);
   res.status(201).json({ session_id: sessionId, started_at: now });
 });
 
@@ -1384,13 +1395,75 @@ app.get('/api/admin/audit-logs', (req, res) => {
 });
 
 // ==========================================
-// 9. REGIONAL STATS & MONITORING DATA (NAXÇIVAN MR)
+// 9. REGIONAL STATS, SCHOOLS & UTİS (NAXÇIVAN MR)
 // ==========================================
+app.post('/api/utis/verify', (req, res) => {
+  const { utis_code, test_id } = req.body;
+  const trimmed = (utis_code || '').trim();
+  if (!trimmed || !/^\d{7}$/.test(trimmed)) {
+    return res.status(400).json({ valid: false, error: 'UTİS kodu dəqiq 7 rəqəmdən ibarət olmalıdır (Məs: 1048291)' });
+  }
+
+  if (test_id) {
+    const existing = db.prepare('SELECT id FROM TestSessions WHERE test_id = ? AND utis_code = ?').get(test_id, trimmed);
+    if (existing) {
+      return res.status(400).json({ valid: false, error: 'Bu UTİS kodu ilə artıq bu testdə iştirak qeydə alınıb.' });
+    }
+  }
+
+  res.json({ valid: true, message: 'UTİS kodu təsdiqləndi' });
+});
+
+app.get('/api/schools', (req, res) => {
+  try {
+    const district = req.query.district;
+    let schools;
+    if (district && district !== 'all') {
+      schools = db.prepare('SELECT * FROM Schools WHERE district = ? ORDER BY name ASC').all(district);
+    } else {
+      schools = db.prepare('SELECT * FROM Schools ORDER BY district ASC, name ASC').all();
+    }
+    res.json(schools);
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Məktəblər yüklənə bilmədi' });
+  }
+});
+
+app.post('/api/schools', (req, res) => {
+  const { id, name, district, utis_code, school_type, status } = req.body;
+  if (!name || !district) {
+    return res.status(400).json({ error: 'Məktəbin adı və rayonu daxil edilməlidir' });
+  }
+
+  const schId = id || 'sch-' + Math.random().toString(36).substring(2, 9);
+  const now = new Date().toISOString();
+
+  try {
+    const existing = db.prepare('SELECT id FROM Schools WHERE id = ? OR name = ?').get(schId, name.trim());
+    if (existing) {
+      db.prepare(`
+        UPDATE Schools
+        SET name = ?, district = ?, utis_code = ?, school_type = ?, status = ?
+        WHERE id = ?
+      `).run(name.trim(), district, utis_code || null, school_type || 'tam_orta', status || 'active', existing.id);
+      return res.json({ message: 'Məktəb məlumatları yeniləndi', id: existing.id });
+    } else {
+      db.prepare(`
+        INSERT INTO Schools (id, name, district, utis_code, school_type, status, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).run(schId, name.trim(), district, utis_code || null, school_type || 'tam_orta', status || 'active', now);
+      return res.status(201).json({ message: 'Yeni məktəb əlavə edildi', id: schId });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Məktəb yadda saxlanıla bilmədi' });
+  }
+});
+
 app.get('/api/regional-stats', (req, res) => {
   try {
     // Strictly monitoring grades: IV, VI, IX, XI
     const completedSessions = db.prepare(`
-      SELECT ts.id, ts.student_name, ts.student_surname, ts.district, ts.school, ts.grade,
+      SELECT ts.id, ts.student_name, ts.student_surname, ts.district, ts.school, ts.grade, ts.utis_code,
              ts.percentage, ts.score, ts.monitoring_period, ts.completed_at,
              t.subject, t.title as test_title
       FROM TestSessions ts

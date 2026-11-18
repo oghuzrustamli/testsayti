@@ -106,7 +106,7 @@ const ContinuousPdfPageItem: React.FC<ContinuousPdfPageItemProps> = ({
       if (renderTask) {
         try {
           renderTask.cancel();
-        } catch {}
+        } catch { }
       }
     };
   }, [pdfDoc, pageNum, scale]);
@@ -134,13 +134,50 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
   const [questions, setQuestions] = useState<Question[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
 
-  // Student name prompt state
-  const [studentName, setStudentName] = useState<string>('');
-  const [studentSurname, setStudentSurname] = useState<string>('');
+  // Student name prompt state (Persisted via localStorage according to Tələb 4 & 6)
+  const [studentName, setStudentName] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem('edx_student_reg');
+      if (saved) return JSON.parse(saved).studentName || '';
+    } catch {}
+    return '';
+  });
+  const [studentSurname, setStudentSurname] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem('edx_student_reg');
+      if (saved) return JSON.parse(saved).studentSurname || '';
+    } catch {}
+    return '';
+  });
   const [className, setClassName] = useState<string>('');
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('Naxçıvan şəhəri');
-  const [selectedSchool, setSelectedSchool] = useState<string>('1 nömrəli tam orta məktəb');
-  const [selectedGrade, setSelectedGrade] = useState<string>('IX sinif');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem('edx_student_reg');
+      if (saved) return JSON.parse(saved).selectedDistrict || 'Naxçıvan şəhəri';
+    } catch {}
+    return 'Naxçıvan şəhəri';
+  });
+  const [selectedSchool, setSelectedSchool] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem('edx_student_reg');
+      if (saved) return JSON.parse(saved).selectedSchool || '1 nömrəli tam orta məktəb';
+    } catch {}
+    return '1 nömrəli tam orta məktəb';
+  });
+  const [selectedGrade, setSelectedGrade] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem('edx_student_reg');
+      if (saved) return JSON.parse(saved).selectedGrade || 'IX sinif';
+    } catch {}
+    return 'IX sinif';
+  });
+  const [utisCode, setUtisCode] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem('edx_student_reg');
+      if (saved) return JSON.parse(saved).utisCode || '';
+    } catch {}
+    return '';
+  });
   const [isExamStarted, setIsExamStarted] = useState<boolean>(false);
 
   // Active question navigation (interactive mode)
@@ -336,15 +373,28 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
         if (stored) {
           setAnswers(JSON.parse(stored));
         }
-      } catch (e) {}
+      } catch (e) { }
     }
   }, [sessionId]);
 
-  // Start exam
+  // Start exam (With mandatory 4-stage validation: Tələb 4 & 6)
   const handleStartExam = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!studentName.trim() || !studentSurname.trim()) {
-      alert('Zəhmət olmasa ad və soyadınızı daxil edin');
+      alert('1-ci mərhələ xətası: Zəhmət olmasa ad və soyadınızı daxil edin');
+      return;
+    }
+    if (!selectedDistrict || !selectedSchool) {
+      alert('2-ci mərhələ xətası: Zəhmət olmasa rayon və təhsil aldığınız məktəbi seçin');
+      return;
+    }
+    if (!selectedGrade) {
+      alert('3-cü mərhələ xətası: Zəhmət olmasa təhsil aldığınız sinfi seçin');
+      return;
+    }
+    const cleanUtis = (utisCode || '').trim();
+    if (!cleanUtis || !/^\d{7}$/.test(cleanUtis)) {
+      alert('4-cü mərhələ xətası: UTİS kodu mütləq daxil edilməli və dəqiq 7 rəqəmdən ibarət olmalıdır (Məsələn: 1048291)');
       return;
     }
     if (!questions || questions.length === 0) {
@@ -362,12 +412,26 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
         selectedDistrict,
         selectedSchool,
         selectedGrade,
+        cleanUtis,
         'I Monitorinq'
       );
+
+      // Persist verified registration data so student doesn't have to retype every test (Tələb 6)
+      try {
+        localStorage.setItem('edx_student_reg', JSON.stringify({
+          studentName: studentName.trim(),
+          studentSurname: studentSurname.trim(),
+          selectedDistrict,
+          selectedSchool,
+          selectedGrade,
+          utisCode: cleanUtis
+        }));
+      } catch {}
+
       setSessionId(res.session_id);
       setIsExamStarted(true);
     } catch (err: any) {
-      alert(err.message || 'İmtahana başlamaqda xəta');
+      alert(err.message || 'İmtahana başlamaqda xəta baş verdi');
     } finally {
       setLoading(false);
     }
@@ -404,7 +468,7 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
       if (sessionId) {
         try {
           localStorage.setItem(`edx_answers_${sessionId}`, JSON.stringify(next));
-        } catch (e) {}
+        } catch (e) { }
       }
       return next;
     });
@@ -452,7 +516,7 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
       // Clean local storage cache
       try {
         localStorage.removeItem(`edx_answers_${sessionId}`);
-      } catch (e) {}
+      } catch (e) { }
 
       // Trigger celebration confetti
       try {
@@ -461,7 +525,7 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
           spread: 70,
           origin: { y: 0.6 }
         });
-      } catch (e) {}
+      } catch (e) { }
     } catch (err: any) {
       alert(err.message || 'Nəticə göndərilərkən xəta baş verdi');
     } finally {
@@ -528,9 +592,8 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
               <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/60 inline-block">
                 {test.exam_model} • {test.subject}
               </span>
-              <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${
-                isOmrMode ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
-              }`}>
+              <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${isOmrMode ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                }`}>
                 {isOmrMode ? 'OMR Test' : 'İnteraktiv Test'}
               </span>
             </div>
@@ -558,100 +621,147 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
             </div>
           </div>
 
-          <form onSubmit={handleStartExam} className="flex flex-col gap-4">
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
-                Adınız: <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-                placeholder="Məsələn: Əli"
-                className="w-full px-4 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
-                Soyadınız: <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={studentSurname}
-                onChange={(e) => setStudentSurname(e.target.value)}
-                placeholder="Məsələn: Həsənov"
-                className="w-full px-4 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-2.5">
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Rayon / Şəhər:
-                </label>
-                <select
-                  value={selectedDistrict}
-                  onChange={(e) => {
-                    const newDist = e.target.value;
-                    setSelectedDistrict(newDist);
-                    const schools = DISTRICT_SCHOOLS[newDist];
-                    if (schools && schools.length > 0) {
-                      setSelectedSchool(schools[0]);
-                    }
-                  }}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                >
-                  {NAKHCHIVAN_DISTRICTS.map((d) => (
-                    <option key={d.id} value={d.name}>{d.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Sinif:
-                </label>
-                <select
-                  value={selectedGrade}
-                  onChange={(e) => setSelectedGrade(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                >
-                  {MONITORING_GRADES.map((g) => (
-                    <option key={g} value={g}>{g}</option>
-                  ))}
-                </select>
+          <form onSubmit={handleStartExam} className="flex flex-col gap-4 text-left">
+            {/* Birinci mərhələ – Şəxsi məlumatlar (Tələb 4) */}
+            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex flex-col gap-2.5">
+              <span className="text-[10px] font-black uppercase text-indigo-700 tracking-wider flex items-center gap-1.5">
+                <span className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[9px]">1</span>
+                Birinci Mərhələ: Şəxsi Məlumatlar
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                    Adınız: <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                    placeholder="Məsələn: Əli"
+                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                    Soyadınız: <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={studentSurname}
+                    onChange={(e) => setStudentSurname(e.target.value)}
+                    placeholder="Məsələn: Həsənov"
+                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  />
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
-                Məktəb:
-              </label>
-              <select
-                value={selectedSchool}
-                onChange={(e) => setSelectedSchool(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-              >
-                {(DISTRICT_SCHOOLS[selectedDistrict] || []).map((sch) => (
-                  <option key={sch} value={sch}>{sch}</option>
-                ))}
-              </select>
+            {/* İkinci mərhələ – Rayon və məktəb məlumatları (Tələb 4) */}
+            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex flex-col gap-2.5">
+              <span className="text-[10px] font-black uppercase text-indigo-700 tracking-wider flex items-center gap-1.5">
+                <span className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[9px]">2</span>
+                İkinci Mərhələ: Rayon və Məktəb
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                    Rayon / Şəhər: <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={selectedDistrict}
+                    onChange={(e) => {
+                      const newDist = e.target.value;
+                      setSelectedDistrict(newDist);
+                      const schools = DISTRICT_SCHOOLS[newDist];
+                      if (schools && schools.length > 0) {
+                        setSelectedSchool(schools[0]);
+                      }
+                    }}
+                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    {NAKHCHIVAN_DISTRICTS.map((d) => (
+                      <option key={d.id} value={d.name}>{d.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                    Təhsil Aldığınız Məktəb: <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={selectedSchool}
+                    onChange={(e) => setSelectedSchool(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    {(DISTRICT_SCHOOLS[selectedDistrict] || []).map((sch) => (
+                      <option key={sch} value={sch}>{sch}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
-                Sinif Şifrəsi / Qrup:
-              </label>
-              <input
-                type="text"
-                value={className}
-                onChange={(e) => setClassName(e.target.value)}
-                placeholder="Məsələn: 9-A və ya Qrup 1"
-                className="w-full px-4 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-800 focus:bg-white focus:outline-none"
-              />
+            {/* Üçüncü mərhələ – Sinif seçimi (Tələb 4 & 12: Yalnız IV, VI, IX, XI) */}
+            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex flex-col gap-2.5">
+              <span className="text-[10px] font-black uppercase text-indigo-700 tracking-wider flex items-center gap-1.5">
+                <span className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[9px]">3</span>
+                Üçüncü Mərhələ: Sinif Seçimi (Regional Monitorinq)
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                    Monitorinq Sinfi: <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={selectedGrade}
+                    onChange={(e) => setSelectedGrade(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    {MONITORING_GRADES.map((g) => (
+                      <option key={g} value={g}>{g}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                    Sinif Qrupu / İndeks (istəyə bağlı):
+                  </label>
+                  <input
+                    type="text"
+                    value={className}
+                    onChange={(e) => setClassName(e.target.value)}
+                    placeholder="Məsələn: 9-A və ya Qrup 1"
+                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-800 focus:outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Dördüncü mərhələ – UTİS kodu (Tələb 4 & 17: Məcburi və Unikal Yoxlanış) */}
+            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex flex-col gap-2">
+              <span className="text-[10px] font-black uppercase text-indigo-700 tracking-wider flex items-center gap-1.5">
+                <span className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[9px]">4</span>
+                Dördüncü Mərhələ: Şagirdin UTİS Kodu
+              </span>
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                  7 Rəqəmli UTİS Kodu: <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  maxLength={7}
+                  value={utisCode}
+                  onChange={(e) => setUtisCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="Məsələn: 1048291"
+                  className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-mono font-bold tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                />
+                <span className="text-[10px] text-slate-500 mt-1 block">
+                  * Təkrar imtahana icazə verilmir. Nəticələriniz bu kod vasitəsilə məktəbinizin regional reytinqinə əlavə ediləcəkdir.
+                </span>
+              </div>
             </div>
 
             {(!questions || questions.length === 0) && (
@@ -683,9 +793,8 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="bg-white border border-slate-200 rounded-3xl shadow-xl max-w-2xl w-full p-6 sm:p-8 text-center animate-in fade-in zoom-in-95 my-6">
-          <div className={`w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4 ${
-            isPassing ? 'bg-emerald-100 text-emerald-600 shadow-emerald-100' : 'bg-amber-100 text-amber-600'
-          } shadow-lg`}>
+          <div className={`w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4 ${isPassing ? 'bg-emerald-100 text-emerald-600 shadow-emerald-100' : 'bg-amber-100 text-amber-600'
+            } shadow-lg`}>
             <Award className="w-9 h-9" />
           </div>
 
@@ -713,13 +822,12 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
             <div className="text-4xl font-black text-indigo-900 mb-1">
               {examResult.score} <span className="text-base text-slate-500 font-bold">/ {test?.total_points || 100} bal</span>
             </div>
-            <div className={`inline-block px-3 py-1 rounded-full text-xs font-black ${
-              examResult.percentage >= 80
-                ? 'bg-emerald-100 text-emerald-800'
-                : examResult.percentage >= 50
+            <div className={`inline-block px-3 py-1 rounded-full text-xs font-black ${examResult.percentage >= 80
+              ? 'bg-emerald-100 text-emerald-800'
+              : examResult.percentage >= 50
                 ? 'bg-amber-100 text-amber-800'
                 : 'bg-rose-100 text-rose-800'
-            }`}>
+              }`}>
               Müvəffəqiyyət Faizi: {examResult.percentage}%
             </div>
 
@@ -854,9 +962,8 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
               <h2 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
                 {test?.title || 'Sınaq İmtahanı'}
               </h2>
-              <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
-                isOmrMode ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'
-              }`}>
+              <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${isOmrMode ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'
+                }`}>
                 {isOmrMode ? 'OMR' : 'İnteraktiv'}
               </span>
             </div>
@@ -868,11 +975,10 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
 
         {/* Right side: Countdown Timer & Network Status */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <div className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl font-mono text-xs font-black border transition-colors ${
-            timeLeftSeconds < 300
-              ? 'bg-rose-50 border-rose-300 text-rose-700 animate-pulse'
-              : 'bg-indigo-50 border-indigo-200 text-indigo-900'
-          }`}>
+          <div className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl font-mono text-xs font-black border transition-colors ${timeLeftSeconds < 300
+            ? 'bg-rose-50 border-rose-300 text-rose-700 animate-pulse'
+            : 'bg-indigo-50 border-indigo-200 text-indigo-900'
+            }`}>
             <Clock className="w-3.5 h-3.5" />
             <span>{formatTime(timeLeftSeconds)}</span>
           </div>
@@ -1045,11 +1151,10 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                                   return (
                                     <div
                                       key={q.id || qNum}
-                                      className={`px-2 py-0.5 rounded-md border flex items-center justify-center gap-2 transition-colors ${
-                                        currentSelection
-                                          ? 'bg-emerald-50/60 border-emerald-300'
-                                          : 'bg-white border-slate-200 hover:border-slate-300'
-                                      }`}
+                                      className={`px-2 py-0.5 rounded-md border flex items-center justify-center gap-2 transition-colors ${currentSelection
+                                        ? 'bg-emerald-50/60 border-emerald-300'
+                                        : 'bg-white border-slate-200 hover:border-slate-300'
+                                        }`}
                                     >
                                       {/* Sual nömrəsi */}
                                       <div className="flex items-center gap-0.5 shrink-0 min-w-[20px] text-right justify-end">
@@ -1280,13 +1385,12 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                   <button
                     key={q.id || idx}
                     onClick={() => setCurrentIndex(idx)}
-                    className={`w-9 h-8 rounded-lg font-bold text-xs flex items-center justify-center transition-all border ${
-                      isCurrent
-                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-200'
-                        : isAnswered
+                    className={`w-9 h-8 rounded-lg font-bold text-xs flex items-center justify-center transition-all border ${isCurrent
+                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-200'
+                      : isAnswered
                         ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold'
                         : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                    }`}
+                      }`}
                   >
                     {idx + 1}
                   </button>
@@ -1415,17 +1519,15 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                             key={opt.id}
                             type="button"
                             onClick={() => handleSelectAnswer(currentQ.id, opt.id)}
-                            className={`w-full flex items-center gap-3.5 px-4 py-2.5 rounded-xl border text-left transition-all ${
-                              isSelected
-                                ? 'bg-indigo-50 border-indigo-600 ring-1 ring-indigo-600 text-indigo-950 font-bold shadow-xs'
-                                : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/60 text-slate-800 font-medium'
-                            }`}
+                            className={`w-full flex items-center gap-3.5 px-4 py-2.5 rounded-xl border text-left transition-all ${isSelected
+                              ? 'bg-indigo-50 border-indigo-600 ring-1 ring-indigo-600 text-indigo-950 font-bold shadow-xs'
+                              : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/60 text-slate-800 font-medium'
+                              }`}
                           >
-                            <span className={`w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 transition-colors ${
-                              isSelected
-                                ? 'bg-indigo-600 text-white shadow-xs'
-                                : 'bg-slate-100 text-slate-700'
-                            }`}>
+                            <span className={`w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 transition-colors ${isSelected
+                              ? 'bg-indigo-600 text-white shadow-xs'
+                              : 'bg-slate-100 text-slate-700'
+                              }`}>
                               {opt.id}
                             </span>
 

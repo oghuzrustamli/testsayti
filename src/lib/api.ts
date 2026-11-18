@@ -536,6 +536,7 @@ export const api = {
     district?: string,
     school?: string,
     grade?: string,
+    utis_code?: string,
     monitoring_period?: string
   ): Promise<{ session_id: string; started_at: string }> {
     try {
@@ -550,15 +551,33 @@ export const api = {
           district,
           school,
           grade,
+          utis_code,
           monitoring_period
         }),
       });
       if (res.ok) return await res.json();
-    } catch {}
+      const errData = await res.json().catch(() => ({}));
+      if (errData.error) throw new Error(errData.error);
+    } catch (e: any) {
+      if (e.message && e.message.includes('UTİS')) throw e;
+    }
 
     const sessionId = 'ses-' + Math.random().toString(36).substring(2, 9);
     const now = new Date().toISOString();
     return { session_id: sessionId, started_at: now };
+  },
+
+  async verifyUtisCode(utis_code: string, test_id?: string): Promise<{ valid: boolean; message?: string; error?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ utis_code, test_id })
+      });
+      return await res.json();
+    } catch {
+      return { valid: true };
+    }
   },
 
   async getRegionalStats(): Promise<{ success: boolean; sessions: any[]; count: number }> {

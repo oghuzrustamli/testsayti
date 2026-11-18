@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { User, UserRole } from '../types';
 import { api } from '../lib/api';
+import { NAKHCHIVAN_DISTRICTS, DISTRICT_SCHOOLS } from '../lib/nakhchivanData';
 import {
   Sparkles,
   Lock,
@@ -45,7 +46,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [password, setPassword] = useState<string>('');
   const [fullName, setFullName] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
-  const [school, setSchool] = useState<string>('');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('Naxçıvan şəhəri');
+  const [school, setSchool] = useState<string>('1 nömrəli tam orta məktəb');
+  const [teacherUtisCode, setTeacherUtisCode] = useState<string>('');
   const [role, setRole] = useState<'teacher' | 'student'>('teacher');
 
   if (!isOpen) return null;
@@ -84,6 +87,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
+    if (role === 'teacher') {
+      const cleanUtis = teacherUtisCode.trim();
+      if (!cleanUtis || !/^\d{7}$/.test(cleanUtis)) {
+        setErrorMsg('Müəllimin UTİS kodu mütləq daxil edilməli və dəqiq 7 rəqəmdən ibarət olmalıdır (Məsələn: 1048291)');
+        return;
+      }
+    }
+
     try {
       setLoading(true);
       setErrorMsg('');
@@ -92,7 +103,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         password,
         full_name: fullName.trim(),
         phone: phone.trim(),
-        school: school.trim(),
+        school: role === 'teacher' ? `${school} (${selectedDistrict})` : school.trim(),
         role,
       });
       setSuccessMsg('Qeydiyyat uğurla tamamlandı! Xoş gəldiniz!');
@@ -409,22 +420,83 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </div>
             </div>
 
-            {/* School */}
-            <div>
-              <label className="text-[11px] font-mono tracking-wider text-slate-300 block mb-1">
-                MƏKTƏB / LİSEY / MƏRKƏZ
-              </label>
-              <div className="relative">
-                <School className="w-4 h-4 text-cyan-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={school}
-                  onChange={(e) => setSchool(e.target.value)}
-                  placeholder="Məsələn: Bakı şəhəri Zəkalar Liseyi"
-                  className="w-full pl-10 pr-3 py-2 text-xs bg-slate-950/70 border border-slate-700/80 hover:border-cyan-500/50 focus:border-cyan-400 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all font-sans"
-                />
+            {/* Teacher District, School & UTİS (Tələb 5: Məcburi Əlaqələndirmə) */}
+            {role === 'teacher' ? (
+              <div className="bg-slate-950/40 p-3 rounded-2xl border border-slate-800 flex flex-col gap-2.5">
+                <span className="text-[10px] font-mono uppercase text-cyan-400 tracking-wider flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Müəllim Məktəb & UTİS Qeydiyyatı
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] font-mono text-slate-300 block mb-1">
+                      RAYON / ŞƏHƏR <span className="text-cyan-400">*</span>
+                    </label>
+                    <select
+                      value={selectedDistrict}
+                      onChange={(e) => {
+                        const newDist = e.target.value;
+                        setSelectedDistrict(newDist);
+                        const list = DISTRICT_SCHOOLS[newDist];
+                        if (list && list.length > 0) setSchool(list[0]);
+                      }}
+                      className="w-full px-2.5 py-2 text-xs bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-cyan-400"
+                    >
+                      {NAKHCHIVAN_DISTRICTS.map((d) => (
+                        <option key={d.id} value={d.name}>{d.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-mono text-slate-300 block mb-1">
+                      İŞLƏDİYİNİZ MƏKTƏB <span className="text-cyan-400">*</span>
+                    </label>
+                    <select
+                      value={school}
+                      onChange={(e) => setSchool(e.target.value)}
+                      className="w-full px-2.5 py-2 text-xs bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-cyan-400"
+                    >
+                      {(DISTRICT_SCHOOLS[selectedDistrict] || []).map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-mono text-slate-300 block mb-1">
+                    MÜƏLLİMİN 7 RƏQƏMLİ UTİS KODU <span className="text-cyan-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={7}
+                    value={teacherUtisCode}
+                    onChange={(e) => setTeacherUtisCode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="Məsələn: 2049182"
+                    className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-xl text-cyan-300 font-mono font-bold tracking-widest focus:outline-none focus:border-cyan-400 placeholder-slate-600"
+                  />
+                </div>
               </div>
-            </div>
+            ) : (
+              <div>
+                <label className="text-[11px] font-mono tracking-wider text-slate-300 block mb-1">
+                  MƏKTƏB / LİSEY / MƏRKƏZ
+                </label>
+                <div className="relative">
+                  <School className="w-4 h-4 text-cyan-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={school}
+                    onChange={(e) => setSchool(e.target.value)}
+                    placeholder="Məsələn: Bakı şəhəri Zəkalar Liseyi"
+                    className="w-full pl-10 pr-3 py-2 text-xs bg-slate-950/70 border border-slate-700/80 hover:border-cyan-500/50 focus:border-cyan-400 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all font-sans"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Password */}
             <div>

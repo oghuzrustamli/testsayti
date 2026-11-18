@@ -216,6 +216,24 @@ export function initDatabase() {
   try { db.exec("ALTER TABLE TestSessions ADD COLUMN school TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE TestSessions ADD COLUMN grade TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE TestSessions ADD COLUMN monitoring_period TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE TestSessions ADD COLUMN utis_code TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE Users ADD COLUMN district TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE Users ADD COLUMN utis_code TEXT;"); } catch (e) {}
+
+  // Schools table for centralized school management (Tələb 3)
+  try {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS Schools (
+        id TEXT PRIMARY KEY,
+        name TEXT UNIQUE NOT NULL,
+        district TEXT NOT NULL,
+        utis_code TEXT UNIQUE,
+        school_type TEXT DEFAULT 'tam_orta',
+        status TEXT NOT NULL DEFAULT 'active',
+        created_at TEXT NOT NULL
+      );
+    `);
+  } catch (e) {}
 
   seedInitialData();
   repairExistingTests();
