@@ -1,229 +1,147 @@
 // src/lib/regionalAnalytics.ts
-// Naxçıvan Muxtar Respublikası Regional Statistika və Reytinq Hesablama Mühərriki
+// Naxçıvan Muxtar Respublikası Regional Təhsil Statistikası və Reytinq Hesablama Mühərriki
+// YALNIZ VƏ YALNIZ EDUNEX PLATFORMASINDAN QEYDİYYATDAN KEÇƏN REAL ŞAGİRD VƏ İMTAHAN NƏTİCƏLƏRİNƏ ƏSASLANIR
 import {
   NAKHCHIVAN_DISTRICTS,
-  DISTRICT_SCHOOLS,
   MONITORING_GRADES,
   MONITORING_SUBJECTS,
   DistrictRecord,
   SchoolRecord,
   NmrOverviewStats,
-  getAllSchools
+  getAllSchools,
+  SchoolRecordItem
 } from './nakhchivanData';
 
-// Baseline authentic monitoring dataset for Nakhchivan AR IV, VI, IX, XI grades
-export function generateBaselineRegionalData(): {
+export interface RegionalAnalyticsResult {
   districts: DistrictRecord[];
   schools: SchoolRecord[];
   overview: NmrOverviewStats;
-} {
-  // Deterministic realistic scores for known landmark schools
-  const baseScores: Record<string, { base: number; count: number; d1: number; d2: number; d3: number }> = {
-    // Naxçıvan şəhəri
-    'Heydər Əliyev adına Hərbi Lisey': { base: 84.6, count: 210, d1: 81.2, d2: 83.0, d3: 84.6 },
-    'Naxçıvan Qarnizonu Tam Orta Məktəbi': { base: 81.4, count: 185, d1: 78.5, d2: 80.2, d3: 81.4 },
-    '1 nömrəli tam orta məktəb': { base: 79.8, count: 240, d1: 77.0, d2: 78.6, d3: 79.8 },
-    '3 nömrəli rus təmayüllü tam orta məktəb': { base: 78.5, count: 195, d1: 75.8, d2: 77.1, d3: 78.5 },
-    '5 nömrəli tam orta məktəb': { base: 76.2, count: 220, d1: 74.0, d2: 75.3, d3: 76.2 },
-    '12 nömrəli tam orta məktəb': { base: 75.0, count: 180, d1: 72.8, d2: 74.1, d3: 75.0 },
-    'Naxçıvan Qızlar Liseyi': { base: 83.2, count: 160, d1: 80.4, d2: 81.9, d3: 83.2 },
-    'Naxçıvan şəhər Kimya-Biologiya Təmayüllü Lisey': { base: 85.8, count: 175, d1: 82.5, d2: 84.2, d3: 85.8 },
+  participatingSchoolsCount: number;
+  participatingDistrictsCount: number;
+}
 
-    // Şərur rayonu
-    'Şərur şəhər 1 nömrəli tam orta məktəb': { base: 78.2, count: 190, d1: 75.4, d2: 76.9, d3: 78.2 },
-    'Şərur şəhər 2 nömrəli tam orta məktəb': { base: 76.5, count: 170, d1: 73.8, d2: 75.0, d3: 76.5 },
-    'Şərur Türk Liseyi': { base: 82.1, count: 155, d1: 79.5, d2: 81.0, d3: 82.1 },
-    'Düdəngə kənd tam orta məktəbi': { base: 74.8, count: 130, d1: 72.0, d2: 73.5, d3: 74.8 },
-    'Çərçiboğan kənd tam orta məktəbi': { base: 72.4, count: 115, d1: 69.5, d2: 71.0, d3: 72.4 },
-    'Yengicə kənd tam orta məktəbi': { base: 73.6, count: 125, d1: 70.8, d2: 72.2, d3: 73.6 },
-    'Mahmudkənd tam orta məktəbi': { base: 71.0, count: 105, d1: 68.2, d2: 69.7, d3: 71.0 },
-    'Danyeri kənd tam orta məktəbi': { base: 69.5, count: 95, d1: 66.8, d2: 68.1, d3: 69.5 },
+/**
+ * Pure calculation function: Takes actual completed test sessions from EDUNEX database
+ * and computes exact academic statistics and rankings without any fake or simulated data.
+ */
+export function calculateRegionalAnalytics(sessions: any[] = []): RegionalAnalyticsResult {
+  const registeredSchools: SchoolRecordItem[] = getAllSchools();
 
-    // Ordubad rayonu
-    'Ordubad şəhər 1 nömrəli tam orta məktəb': { base: 80.5, count: 165, d1: 77.8, d2: 79.2, d3: 80.5 },
-    'M.T.Sidqi adına tam orta məktəb': { base: 77.8, count: 140, d1: 75.0, d2: 76.4, d3: 77.8 },
-    'Vənənd kənd 1 nömrəli tam orta məktəb': { base: 75.2, count: 120, d1: 72.6, d2: 74.0, d3: 75.2 },
-    'Dəstə kənd tam orta məktəbi': { base: 73.4, count: 110, d1: 70.5, d2: 72.0, d3: 73.4 },
-    'Unus kənd tam orta məktəbi': { base: 70.8, count: 85, d1: 68.0, d2: 69.5, d3: 70.8 },
-    'Gənzə kənd tam orta məktəbi': { base: 72.1, count: 90, d1: 69.4, d2: 70.8, d3: 72.1 },
+  // Filter sessions strictly to valid monitoring grades (IV, VI, IX, XI)
+  const validSessions = (sessions || []).filter((s) => {
+    if (!s || s.percentage === undefined || s.percentage === null) return false;
+    const g = String(s.grade || '').trim();
+    return (
+      g.includes('IV') ||
+      g.includes('VI') ||
+      g.includes('IX') ||
+      g.includes('XI') ||
+      g === '4' ||
+      g === '6' ||
+      g === '9' ||
+      g === '11'
+    );
+  });
 
-    // Babək rayonu
-    'Babək şəhər 1 nömrəli tam orta məktəb': { base: 75.8, count: 175, d1: 73.0, d2: 74.5, d3: 75.8 },
-    'Nehrəm qəsəbə 1 nömrəli tam orta məktəb': { base: 74.2, count: 200, d1: 71.5, d2: 73.0, d3: 74.2 },
-    'Nehrəm qəsəbə 2 nömrəli tam orta məktəb': { base: 72.6, count: 160, d1: 69.8, d2: 71.2, d3: 72.6 },
-    'Cəhri qəsəbə 1 nömrəli tam orta məktəb': { base: 73.5, count: 180, d1: 70.8, d2: 72.1, d3: 73.5 },
-    'Q.Sadiqov adına Cəhri qəsəbə 2 №-li tam orta məktəb': { base: 74.8, count: 170, d1: 72.0, d2: 73.5, d3: 74.8 },
-    'Sirab kənd tam orta məktəbi': { base: 71.4, count: 110, d1: 68.5, d2: 70.0, d3: 71.4 },
-    'Şıxmahmud kənd tam orta məktəbi': { base: 70.2, count: 95, d1: 67.4, d2: 68.9, d3: 70.2 },
-    'Zeynəddin kənd tam orta məktəbi': { base: 68.8, count: 90, d1: 66.0, d2: 67.5, d3: 68.8 },
+  // Group real sessions by school & district
+  const schoolSessionsMap: Record<string, any[]> = {};
+  validSessions.forEach((sess) => {
+    const schName = (sess.school || '').trim();
+    if (!schName) return;
+    if (!schoolSessionsMap[schName]) {
+      schoolSessionsMap[schName] = [];
+    }
+    schoolSessionsMap[schName].push(sess);
+  });
 
-    // Culfa rayonu
-    'Culfa şəhər 1 nömrəli tam orta məktəb': { base: 76.4, count: 155, d1: 73.6, d2: 75.1, d3: 76.4 },
-    'Culfa şəhər 2 nömrəli tam orta məktəb': { base: 74.1, count: 140, d1: 71.4, d2: 72.8, d3: 74.1 },
-    'Əbrəqunus kənd tam orta məktəbi': { base: 71.8, count: 105, d1: 69.0, d2: 70.4, d3: 71.8 },
-    'Yaycı kənd 1 nömrəli tam orta məktəb': { base: 73.0, count: 125, d1: 70.2, d2: 71.6, d3: 73.0 },
-    'Bənəniyar kənd tam orta məktəbi': { base: 70.5, count: 95, d1: 67.8, d2: 69.2, d3: 70.5 },
-    'Qazançı kənd tam orta məktəbi': { base: 67.4, count: 80, d1: 64.6, d2: 66.0, d3: 67.4 },
+  // Build School Records
+  const allSchools: SchoolRecord[] = registeredSchools.map((sch) => {
+    const sList = schoolSessionsMap[sch.name] || [];
+    const count = sList.length;
 
-    // Kəngərli rayonu
-    'Qıvraq qəsəbə tam orta məktəbi': { base: 75.1, count: 145, d1: 72.4, d2: 73.8, d3: 75.1 },
-    'Şahtaxtı kənd tam orta məktəbi': { base: 73.8, count: 120, d1: 71.0, d2: 72.4, d3: 73.8 },
-    'Qarabağlar kənd 1 nömrəli tam orta məktəb': { base: 72.2, count: 110, d1: 69.5, d2: 70.9, d3: 72.2 },
-    'Qarabağlar kənd 2 nömrəli tam orta məktəb': { base: 70.4, count: 95, d1: 67.6, d2: 69.0, d3: 70.4 },
-    'Xok kənd tam orta məktəbi': { base: 71.6, count: 100, d1: 68.8, d2: 70.2, d3: 71.6 },
-    'Çalxanqala kənd tam orta məktəbi': { base: 68.5, count: 85, d1: 65.8, d2: 67.2, d3: 68.5 },
+    if (count === 0) {
+      // School has not participated in any exam in EDUNEX yet
+      return {
+        id: sch.id,
+        name: sch.name,
+        district: sch.district,
+        utisCode: sch.utis_code,
+        studentsCount: 0,
+        overallScore: 0,
+        minScore: 0,
+        maxScore: 0,
+        gradeScores: {
+          'IV sinif': 0,
+          'VI sinif': 0,
+          'IX sinif': 0,
+          'XI sinif': 0
+        },
+        subjectScores: {},
+        districtRank: 0,
+        nmrRank: 0,
+        dynamics: {
+          mon1: 0,
+          mon2: 0,
+          mon3: 0,
+          changePct: 0
+        }
+      };
+    }
 
-    // Şahbuz rayonu
-    'Şahbuz şəhər 1 nömrəli tam orta məktəb': { base: 74.6, count: 135, d1: 71.8, d2: 73.2, d3: 74.6 },
-    'Kükü kənd tam orta məktəbi': { base: 70.8, count: 80, d1: 68.0, d2: 69.5, d3: 70.8 },
-    'Badamlı qəsəbə tam orta məktəbi': { base: 71.5, count: 90, d1: 68.7, d2: 70.1, d3: 71.5 },
-    'Nursu kənd tam orta məktəbi': { base: 72.8, count: 85, d1: 70.0, d2: 71.4, d3: 72.8 },
-    'Kolani kənd tam orta məktəbi': { base: 69.2, count: 75, d1: 66.5, d2: 67.9, d3: 69.2 },
-    'Keçili kənd tam orta məktəbi': { base: 66.8, count: 70, d1: 64.0, d2: 65.5, d3: 66.8 },
+    // Calculate real numbers from actual student sessions in EDUNEX
+    const percentages: number[] = sList.map((s) => Number(s.percentage) || 0);
+    const sumPct = percentages.reduce((a, b) => a + b, 0);
+    const overallScore = Number((sumPct / count).toFixed(1));
+    const minScore = Math.min(...percentages);
+    const maxScore = Math.max(...percentages);
 
-    // Sədərək rayonu
-    'Heydərabad qəsəbə tam orta məktəbi': { base: 75.4, count: 125, d1: 72.6, d2: 74.0, d3: 75.4 },
-    'Sədərək kənd 1 nömrəli tam orta məktəb': { base: 73.9, count: 140, d1: 71.2, d2: 72.5, d3: 73.9 },
-    'Sədərək kənd 2 nömrəli tam orta məktəb': { base: 71.2, count: 110, d1: 68.4, d2: 69.8, d3: 71.2 },
-    'Qaraağac kənd tam orta məktəbi': { base: 67.8, count: 75, d1: 65.0, d2: 66.5, d3: 67.8 }
-  };
-
-  const allSchools: SchoolRecord[] = [];
-  const registeredSchools = getAllSchools();
-
-  registeredSchools.forEach((sch, idx) => {
-    const schoolName = sch.name;
-    const districtName = sch.district;
-    const info = baseScores[schoolName] || {
-      base: Number((72.5 - (idx % 12) * 0.7).toFixed(1)),
-      count: 95 - (idx % 8) * 4,
-      d1: Number((69.0 - (idx % 12) * 0.7).toFixed(1)),
-      d2: Number((70.8 - (idx % 12) * 0.7).toFixed(1)),
-      d3: Number((72.5 - (idx % 12) * 0.7).toFixed(1))
+    // Grade averages for this school
+    const gradeScores: Record<string, number> = {
+      'IV sinif': 0,
+      'VI sinif': 0,
+      'IX sinif': 0,
+      'XI sinif': 0
     };
-
-    const gIV = Number((info.base + 2.4).toFixed(1));
-    const gVI = Number((info.base - 0.8).toFixed(1));
-    const gIX = Number((info.base + 0.6).toFixed(1));
-    const gXI = Number((info.base - 1.8).toFixed(1));
-
-    const subScores: Record<string, number> = {
-      'Azərbaycan dili': Number((info.base + 1.8).toFixed(1)),
-      'Riyaziyyat': Number((info.base - 1.2).toFixed(1)),
-      'Xarici dil': Number((info.base - 0.4).toFixed(1)),
-      'Təbiət / Həyat bilgisi': Number((info.base + 2.2).toFixed(1)),
-      'Tarix': Number((info.base + 0.8).toFixed(1)),
-      'Fizika': Number((info.base - 1.6).toFixed(1)),
-      'Kimya': Number((info.base - 1.4).toFixed(1)),
-      'Biologiya': Number((info.base + 0.4).toFixed(1)),
-      'Coğrafiya': Number((info.base + 1.1).toFixed(1)),
-    };
-
-    const changePct = Number(((info.d3 - info.d1) / info.d1 * 100).toFixed(1));
-
-    allSchools.push({
-      id: sch.id || `sch-${idx + 1}`,
-      name: schoolName,
-      district: districtName,
-      utisCode: sch.utis_code,
-      studentsCount: info.count,
-      overallScore: Number(info.base.toFixed(1)),
-      minScore: Number(Math.max(30, info.base - 14.5).toFixed(1)),
-      maxScore: Number(Math.min(100, info.base + 12.8).toFixed(1)),
-      gradeScores: {
-        'IV sinif': gIV,
-        'VI sinif': gVI,
-        'IX sinif': gIX,
-        'XI sinif': gXI
-      },
-      subjectScores: subScores,
-      districtRank: 0,
-      nmrRank: 0,
-      dynamics: {
-        mon1: info.d1,
-        mon2: info.d2,
-        mon3: info.d3,
-        changePct
+    MONITORING_GRADES.forEach((g) => {
+      const gSessions = sList.filter((s) => String(s.grade || '').includes(g.split(' ')[0]));
+      if (gSessions.length > 0) {
+        const gSum = gSessions.reduce((a, b) => a + (Number(b.percentage) || 0), 0);
+        gradeScores[g] = Number((gSum / gSessions.length).toFixed(1));
       }
     });
-  });
 
-  // Sort schools by overall score to determine NMR Rank
-  allSchools.sort((a, b) => b.overallScore - a.overallScore);
-  allSchools.forEach((school, index) => {
-    school.nmrRank = index + 1;
-  });
-
-  // Calculate District-level ranking and metrics
-  const districtRecords: DistrictRecord[] = [];
-
-  NAKHCHIVAN_DISTRICTS.forEach((dist) => {
-    const dSchools = allSchools.filter((s) => s.district === dist.name);
-    // Intra-district rank calculation
-    dSchools.sort((a, b) => b.overallScore - a.overallScore);
-    dSchools.forEach((s, idx) => {
-      s.districtRank = idx + 1;
-    });
-
-    const totalStudents = dSchools.reduce((acc, s) => acc + s.studentsCount, 0);
-    const overallScore = totalStudents > 0
-      ? Number((dSchools.reduce((acc, s) => acc + s.overallScore * s.studentsCount, 0) / totalStudents).toFixed(1))
-      : 0;
-
-    const gIV = totalStudents > 0
-      ? Number((dSchools.reduce((acc, s) => acc + s.gradeScores['IV sinif'] * s.studentsCount, 0) / totalStudents).toFixed(1))
-      : 0;
-    const gVI = totalStudents > 0
-      ? Number((dSchools.reduce((acc, s) => acc + s.gradeScores['VI sinif'] * s.studentsCount, 0) / totalStudents).toFixed(1))
-      : 0;
-    const gIX = totalStudents > 0
-      ? Number((dSchools.reduce((acc, s) => acc + s.gradeScores['IX sinif'] * s.studentsCount, 0) / totalStudents).toFixed(1))
-      : 0;
-    const gXI = totalStudents > 0
-      ? Number((dSchools.reduce((acc, s) => acc + s.gradeScores['XI sinif'] * s.studentsCount, 0) / totalStudents).toFixed(1))
-      : 0;
-
-    const subScores: Record<string, number> = {};
+    // Subject scores for this school
+    const subjectScores: Record<string, number> = {};
     MONITORING_SUBJECTS.forEach((sub) => {
-      subScores[sub] = totalStudents > 0
-        ? Number((dSchools.reduce((acc, s) => acc + (s.subjectScores[sub] || s.overallScore) * s.studentsCount, 0) / totalStudents).toFixed(1))
-        : 0;
+      const subSessions = sList.filter((s) => s.subject === sub);
+      if (subSessions.length > 0) {
+        const subSum = subSessions.reduce((a, b) => a + (Number(b.percentage) || 0), 0);
+        subjectScores[sub] = Number((subSum / subSessions.length).toFixed(1));
+      }
     });
 
-    const mon1 = totalStudents > 0
-      ? Number((dSchools.reduce((acc, s) => acc + s.dynamics.mon1 * s.studentsCount, 0) / totalStudents).toFixed(1))
-      : 0;
-    const mon2 = totalStudents > 0
-      ? Number((dSchools.reduce((acc, s) => acc + s.dynamics.mon2 * s.studentsCount, 0) / totalStudents).toFixed(1))
-      : 0;
-    const mon3 = totalStudents > 0
-      ? Number((dSchools.reduce((acc, s) => acc + s.dynamics.mon3 * s.studentsCount, 0) / totalStudents).toFixed(1))
-      : 0;
+    // Dynamics across monitoring periods
+    const mon1Sessions = sList.filter((s) => (s.monitoring_period || '').includes('I'));
+    const mon2Sessions = sList.filter((s) => (s.monitoring_period || '').includes('II'));
+    const mon3Sessions = sList.filter((s) => (s.monitoring_period || '').includes('III'));
+
+    const mon1 = mon1Sessions.length > 0 ? Number((mon1Sessions.reduce((a, b) => a + (Number(b.percentage) || 0), 0) / mon1Sessions.length).toFixed(1)) : overallScore;
+    const mon2 = mon2Sessions.length > 0 ? Number((mon2Sessions.reduce((a, b) => a + (Number(b.percentage) || 0), 0) / mon2Sessions.length).toFixed(1)) : overallScore;
+    const mon3 = mon3Sessions.length > 0 ? Number((mon3Sessions.reduce((a, b) => a + (Number(b.percentage) || 0), 0) / mon3Sessions.length).toFixed(1)) : overallScore;
     const changePct = mon1 > 0 ? Number(((mon3 - mon1) / mon1 * 100).toFixed(1)) : 0;
 
-    const topSchool = dSchools.length > 0 ? { name: dSchools[0].name, score: dSchools[0].overallScore } : { name: '-', score: 0 };
-    const lowestSchool = dSchools.length > 0 ? { name: dSchools[dSchools.length - 1].name, score: dSchools[dSchools.length - 1].overallScore } : { name: '-', score: 0 };
-
-    const minScore = dSchools.length > 0 ? Math.min(...dSchools.map(s => s.minScore)) : 0;
-    const maxScore = dSchools.length > 0 ? Math.max(...dSchools.map(s => s.maxScore)) : 0;
-
-    districtRecords.push({
-      id: dist.id,
-      name: dist.name,
-      schoolsCount: dSchools.length,
-      studentsCount: totalStudents,
+    return {
+      id: sch.id,
+      name: sch.name,
+      district: sch.district,
+      utisCode: sch.utis_code,
+      studentsCount: count,
       overallScore,
       minScore,
       maxScore,
-      gradeScores: {
-        'IV sinif': gIV,
-        'VI sinif': gVI,
-        'IX sinif': gIX,
-        'XI sinif': gXI
-      },
-      subjectScores: subScores,
-      topSchool,
-      lowestSchool,
+      gradeScores,
+      subjectScores,
+      districtRank: 0,
       nmrRank: 0,
       dynamics: {
         mon1,
@@ -231,45 +149,153 @@ export function generateBaselineRegionalData(): {
         mon3,
         changePct
       }
-    });
+    };
   });
 
-  districtRecords.sort((a, b) => b.overallScore - a.overallScore);
-  districtRecords.forEach((d, idx) => {
+  // Rank ONLY participating schools (studentsCount > 0)
+  const participatingSchools = allSchools.filter((s) => s.studentsCount > 0);
+  participatingSchools.sort((a, b) => b.overallScore - a.overallScore);
+  participatingSchools.forEach((s, idx) => {
+    s.nmrRank = idx + 1;
+  });
+
+  // Calculate District-level real stats
+  const districtRecords: DistrictRecord[] = NAKHCHIVAN_DISTRICTS.map((dist) => {
+    const dSchools = allSchools.filter((s) => s.district === dist.name);
+    const dParticipatingSchools = dSchools.filter((s) => s.studentsCount > 0);
+
+    // Intra-district ranking for participating schools
+    dParticipatingSchools.sort((a, b) => b.overallScore - a.overallScore);
+    dParticipatingSchools.forEach((s, idx) => {
+      s.districtRank = idx + 1;
+    });
+
+    const dSessions = validSessions.filter((s) => s.district === dist.name);
+    const dStudentsCount = dSessions.length;
+
+    if (dStudentsCount === 0) {
+      return {
+        id: dist.id,
+        name: dist.name,
+        schoolsCount: dSchools.length,
+        studentsCount: 0,
+        overallScore: 0,
+        minScore: 0,
+        maxScore: 0,
+        gradeScores: { 'IV sinif': 0, 'VI sinif': 0, 'IX sinif': 0, 'XI sinif': 0 },
+        subjectScores: {},
+        topSchool: { name: 'İştirakçı yoxdur', score: 0 },
+        lowestSchool: { name: 'İştirakçı yoxdur', score: 0 },
+        nmrRank: 0,
+        dynamics: { mon1: 0, mon2: 0, mon3: 0, changePct: 0 }
+      };
+    }
+
+    const dPercentages = dSessions.map((s) => Number(s.percentage) || 0);
+    const overallScore = Number((dPercentages.reduce((a, b) => a + b, 0) / dStudentsCount).toFixed(1));
+    const minScore = Math.min(...dPercentages);
+    const maxScore = Math.max(...dPercentages);
+
+    const gScores: Record<string, number> = { 'IV sinif': 0, 'VI sinif': 0, 'IX sinif': 0, 'XI sinif': 0 };
+    MONITORING_GRADES.forEach((g) => {
+      const gSess = dSessions.filter((s) => String(s.grade || '').includes(g.split(' ')[0]));
+      if (gSess.length > 0) {
+        gScores[g] = Number((gSess.reduce((a, b) => a + (Number(b.percentage) || 0), 0) / gSess.length).toFixed(1));
+      }
+    });
+
+    const subScores: Record<string, number> = {};
+    MONITORING_SUBJECTS.forEach((sub) => {
+      const sSess = dSessions.filter((s) => s.subject === sub);
+      if (sSess.length > 0) {
+        subScores[sub] = Number((sSess.reduce((a, b) => a + (Number(b.percentage) || 0), 0) / sSess.length).toFixed(1));
+      }
+    });
+
+    const topSchool = dParticipatingSchools[0]
+      ? { name: dParticipatingSchools[0].name, score: dParticipatingSchools[0].overallScore }
+      : { name: 'İştirakçı yoxdur', score: 0 };
+    const lowestSchool = dParticipatingSchools[dParticipatingSchools.length - 1]
+      ? { name: dParticipatingSchools[dParticipatingSchools.length - 1].name, score: dParticipatingSchools[dParticipatingSchools.length - 1].overallScore }
+      : { name: 'İştirakçı yoxdur', score: 0 };
+
+    return {
+      id: dist.id,
+      name: dist.name,
+      schoolsCount: dSchools.length,
+      studentsCount: dStudentsCount,
+      overallScore,
+      minScore,
+      maxScore,
+      gradeScores: gScores,
+      subjectScores: subScores,
+      topSchool,
+      lowestSchool,
+      nmrRank: 0,
+      dynamics: {
+        mon1: overallScore,
+        mon2: overallScore,
+        mon3: overallScore,
+        changePct: 0
+      }
+    };
+  });
+
+  // Rank participating districts
+  const participatingDistricts = districtRecords.filter((d) => d.studentsCount > 0);
+  participatingDistricts.sort((a, b) => b.overallScore - a.overallScore);
+  participatingDistricts.forEach((d, idx) => {
     d.nmrRank = idx + 1;
   });
 
-  // Calculate NMR Overview Stats
-  const totalStudents = allSchools.reduce((acc, s) => acc + s.studentsCount, 0);
-  const totalSchools = allSchools.length;
-  const overallAverage = Number(
-    (allSchools.reduce((acc, s) => acc + s.overallScore * s.studentsCount, 0) / totalStudents).toFixed(1)
-  );
+  // Calculate Muxtar Respublika Overview Stats (Strictly from real EDUNEX test takers)
+  const totalStudents = validSessions.length;
+  const totalSchools = participatingSchools.length;
+  const overallAverage = totalStudents > 0
+    ? Number((validSessions.reduce((acc, s) => acc + (Number(s.percentage) || 0), 0) / totalStudents).toFixed(1))
+    : 0;
 
   const gradeAverages: Record<string, number> = {
-    'IV sinif': Number((allSchools.reduce((acc, s) => acc + s.gradeScores['IV sinif'] * s.studentsCount, 0) / totalStudents).toFixed(1)),
-    'VI sinif': Number((allSchools.reduce((acc, s) => acc + s.gradeScores['VI sinif'] * s.studentsCount, 0) / totalStudents).toFixed(1)),
-    'IX sinif': Number((allSchools.reduce((acc, s) => acc + s.gradeScores['IX sinif'] * s.studentsCount, 0) / totalStudents).toFixed(1)),
-    'XI sinif': Number((allSchools.reduce((acc, s) => acc + s.gradeScores['XI sinif'] * s.studentsCount, 0) / totalStudents).toFixed(1)),
+    'IV sinif': 0,
+    'VI sinif': 0,
+    'IX sinif': 0,
+    'XI sinif': 0
   };
+  MONITORING_GRADES.forEach((g) => {
+    const gSess = validSessions.filter((s) => String(s.grade || '').includes(g.split(' ')[0]));
+    if (gSess.length > 0) {
+      gradeAverages[g] = Number((gSess.reduce((a, b) => a + (Number(b.percentage) || 0), 0) / gSess.length).toFixed(1));
+    }
+  });
 
   const subjectAverages: Record<string, number> = {};
   MONITORING_SUBJECTS.forEach((sub) => {
-    subjectAverages[sub] = Number(
-      (allSchools.reduce((acc, s) => acc + (s.subjectScores[sub] || s.overallScore) * s.studentsCount, 0) / totalStudents).toFixed(1)
-    );
+    const sSess = validSessions.filter((s) => s.subject === sub);
+    if (sSess.length > 0) {
+      subjectAverages[sub] = Number((sSess.reduce((a, b) => a + (Number(b.percentage) || 0), 0) / sSess.length).toFixed(1));
+    }
   });
 
-  const sortedDistricts = [...districtRecords].sort((a, b) => b.overallScore - a.overallScore);
-  const topDistrict = { name: sortedDistricts[0].name, score: sortedDistricts[0].overallScore };
-  const lowestDistrict = { name: sortedDistricts[sortedDistricts.length - 1].name, score: sortedDistricts[sortedDistricts.length - 1].overallScore };
+  const topDistrict = participatingDistricts.length > 0
+    ? { name: participatingDistricts[0].name, score: participatingDistricts[0].overallScore }
+    : { name: 'İştirakçı yoxdur', score: 0 };
+  const lowestDistrict = participatingDistricts.length > 0
+    ? { name: participatingDistricts[participatingDistricts.length - 1].name, score: participatingDistricts[participatingDistricts.length - 1].overallScore }
+    : { name: 'İştirakçı yoxdur', score: 0 };
 
-  const sortedSchools = [...allSchools].sort((a, b) => b.overallScore - a.overallScore);
-  const topSchool = { name: sortedSchools[0].name, district: sortedSchools[0].district, score: sortedSchools[0].overallScore };
-  const lowestSchool = { name: sortedSchools[sortedSchools.length - 1].name, district: sortedSchools[sortedSchools.length - 1].district, score: sortedSchools[sortedSchools.length - 1].overallScore };
+  const topSchool = participatingSchools.length > 0
+    ? { name: participatingSchools[0].name, district: participatingSchools[0].district, score: participatingSchools[0].overallScore }
+    : { name: 'İştirakçı yoxdur', district: '-', score: 0 };
+  const lowestSchool = participatingSchools.length > 0
+    ? { name: participatingSchools[participatingSchools.length - 1].name, district: participatingSchools[participatingSchools.length - 1].district, score: participatingSchools[participatingSchools.length - 1].overallScore }
+    : { name: 'İştirakçı yoxdur', district: '-', score: 0 };
 
-  const minScore = { score: lowestSchool.score, school: lowestSchool.name, district: lowestSchool.district };
-  const maxScore = { score: topSchool.score, school: topSchool.name, district: topSchool.district };
+  const minScore = participatingSchools.length > 0
+    ? { score: lowestSchool.score, school: lowestSchool.name, district: lowestSchool.district }
+    : { score: 0, school: 'İştirakçı yoxdur', district: '-' };
+  const maxScore = participatingSchools.length > 0
+    ? { score: topSchool.score, school: topSchool.name, district: topSchool.district }
+    : { score: 0, school: 'İştirakçı yoxdur', district: '-' };
 
   const overview: NmrOverviewStats = {
     totalStudents,
@@ -289,7 +315,9 @@ export function generateBaselineRegionalData(): {
   return {
     districts: districtRecords,
     schools: allSchools,
-    overview
+    overview,
+    participatingSchoolsCount: participatingSchools.length,
+    participatingDistrictsCount: participatingDistricts.length
   };
 }
 

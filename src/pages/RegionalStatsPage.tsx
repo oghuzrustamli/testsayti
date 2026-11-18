@@ -16,7 +16,7 @@ import {
   getAllSchools,
   saveSchool
 } from '../lib/nakhchivanData';
-import { generateBaselineRegionalData, filterRegionalData } from '../lib/regionalAnalytics';
+import { calculateRegionalAnalytics, filterRegionalData } from '../lib/regionalAnalytics';
 import { exportRegionalStatsToExcel } from '../lib/export-utils';
 import {
   Award,
@@ -89,40 +89,33 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
   const [newSchoolUtis, setNewSchoolUtis] = useState<string>('');
   const [adminSuccessMsg, setAdminSuccessMsg] = useState<string>('');
 
-  // Deterministic baseline academic data
-  const baseData = useMemo(() => generateBaselineRegionalData(), []);
-  const [districts, setDistricts] = useState<DistrictRecord[]>(baseData.districts);
-  const [schools, setSchools] = useState<SchoolRecord[]>(baseData.schools);
-  const [overview, setOverview] = useState<NmrOverviewStats>(baseData.overview);
+  // Pure data from real EDUNEX test sessions (No simulated/fake numbers: Tələb 14 & 17)
+  const [liveSessions, setLiveSessions] = useState<any[]>([]);
+  const [loadingStats, setLoadingStats] = useState<boolean>(true);
 
   // Sync live database sessions from server
   useEffect(() => {
     async function fetchLiveStats() {
       try {
+        setLoadingStats(true);
         const live = await api.getRegionalStats();
-        if (live && live.sessions && live.sessions.length > 0) {
-          const updatedSchools = [...baseData.schools];
-          live.sessions.forEach((sess: any) => {
-            if (sess.school && sess.district) {
-              const found = updatedSchools.find(
-                (s) => s.name.toLowerCase() === sess.school.toLowerCase() || s.name === sess.school
-              );
-              if (found) {
-                found.studentsCount += 1;
-                found.overallScore = Number(
-                  ((found.overallScore * (found.studentsCount - 1) + (sess.percentage || 75)) / found.studentsCount).toFixed(1)
-                );
-              }
-            }
-          });
-          setSchools(updatedSchools);
+        if (live && live.sessions) {
+          setLiveSessions(live.sessions);
         }
       } catch (e) {
         console.warn('Live regional data fetch fallback:', e);
+      } finally {
+        setLoadingStats(false);
       }
     }
     fetchLiveStats();
-  }, [baseData]);
+  }, []);
+
+  // Compute strictly from verified EDUNEX test completions
+  const regionalData = useMemo(() => calculateRegionalAnalytics(liveSessions), [liveSessions]);
+  const districts = regionalData.districts;
+  const schools = regionalData.schools;
+  const overview = regionalData.overview;
 
   // Filtered schools for Tab 3 (Məktəblər üzrə reytinq)
   const filteredSchools = useMemo(() => {
@@ -281,6 +274,21 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
           ============================================================== */}
       <div className="p-4 sm:p-6 flex flex-col gap-6 max-w-7xl w-full mx-auto flex-1">
 
+        {/* Real Data Notice Banner (Tələb 14 & 17) */}
+        {overview.totalStudents === 0 && (
+          <div className="bg-amber-50/90 border border-amber-200/90 p-4 rounded-2xl flex items-start gap-3 text-left animate-in fade-in">
+            <Sparkles className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-xs font-black uppercase text-amber-900 tracking-wider">
+                EDUNEX Qeydiyyat Sistemi: Hələlik Canlı İmtahan İştirakçısı Qeydə Alınmayıb
+              </h4>
+              <p className="text-xs text-amber-800 mt-1 leading-relaxed">
+                Bu sistemdə heç bir süni və ya uydurma demo rəqəmlər göstərilmir. Şagirdlər test linki vasitəsilə qeydiyyatdan keçib (Ad, Soyad, Rayon, Məktəb, Sinif və UTİS kodunu təsdiqləyərək) imtahanı bitirdikdə, onların faktiki test nəticələri əsasında regional reytinq cədvəli və diaqramlar burada avtomatik hesablanacaq və canlı formalaşacaqdır.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* ==============================================================
             BÖLMƏ 1: NAXÇIVAN MR – ÜMUMİ STATİSTİKA (Tələb 8)
             ============================================================== */}
@@ -294,7 +302,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                   {overview.totalStudents.toLocaleString()} <span className="text-xs font-bold text-slate-500">şagird</span>
                 </div>
                 <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-bold mt-2 self-start">
-                  8 rayon və şəhər üzrə
+                  {overview.totalStudents > 0 ? 'Faktiki imtahan iştirakçıları' : 'Hələlik iştirakçı yoxdur'}
                 </span>
               </div>
 
@@ -304,14 +312,14 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                   {overview.totalSchools} <span className="text-xs font-bold text-slate-500">məktəb</span>
                 </div>
                 <span className="text-[10px] text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded font-bold mt-2 self-start">
-                  Vahid reyestr əsasında
+                  Faktiki imtahan verən məktəblər
                 </span>
               </div>
 
               <div className="bg-white p-4 sm:p-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-white to-emerald-50/40 shadow-2xs flex flex-col justify-between">
                 <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Naxçıvan MR Orta Nəticə</span>
                 <div className="text-2xl sm:text-3xl font-black text-emerald-700 mt-1 flex items-baseline gap-1">
-                  {overview.overallAverage}%
+                  {overview.totalStudents > 0 ? `${overview.overallAverage}%` : '—'}
                 </div>
                 <div className="w-full bg-emerald-100 h-1.5 rounded-full overflow-hidden mt-2">
                   <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${overview.overallAverage}%` }} />
@@ -321,11 +329,17 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
               <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs flex flex-col justify-between">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Lider Rayon və Məktəb</span>
                 <div className="mt-1">
-                  <div className="text-sm font-black text-slate-900 truncate">1. {overview.topDistrict.name} ({overview.topDistrict.score}%)</div>
-                  <div className="text-xs text-indigo-700 font-bold truncate mt-0.5">{overview.topSchool.name} ({overview.topSchool.score}%)</div>
+                  {overview.totalStudents > 0 ? (
+                    <>
+                      <div className="text-sm font-black text-slate-900 truncate">1. {overview.topDistrict.name} ({overview.topDistrict.score}%)</div>
+                      <div className="text-xs text-indigo-700 font-bold truncate mt-0.5">{overview.topSchool.name} ({overview.topSchool.score}%)</div>
+                    </>
+                  ) : (
+                    <div className="text-xs text-slate-400 font-bold">Hələlik nəticə yoxdur</div>
+                  )}
                 </div>
                 <span className="text-[10px] text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded font-bold mt-2 self-start">
-                  Akademik liderlər
+                  Faktiki nəticələr əsasında
                 </span>
               </div>
             </div>
@@ -335,7 +349,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
               <div className="bg-rose-50/70 border border-rose-200/80 p-3.5 rounded-2xl flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-black uppercase text-rose-700 tracking-wider">Minimum Nəticə</span>
-                  <div className="text-lg font-black text-rose-950 mt-0.5">{overview.minScore.score}%</div>
+                  <div className="text-lg font-black text-rose-950 mt-0.5">{overview.totalStudents > 0 ? `${overview.minScore.score}%` : '—'}</div>
                   <div className="text-[10px] text-rose-800 truncate max-w-[200px]">{overview.minScore.school}</div>
                 </div>
                 <ArrowDownRight className="w-6 h-6 text-rose-600 shrink-0" />
@@ -344,8 +358,8 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
               <div className="bg-indigo-50/70 border border-indigo-200/80 p-3.5 rounded-2xl flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-black uppercase text-indigo-700 tracking-wider">Muxtar Respublika Ortalaması</span>
-                  <div className="text-lg font-black text-indigo-950 mt-0.5">{overview.avgScore}%</div>
-                  <div className="text-[10px] text-indigo-800">Bütün iştirakçıların ədədi ortası</div>
+                  <div className="text-lg font-black text-indigo-950 mt-0.5">{overview.totalStudents > 0 ? `${overview.avgScore}%` : '—'}</div>
+                  <div className="text-[10px] text-indigo-800">Faktiki imtahan verənlərin ədədi ortası</div>
                 </div>
                 <TrendingUp className="w-6 h-6 text-indigo-600 shrink-0" />
               </div>
@@ -353,7 +367,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
               <div className="bg-emerald-50/70 border border-emerald-200/80 p-3.5 rounded-2xl flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-black uppercase text-emerald-700 tracking-wider">Maksimum Nəticə</span>
-                  <div className="text-lg font-black text-emerald-950 mt-0.5">{overview.maxScore.score}%</div>
+                  <div className="text-lg font-black text-emerald-950 mt-0.5">{overview.totalStudents > 0 ? `${overview.maxScore.score}%` : '—'}</div>
                   <div className="text-[10px] text-emerald-800 truncate max-w-[200px]">{overview.maxScore.school}</div>
                 </div>
                 <ArrowUpRight className="w-6 h-6 text-emerald-600 shrink-0" />
@@ -397,9 +411,9 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                             dist.nmrRank === 1 ? 'bg-amber-100 text-amber-800' :
                             dist.nmrRank === 2 ? 'bg-slate-200 text-slate-800' :
                             dist.nmrRank === 3 ? 'bg-amber-50 text-amber-900 border border-amber-200' :
-                            'bg-slate-100 text-slate-600'
+                            'bg-slate-100 text-slate-500'
                           }`}>
-                            {dist.nmrRank}
+                            {dist.studentsCount > 0 ? dist.nmrRank : '—'}
                           </span>
                         </td>
                         <td className="py-3 px-4 font-bold text-slate-900">
@@ -412,25 +426,33 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                           {dist.schoolsCount} məktəb
                         </td>
                         <td className="py-3 px-4 text-center">
-                          <span className="font-black text-sm text-emerald-700">
-                            {dist.overallScore}%
+                          <span className={`font-black text-sm ${dist.studentsCount > 0 ? 'text-emerald-700' : 'text-slate-400'}`}>
+                            {dist.studentsCount > 0 ? `${dist.overallScore}%` : '—'}
                           </span>
                         </td>
                         <td className="py-3 px-3 text-center text-rose-700 font-bold">
-                          {dist.minScore}%
+                          {dist.studentsCount > 0 ? `${dist.minScore}%` : '—'}
                         </td>
                         <td className="py-3 px-3 text-center text-emerald-700 font-bold">
-                          {dist.maxScore}%
+                          {dist.studentsCount > 0 ? `${dist.maxScore}%` : '—'}
                         </td>
                         <td className="py-3 px-4 text-slate-800 truncate max-w-[240px]">
-                          <strong>{dist.topSchool.name}</strong> ({dist.topSchool.score}%)
+                          {dist.studentsCount > 0 ? (
+                            <><strong>{dist.topSchool.name}</strong> ({dist.topSchool.score}%)</>
+                          ) : (
+                            <span className="text-slate-400 text-xs font-semibold">Hələlik iştirakçı yoxdur</span>
+                          )}
                         </td>
                         <td className="py-3 px-3 text-center">
-                          <span className={`font-black text-[11px] px-2 py-0.5 rounded ${
-                            dist.dynamics.changePct >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
-                          }`}>
-                            {dist.dynamics.changePct >= 0 ? `+${dist.dynamics.changePct}%` : `${dist.dynamics.changePct}%`}
-                          </span>
+                          {dist.studentsCount > 0 ? (
+                            <span className={`font-black text-[11px] px-2 py-0.5 rounded ${
+                              dist.dynamics.changePct >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                            }`}>
+                              {dist.dynamics.changePct >= 0 ? `+${dist.dynamics.changePct}%` : `${dist.dynamics.changePct}%`}
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 text-xs">—</span>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -452,10 +474,10 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                     <div className="flex-1 bg-slate-100 h-6 rounded-xl overflow-hidden relative flex items-center">
                       <div
                         className="h-full bg-gradient-to-r from-teal-500 to-emerald-600 rounded-xl transition-all duration-500"
-                        style={{ width: `${dist.overallScore}%` }}
+                        style={{ width: `${dist.studentsCount > 0 ? dist.overallScore : 0}%` }}
                       />
                       <span className="absolute right-2 font-black text-xs text-slate-700">
-                        {dist.overallScore}%
+                        {dist.studentsCount > 0 ? `${dist.overallScore}%` : '—'}
                       </span>
                     </div>
                   </div>
@@ -493,7 +515,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-xs truncate">{d.name}</span>
-                        {distRecord && (
+                        {distRecord && distRecord.studentsCount > 0 && (
                           <span className={`text-[10px] font-black px-1.5 py-0.2 rounded ${
                             isSelected ? 'bg-emerald-500 text-white' : 'bg-emerald-100 text-emerald-800'
                           }`}>
@@ -502,7 +524,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                         )}
                       </div>
                       <span className={`text-[11px] font-black mt-1 ${isSelected ? 'text-emerald-300' : 'text-emerald-700'}`}>
-                        {distRecord?.overallScore || 0}%
+                        {distRecord && distRecord.studentsCount > 0 ? `${distRecord.overallScore}%` : '—'}
                       </span>
                     </button>
                   );
@@ -515,19 +537,25 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
               <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-700 font-black text-xl flex items-center justify-center shadow-xs">
-                    #{currentDistrictRecord.nmrRank}
+                    {currentDistrictRecord.studentsCount > 0 ? `#${currentDistrictRecord.nmrRank}` : '—'}
                   </div>
                   <div>
                     <h2 className="text-lg font-black text-slate-900">{currentDistrictRecord.name}</h2>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Naxçıvan MR üzrə reytinq mövqeyi: <strong>8 rayondan {currentDistrictRecord.nmrRank}-ci yer</strong>
+                      {currentDistrictRecord.studentsCount > 0 ? (
+                        <>Naxçıvan MR üzrə reytinq mövqeyi: <strong>8 rayondan {currentDistrictRecord.nmrRank}-ci yer</strong></>
+                      ) : (
+                        <span className="text-slate-400">Bu rayon üzrə hələlik EDUNEX imtahan nəticəsi qeydə alınmayıb</span>
+                      )}
                     </p>
                   </div>
                 </div>
 
                 <div className="text-right">
                   <span className="text-[11px] text-slate-400 font-bold block uppercase">Rayon Üzrə Orta Nəticə</span>
-                  <span className="text-3xl font-black text-emerald-700">{currentDistrictRecord.overallScore}%</span>
+                  <span className="text-3xl font-black text-emerald-700">
+                    {currentDistrictRecord.studentsCount > 0 ? `${currentDistrictRecord.overallScore}%` : '—'}
+                  </span>
                 </div>
               </div>
 
@@ -543,16 +571,26 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                 </div>
                 <div className="p-3 bg-rose-50/70 rounded-xl border border-rose-200 text-center">
                   <span className="text-[10px] text-rose-700 font-bold block uppercase">Minimum %</span>
-                  <span className="text-base font-black text-rose-950 mt-0.5 block">{currentDistrictRecord.minScore}%</span>
+                  <span className="text-base font-black text-rose-950 mt-0.5 block">
+                    {currentDistrictRecord.studentsCount > 0 ? `${currentDistrictRecord.minScore}%` : '—'}
+                  </span>
                 </div>
                 <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200 text-center">
                   <span className="text-[10px] text-emerald-700 font-bold block uppercase">Maksimum %</span>
-                  <span className="text-base font-black text-emerald-950 mt-0.5 block">{currentDistrictRecord.maxScore}%</span>
+                  <span className="text-base font-black text-emerald-950 mt-0.5 block">
+                    {currentDistrictRecord.studentsCount > 0 ? `${currentDistrictRecord.maxScore}%` : '—'}
+                  </span>
                 </div>
                 <div className="p-3 bg-indigo-50/70 rounded-xl border border-indigo-200 col-span-2 text-left">
                   <span className="text-[10px] text-indigo-700 font-bold block uppercase">Lider və Sonuncu Məktəb</span>
-                  <div className="text-xs font-bold text-slate-800 truncate mt-0.5">Top: {currentDistrictRecord.topSchool.name} ({currentDistrictRecord.topSchool.score}%)</div>
-                  <div className="text-[10px] text-slate-500 truncate">Son: {currentDistrictRecord.lowestSchool.name} ({currentDistrictRecord.lowestSchool.score}%)</div>
+                  {currentDistrictRecord.studentsCount > 0 ? (
+                    <>
+                      <div className="text-xs font-bold text-slate-800 truncate mt-0.5">Top: {currentDistrictRecord.topSchool.name} ({currentDistrictRecord.topSchool.score}%)</div>
+                      <div className="text-[10px] text-slate-500 truncate">Son: {currentDistrictRecord.lowestSchool.name} ({currentDistrictRecord.lowestSchool.score}%)</div>
+                    </>
+                  ) : (
+                    <div className="text-xs text-slate-400 font-semibold mt-1">İmtahan iştirakçısı yoxdur</div>
+                  )}
                 </div>
               </div>
 
@@ -567,12 +605,14 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                     const isCur = d.name === currentDistrictRecord.name;
                     return (
                       <div key={d.id} className="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <span className={`text-[10px] font-black ${isCur ? 'text-indigo-600' : 'text-slate-600'}`}>{d.overallScore}%</span>
+                        <span className={`text-[10px] font-black ${isCur ? 'text-indigo-600' : 'text-slate-600'}`}>
+                          {d.studentsCount > 0 ? `${d.overallScore}%` : '—'}
+                        </span>
                         <div
                           className={`w-full max-w-[36px] rounded-t-lg transition-all ${
                             isCur ? 'bg-indigo-600' : 'bg-slate-300 hover:bg-slate-400'
                           }`}
-                          style={{ height: `${Math.max(20, d.overallScore * 1.5)}px` }}
+                          style={{ height: `${Math.max(12, (d.studentsCount > 0 ? d.overallScore : 0) * 1.5)}px` }}
                         />
                         <span className="text-[9px] font-bold text-slate-600 text-center truncate max-w-full">{d.name.replace(' rayonu', '').replace(' şəhəri', '')}</span>
                       </div>
@@ -651,11 +691,11 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                       <tr key={sch.id} className="hover:bg-slate-50/80 transition-colors">
                         <td className="py-3 px-3 text-center">
                           <span className={`inline-flex items-center justify-center w-6 h-6 rounded-lg font-black text-xs ${
-                            sch.nmrRank === 1 ? 'bg-amber-100 text-amber-800' :
-                            sch.nmrRank <= 3 ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' :
-                            'bg-slate-100 text-slate-700'
+                            sch.studentsCount > 0 && sch.nmrRank === 1 ? 'bg-amber-100 text-amber-800' :
+                            sch.studentsCount > 0 && sch.nmrRank <= 3 ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' :
+                            'bg-slate-100 text-slate-500'
                           }`}>
-                            {sch.nmrRank}
+                            {sch.studentsCount > 0 ? sch.nmrRank : '—'}
                           </span>
                         </td>
                         <td className="py-3 px-3.5 font-bold text-slate-900">
@@ -668,34 +708,42 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                           {sch.utisCode || '700xxxx'}
                         </td>
                         <td className="py-3 px-3 text-center text-slate-700">
-                          {sch.studentsCount} şagird
+                          {sch.studentsCount > 0 ? `${sch.studentsCount} şagird` : <span className="text-slate-400 font-semibold">0 şagird</span>}
                         </td>
                         <td className="py-3 px-3 text-center">
-                          <span className="font-black text-sm text-emerald-700">
-                            {sch.overallScore}%
+                          <span className={`font-black text-sm ${sch.studentsCount > 0 ? 'text-emerald-700' : 'text-slate-400'}`}>
+                            {sch.studentsCount > 0 ? `${sch.overallScore}%` : '—'}
                           </span>
                         </td>
                         <td className="py-3 px-2.5 text-center text-rose-700 font-bold">
-                          {sch.minScore}%
+                          {sch.studentsCount > 0 ? `${sch.minScore}%` : '—'}
                         </td>
                         <td className="py-3 px-2.5 text-center text-emerald-700 font-bold">
-                          {sch.maxScore}%
+                          {sch.studentsCount > 0 ? `${sch.maxScore}%` : '—'}
                         </td>
                         <td className="py-3 px-3 text-center">
-                          <span className={`font-black text-[10px] px-1.5 py-0.2 rounded ${
-                            sch.dynamics.changePct >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
-                          }`}>
-                            {sch.dynamics.changePct >= 0 ? `+${sch.dynamics.changePct}%` : `${sch.dynamics.changePct}%`}
-                          </span>
+                          {sch.studentsCount > 0 ? (
+                            <span className={`font-black text-[10px] px-1.5 py-0.2 rounded ${
+                              sch.dynamics.changePct >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                            }`}>
+                              {sch.dynamics.changePct >= 0 ? `+${sch.dynamics.changePct}%` : `${sch.dynamics.changePct}%`}
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 text-xs">—</span>
+                          )}
                         </td>
                         <td className="py-3 px-3 text-center">
-                          <button
-                            type="button"
-                            onClick={() => setModalSchool(sch)}
-                            className="px-2.5 py-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
-                          >
-                            Ətraflı
-                          </button>
+                          {sch.studentsCount > 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => setModalSchool(sch)}
+                              className="px-2.5 py-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                            >
+                              Ətraflı
+                            </button>
+                          ) : (
+                            <span className="text-slate-400 text-[10px] font-semibold">İştirak etməyib</span>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -764,7 +812,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                       {intraDistrictSchools.map((s, idx) => (
                         <tr key={s.id} className="hover:bg-slate-50">
                           <td className="py-2.5 px-3 text-center font-black">
-                            #{idx + 1}
+                            {s.studentsCount > 0 ? `#${s.districtRank || idx + 1}` : '—'}
                           </td>
                           <td className="py-2.5 px-3 font-bold text-slate-900 truncate max-w-[200px]">
                             {s.name}
@@ -773,10 +821,10 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                             {s.studentsCount}
                           </td>
                           <td className="py-2.5 px-3 text-center font-black text-emerald-700">
-                            {s.overallScore}%
+                            {s.studentsCount > 0 ? `${s.overallScore}%` : '—'}
                           </td>
                           <td className="py-2.5 px-2 text-center text-[11px] text-slate-500">
-                            {s.minScore}% - {s.maxScore}%
+                            {s.studentsCount > 0 ? `${s.minScore}% - ${s.maxScore}%` : '—'}
                           </td>
                         </tr>
                       ))}
@@ -796,12 +844,14 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                     <div key={s.id} className="flex flex-col gap-0.5">
                       <div className="flex justify-between text-[11px] font-bold text-slate-700">
                         <span className="truncate max-w-[220px]">{s.name}</span>
-                        <span className="text-emerald-700 font-black">{s.overallScore}%</span>
+                        <span className={`font-black ${s.studentsCount > 0 ? 'text-emerald-700' : 'text-slate-400'}`}>
+                          {s.studentsCount > 0 ? `${s.overallScore}%` : '—'}
+                        </span>
                       </div>
                       <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                         <div
                           className="bg-emerald-600 h-full rounded-full transition-all duration-300"
-                          style={{ width: `${s.overallScore}%` }}
+                          style={{ width: `${s.studentsCount > 0 ? s.overallScore : 0}%` }}
                         />
                       </div>
                     </div>
@@ -885,15 +935,33 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                         <td className="py-3 px-3 font-bold text-slate-900 truncate max-w-[200px]">{s.name}</td>
                         <td className="py-3 px-3 text-slate-600">{s.district}</td>
                         <td className="py-3 px-2 text-center text-slate-700">{s.studentsCount}</td>
-                        <td className="py-3 px-3 text-center font-black text-emerald-700 text-sm">{s.overallScore}%</td>
-                        <td className="py-3 px-2 text-center text-rose-700 font-bold">{s.minScore}%</td>
-                        <td className="py-3 px-2 text-center text-emerald-700 font-bold">{s.maxScore}%</td>
-                        <td className="py-3 px-2 text-center text-slate-800">{s.gradeScores['IV sinif']}%</td>
-                        <td className="py-3 px-2 text-center text-slate-800">{s.gradeScores['VI sinif']}%</td>
-                        <td className="py-3 px-2 text-center text-slate-800">{s.gradeScores['IX sinif']}%</td>
-                        <td className="py-3 px-2 text-center text-slate-800">{s.gradeScores['XI sinif']}%</td>
-                        <td className="py-3 px-3 text-center text-indigo-700 font-bold">{s.subjectScores['Azərbaycan dili']}%</td>
-                        <td className="py-3 px-3 text-center text-indigo-700 font-bold">{s.subjectScores['Riyaziyyat']}%</td>
+                        <td className="py-3 px-3 text-center font-black text-emerald-700 text-sm">
+                          {s.studentsCount > 0 ? `${s.overallScore}%` : '—'}
+                        </td>
+                        <td className="py-3 px-2 text-center text-rose-700 font-bold">
+                          {s.studentsCount > 0 ? `${s.minScore}%` : '—'}
+                        </td>
+                        <td className="py-3 px-2 text-center text-emerald-700 font-bold">
+                          {s.studentsCount > 0 ? `${s.maxScore}%` : '—'}
+                        </td>
+                        <td className="py-3 px-2 text-center text-slate-800">
+                          {s.studentsCount > 0 && s.gradeScores['IV sinif'] > 0 ? `${s.gradeScores['IV sinif']}%` : '—'}
+                        </td>
+                        <td className="py-3 px-2 text-center text-slate-800">
+                          {s.studentsCount > 0 && s.gradeScores['VI sinif'] > 0 ? `${s.gradeScores['VI sinif']}%` : '—'}
+                        </td>
+                        <td className="py-3 px-2 text-center text-slate-800">
+                          {s.studentsCount > 0 && s.gradeScores['IX sinif'] > 0 ? `${s.gradeScores['IX sinif']}%` : '—'}
+                        </td>
+                        <td className="py-3 px-2 text-center text-slate-800">
+                          {s.studentsCount > 0 && s.gradeScores['XI sinif'] > 0 ? `${s.gradeScores['XI sinif']}%` : '—'}
+                        </td>
+                        <td className="py-3 px-3 text-center text-indigo-700 font-bold">
+                          {s.studentsCount > 0 && s.subjectScores['Azərbaycan dili'] > 0 ? `${s.subjectScores['Azərbaycan dili']}%` : '—'}
+                        </td>
+                        <td className="py-3 px-3 text-center text-indigo-700 font-bold">
+                          {s.studentsCount > 0 && s.subjectScores['Riyaziyyat'] > 0 ? `${s.subjectScores['Riyaziyyat']}%` : '—'}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -941,7 +1009,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                     {selectedGrade} Üzrə Rayonların Göstəriciləri
                   </h3>
                   <span className="text-xs font-black text-indigo-700">
-                    MR Ortası: {overview.gradeAverages[selectedGrade]}%
+                    MR Ortası: {overview.totalStudents > 0 ? `${overview.gradeAverages[selectedGrade]}%` : '—'}
                   </span>
                 </div>
                 <div className="overflow-x-auto">
@@ -960,13 +1028,19 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                         return (
                           <tr key={d.id} className="hover:bg-slate-50">
                             <td className="py-2.5 px-3 text-slate-900">{d.name}</td>
-                            <td className="py-2.5 px-3 text-center font-black text-emerald-700 text-sm">{gScore}%</td>
+                            <td className="py-2.5 px-3 text-center font-black text-emerald-700 text-sm">
+                              {d.studentsCount > 0 && gScore > 0 ? `${gScore}%` : '—'}
+                            </td>
                             <td className="py-2.5 px-3 text-center">
-                              <span className={`text-[10px] font-black px-1.5 py-0.2 rounded ${
-                                diff >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
-                              }`}>
-                                {diff >= 0 ? `+${diff}%` : `${diff}%`}
-                              </span>
+                              {d.studentsCount > 0 && gScore > 0 ? (
+                                <span className={`text-[10px] font-black px-1.5 py-0.2 rounded ${
+                                  diff >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                                }`}>
+                                  {diff >= 0 ? `+${diff}%` : `${diff}%`}
+                                </span>
+                              ) : (
+                                <span className="text-slate-400 text-xs">—</span>
+                              )}
                             </td>
                           </tr>
                         );
@@ -985,25 +1059,32 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                   <span className="text-xs text-slate-500 font-bold">Top 8 Məktəb</span>
                 </div>
                 <div className="divide-y divide-slate-100">
-                  {[...schools]
-                    .sort((a, b) => b.gradeScores[selectedGrade] - a.gradeScores[selectedGrade])
-                    .slice(0, 8)
-                    .map((s, idx) => (
-                      <div key={s.id} className="p-3 flex items-center justify-between hover:bg-slate-50">
-                        <div className="flex items-center gap-2.5">
-                          <span className={`w-5 h-5 rounded flex items-center justify-center font-black text-[10px] ${
-                            idx === 0 ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'
-                          }`}>
-                            #{idx + 1}
-                          </span>
-                          <div>
-                            <span className="text-xs font-bold text-slate-900 block truncate max-w-[240px]">{s.name}</span>
-                            <span className="text-[10px] text-slate-400 font-semibold">{s.district}</span>
+                  {schools.filter(s => s.studentsCount > 0 && s.gradeScores[selectedGrade] > 0).length === 0 ? (
+                    <div className="p-8 text-center text-slate-400 text-xs font-semibold">
+                      {selectedGrade} üzrə hələlik EDUNEX imtahan nəticəsi qeydə alınmayıb
+                    </div>
+                  ) : (
+                    [...schools]
+                      .filter(s => s.studentsCount > 0 && s.gradeScores[selectedGrade] > 0)
+                      .sort((a, b) => b.gradeScores[selectedGrade] - a.gradeScores[selectedGrade])
+                      .slice(0, 8)
+                      .map((s, idx) => (
+                        <div key={s.id} className="p-3 flex items-center justify-between hover:bg-slate-50">
+                          <div className="flex items-center gap-2.5">
+                            <span className={`w-5 h-5 rounded flex items-center justify-center font-black text-[10px] ${
+                              idx === 0 ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'
+                            }`}>
+                              #{idx + 1}
+                            </span>
+                            <div>
+                              <span className="text-xs font-bold text-slate-900 block truncate max-w-[240px]">{s.name}</span>
+                              <span className="text-[10px] text-slate-400 font-semibold">{s.district}</span>
+                            </div>
                           </div>
+                          <span className="text-sm font-black text-emerald-700">{s.gradeScores[selectedGrade]}%</span>
                         </div>
-                        <span className="text-sm font-black text-emerald-700">{s.gradeScores[selectedGrade]}%</span>
-                      </div>
-                    ))}
+                      ))
+                  )}
                 </div>
               </div>
             </div>
@@ -1069,7 +1150,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
               <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Naxçıvan MR Orta Nəticə</span>
                 <div className="text-2xl font-black text-indigo-700 mt-1">
-                  {overview.subjectAverages[selectedSubject] || 74.0}%
+                  {overview.totalStudents > 0 && overview.subjectAverages[selectedSubject] ? `${overview.subjectAverages[selectedSubject]}%` : '—'}
                 </div>
                 <span className="text-[10px] text-slate-500 mt-1">{selectedGrade} • {selectedSubject}</span>
               </div>
@@ -1077,7 +1158,11 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
               <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ən Yüksək Nəticəli Rayon</span>
                 <div className="text-xl font-black text-emerald-700 mt-1">
-                  {districts[0]?.name} ({districts[0]?.subjectScores[selectedSubject] || 0}%)
+                  {overview.totalStudents > 0 && districts[0]?.studentsCount > 0 ? (
+                    `${districts[0]?.name} (${districts[0]?.subjectScores[selectedSubject] || 0}%)`
+                  ) : (
+                    '—'
+                  )}
                 </div>
                 <span className="text-[10px] text-emerald-700 font-semibold mt-1">Fənn üzrə rayon birincisi</span>
               </div>
@@ -1085,9 +1170,11 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
               <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ən Yüksək Nəticəli Məktəb</span>
                 <div className="text-sm font-black text-slate-900 mt-1 truncate">
-                  {schools[0]?.name}
+                  {overview.totalStudents > 0 && schools[0]?.studentsCount > 0 ? schools[0]?.name : '—'}
                 </div>
-                <span className="text-xs font-black text-emerald-700 mt-0.5">{schools[0]?.subjectScores[selectedSubject] || 0}% bal</span>
+                <span className="text-xs font-black text-emerald-700 mt-0.5">
+                  {overview.totalStudents > 0 && schools[0]?.studentsCount > 0 ? `${schools[0]?.subjectScores[selectedSubject] || 0}% bal` : 'İştirakçı yoxdur'}
+                </span>
               </div>
             </div>
 
@@ -1115,14 +1202,18 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                         const sVal = d.subjectScores[selectedSubject] || 0;
                         return (
                           <tr key={d.id} className="hover:bg-slate-50">
-                            <td className="py-2.5 px-3 font-black w-12 text-slate-500">#{idx + 1}</td>
+                            <td className="py-2.5 px-3 font-black w-12 text-slate-500">
+                              {d.studentsCount > 0 && sVal > 0 ? `#${idx + 1}` : '—'}
+                            </td>
                             <td className="py-2.5 px-3 font-bold text-slate-900">{d.name}</td>
-                            <td className="py-2.5 px-3 text-center font-black text-emerald-700 text-sm">{sVal}%</td>
+                            <td className="py-2.5 px-3 text-center font-black text-emerald-700 text-sm">
+                              {d.studentsCount > 0 && sVal > 0 ? `${sVal}%` : '—'}
+                            </td>
                             <td className="py-2.5 px-4 w-1/2">
                               <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                                 <div
                                   className="bg-indigo-600 h-full rounded-full"
-                                  style={{ width: `${sVal}%` }}
+                                  style={{ width: `${d.studentsCount > 0 ? sVal : 0}%` }}
                                 />
                               </div>
                             </td>
@@ -1181,27 +1272,41 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                     {districts.map((d) => (
                       <tr key={d.id} className="hover:bg-slate-50">
                         <td className="py-3 px-3.5 font-bold text-slate-900">{d.name}</td>
-                        <td className="py-3 px-3 text-center text-slate-600 font-bold">{d.dynamics.mon1}%</td>
-                        <td className="py-3 px-3 text-center text-slate-600 font-bold">{d.dynamics.mon2}%</td>
-                        <td className="py-3 px-3 text-center text-slate-900 font-black text-sm">{d.dynamics.mon3}%</td>
+                        <td className="py-3 px-3 text-center text-slate-600 font-bold">
+                          {d.studentsCount > 0 && d.dynamics.mon1 > 0 ? `${d.dynamics.mon1}%` : '—'}
+                        </td>
+                        <td className="py-3 px-3 text-center text-slate-600 font-bold">
+                          {d.studentsCount > 0 && d.dynamics.mon2 > 0 ? `${d.dynamics.mon2}%` : '—'}
+                        </td>
+                        <td className="py-3 px-3 text-center text-slate-900 font-black text-sm">
+                          {d.studentsCount > 0 && d.dynamics.mon3 > 0 ? `${d.dynamics.mon3}%` : '—'}
+                        </td>
                         <td className="py-3 px-3 text-center">
-                          <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded font-black text-xs ${
-                            d.dynamics.changePct >= 0
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-rose-50 text-rose-700 border border-rose-200'
-                          }`}>
-                            {d.dynamics.changePct >= 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-                            {d.dynamics.changePct >= 0 ? `+${d.dynamics.changePct}%` : `${d.dynamics.changePct}%`}
-                          </span>
+                          {d.studentsCount > 0 && d.dynamics.changePct !== 0 ? (
+                            <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded font-black text-xs ${
+                              d.dynamics.changePct >= 0
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                : 'bg-rose-50 text-rose-700 border border-rose-200'
+                            }`}>
+                              {d.dynamics.changePct >= 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+                              {d.dynamics.changePct >= 0 ? `+${d.dynamics.changePct}%` : `${d.dynamics.changePct}%`}
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 text-xs">—</span>
+                          )}
                         </td>
                         <td className="py-3 px-4">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-slate-400">Oktyabr</span>
-                            <div className="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden flex">
-                              <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${d.dynamics.mon3}%` }} />
+                          {d.studentsCount > 0 && d.dynamics.mon3 > 0 ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] text-slate-400">Oktyabr</span>
+                              <div className="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden flex">
+                                <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${d.dynamics.mon3}%` }} />
+                              </div>
+                              <span className="text-[10px] text-slate-600 font-bold">Aprel</span>
                             </div>
-                            <span className="text-[10px] text-slate-600 font-bold">Aprel</span>
-                          </div>
+                          ) : (
+                            <span className="text-[11px] text-slate-400 font-medium">İmtahan nəticəsi yoxdur</span>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -1342,7 +1447,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
             <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-100">
               <div>
                 <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
-                  {modalSchool.district} • Reytinq #{modalSchool.nmrRank}
+                  {modalSchool.district} • {modalSchool.studentsCount > 0 ? `Reytinq #${modalSchool.nmrRank}` : 'İştirak etməyib'}
                 </span>
                 <h3 className="text-base font-black text-slate-900 mt-1">{modalSchool.name}</h3>
                 <span className="text-xs text-slate-500 font-mono">UTİS: {modalSchool.utisCode || '700xxxx'}</span>
@@ -1360,15 +1465,19 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span className="text-[10px] text-slate-400 font-bold block uppercase">İştirakçı</span>
-                <span className="text-base font-black text-slate-800">{modalSchool.studentsCount}</span>
+                <span className="text-base font-black text-slate-800">{modalSchool.studentsCount} şagird</span>
               </div>
               <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200">
                 <span className="text-[10px] text-emerald-700 font-bold block uppercase">Orta Bal %</span>
-                <span className="text-lg font-black text-emerald-950">{modalSchool.overallScore}%</span>
+                <span className="text-lg font-black text-emerald-950">
+                  {modalSchool.studentsCount > 0 ? `${modalSchool.overallScore}%` : '—'}
+                </span>
               </div>
               <div className="p-3 bg-indigo-50/70 rounded-xl border border-indigo-200">
                 <span className="text-[10px] text-indigo-700 font-bold block uppercase">Rayon Sırası</span>
-                <span className="text-base font-black text-indigo-950">#{modalSchool.districtRank}</span>
+                <span className="text-base font-black text-indigo-950">
+                  {modalSchool.studentsCount > 0 ? `#${modalSchool.districtRank}` : '—'}
+                </span>
               </div>
             </div>
 
@@ -1381,7 +1490,9 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                 {MONITORING_GRADES.map((g) => (
                   <div key={g} className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
                     <span className="text-[10px] text-slate-500 font-bold block">{g}</span>
-                    <span className="text-sm font-black text-slate-900 mt-0.5 block">{modalSchool.gradeScores[g]}%</span>
+                    <span className="text-sm font-black text-slate-900 mt-0.5 block">
+                      {modalSchool.studentsCount > 0 && modalSchool.gradeScores[g] > 0 ? `${modalSchool.gradeScores[g]}%` : '—'}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -1396,7 +1507,9 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                 {Object.entries(modalSchool.subjectScores).map(([sub, score]) => (
                   <div key={sub} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg border border-slate-100">
                     <span className="text-slate-700 font-semibold truncate">{sub}</span>
-                    <span className="font-black text-emerald-700">{score}%</span>
+                    <span className="font-black text-emerald-700">
+                      {modalSchool.studentsCount > 0 && score > 0 ? `${score}%` : '—'}
+                    </span>
                   </div>
                 ))}
               </div>
