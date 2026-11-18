@@ -1,6 +1,7 @@
 // src/pages/AboutPage.tsx
 // EDUNEX – “Haqqında” Səhifəsi
 // Proqramın müəllifi: Rəşad Kirmanoğlu, yaradılma məqsədi, imkanları və AI Tanıtım Videosu
+// Dizayn düzəlişi: Bütün çərçivələr, kartlar, mətnlər və boşluqlar mütənasib şəkildə kiçildilib, yığcamlaşdırılıb
 import React, { useState } from 'react';
 import { User } from '../types';
 import { AboutVideoShowcase } from '../components/AboutVideoShowcase';
@@ -24,8 +25,7 @@ import {
   RotateCcw,
   Check,
   Compass,
-  ArrowRight,
-  ExternalLink
+  ArrowRight
 } from 'lucide-react';
 
 interface AboutPageProps {
@@ -51,7 +51,7 @@ const EDUNEX_CAPABILITIES: CapabilityItem[] = [
     icon: Brain,
     color: 'from-blue-600 to-indigo-600',
     desc: 'Milli dərslik proqramları və kurikulum standartlarına tam uyğun olaraq I–XI siniflər və bütün fənlər üzrə saniyələr içində yüksək dəqiqlikli test suallarının avtomatik formalaşdırılması.',
-    highlights: ['I–XI sinif mövzu bazası', 'Bütün fənlərin əhatə olunması', 'Məzmun standartı dəqiqliyi']
+    highlights: ['I–XI sinif mövzu bazası', 'Bütün fənlərin əhatəsi', 'Məzmun dəqiqliyi']
   },
   {
     id: 2,
@@ -60,7 +60,7 @@ const EDUNEX_CAPABILITIES: CapabilityItem[] = [
     icon: Layers,
     color: 'from-indigo-600 to-purple-600',
     desc: 'Tək fənnli testlərlə yanaşı, eyni anda bir neçə fənni birləşdirən çoxfənli imtahanlar, qapalı testlər, açıq suallar və uyğunlaşdırma blokları.',
-    highlights: ['Çoxfənli blok və buraxılış', 'Fərdi sual sayının təyini', 'Qapalı və açıq tapşırıqlar']
+    highlights: ['Çoxfənli blok və buraxılış', 'Fərdi sual sayı', 'Qapalı və açıq sual']
   },
   {
     id: 3,
@@ -69,7 +69,7 @@ const EDUNEX_CAPABILITIES: CapabilityItem[] = [
     icon: Zap,
     color: 'from-amber-500 to-orange-600',
     desc: 'Şagirdlər üçün real vaxt rejimində onlayn imtahanların keçirilməsi, avtomatik vaxt nəzarəti (taymer), cavabların ani yadda saxlanması və operativ nəticə.',
-    highlights: ['Canlı taymer nəzarəti', 'Avtomatik cavab qeydiyyatı', 'İstənilən cihazda işləmə']
+    highlights: ['Canlı taymer nəzarəti', 'Ani cavab qeydiyyatı', 'Bütün cihazlarda dəstək']
   },
   {
     id: 4,
@@ -78,7 +78,7 @@ const EDUNEX_CAPABILITIES: CapabilityItem[] = [
     icon: FileQuestion,
     color: 'from-rose-500 to-pink-600',
     desc: 'Şagirdlərin analitik, məntiqi və tənqidi təfəkkürünü yoxlayan mətn, qrafik və praktik ssenarilər əsasında qurulmuş situasiya sualları.',
-    highlights: ['Mətn və qrafik təhlili', 'Dərin məntiqi qiymətləndirmə', 'DİM imtahan standartı']
+    highlights: ['Mətn və qrafik təhlili', 'Dərin məntiqi analiz', 'DİM imtahan standartı']
   },
   {
     id: 5,
@@ -96,7 +96,7 @@ const EDUNEX_CAPABILITIES: CapabilityItem[] = [
     icon: Printer,
     color: 'from-blue-500 to-cyan-600',
     desc: 'İmtahan sual kitabçaları və cavab vərəqlərinin yüksək poliqrafik keyfiyyətlə A4 formatlı PDF sənəd kimi ixracı və dərhal çap edilməsi.',
-    highlights: ['Səliqəli iki sütunlu düzüm', 'Məktəb və sinif başlığı', 'İmtahana tam hazır dizayn']
+    highlights: ['İki sütunlu təmiz düzüm', 'Məktəb və sinif başlığı', 'İmtahana hazır dizayn']
   },
   {
     id: 7,
@@ -114,7 +114,7 @@ const EDUNEX_CAPABILITIES: CapabilityItem[] = [
     icon: TrendingUp,
     color: 'from-violet-600 to-indigo-700',
     desc: '1-ci pillə: Məktəb daxilində şagirdlərin akademik reytinqi; 2-ci pillə: Məktəblərarası reytinq müqayisəsi; 3-cü pillə: Rayonlararası regional reytinq təhlili.',
-    highlights: ['Şagird pilləsi', 'Məktəb pilləsi', 'Regional rayon pilləsi']
+    highlights: ['Şagird pilləsi', 'Məktəblərarası pillə', 'Regional rayon pilləsi']
   },
   {
     id: 9,
@@ -142,82 +142,81 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
   return (
     <div className="min-h-full bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
       {/* Background Decorative Tech Grids */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b0f_1px,transparent_1px),linear-gradient(to_bottom,#1e293b0f_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b0a_1px,transparent_1px),linear-gradient(to_bottom,#1e293b0a_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
-      {/* Glow Orbs */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-tr from-indigo-600/20 via-sky-500/15 to-transparent blur-3xl pointer-events-none" />
+      {/* Subtle Glow Orb */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[220px] bg-gradient-to-tr from-indigo-600/15 via-sky-500/10 to-transparent blur-3xl pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 relative z-10 flex flex-col gap-14">
+      {/* Yığcam və Mütənasib Konteyner */}
+      <div className="max-w-3xl sm:max-w-4xl mx-auto w-full px-3 sm:px-6 py-5 relative z-10 flex flex-col gap-5 sm:gap-6">
         
         {/* =========================================================================
-            1. HERO & MOTTO HEADER
+            1. HERO & MOTTO HEADER (Yığcamlaşdırılmış)
            ========================================================================= */}
         <section className="text-center flex flex-col items-center">
-          {/* Innovation & Authority Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-indigo-950/80 via-slate-900/90 to-sky-950/80 border border-indigo-500/30 text-indigo-300 text-xs font-bold tracking-wide shadow-lg shadow-indigo-950/50 mb-6 backdrop-blur-md">
-            <Sparkles className="w-4 h-4 text-sky-400 animate-pulse" />
-            <span>MÜASİR TƏHSİLİN İNNOVATİV RƏQƏMSAL EKOSİSTEMİ</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-            <span className="text-[10px] font-mono text-sky-300 font-black">v2.5 PRO</span>
+          {/* Status Pill */}
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-indigo-950/80 via-slate-900/90 to-sky-950/80 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold tracking-wide shadow-md shadow-indigo-950/40 mb-2.5 backdrop-blur-md">
+            <Sparkles className="w-3 h-3 text-sky-400 animate-pulse" />
+            <span>RƏQƏMSAL TƏHSİL EKOSİSTEMİ</span>
+            <span className="w-1 h-1 rounded-full bg-sky-400" />
+            <span className="text-[9px] font-mono text-sky-300 font-black">v2.5 PRO</span>
           </div>
 
-          {/* Main Logo & Title */}
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-sky-500 to-blue-700 p-0.5 shadow-2xl shadow-indigo-500/30 flex items-center justify-center">
-              <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-                <Cpu className="w-8 h-8 text-sky-400" />
+          {/* Logo & Title */}
+          <div className="flex items-center justify-center gap-2.5 mb-1.5">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-sky-500 to-blue-700 p-0.5 shadow-lg shadow-indigo-500/20 flex items-center justify-center">
+              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                <Cpu className="w-5 h-5 text-sky-400" />
               </div>
             </div>
-            <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-sky-300">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-sky-300">
               EDUNEX
             </h1>
           </div>
 
-          {/* Official Motto */}
-          <p className="text-xl sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-300 to-blue-300 max-w-2xl tracking-tight mb-6">
+          {/* Motto */}
+          <p className="text-xs sm:text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-indigo-200 to-blue-200 max-w-xl tracking-tight mb-2.5">
             Təhsilin rəqəmsal inkişaf platforması
           </p>
 
           {/* Quick Technology Chips */}
-          <div className="flex flex-wrap items-center justify-center gap-2.5 max-w-2xl">
-            <span className="px-3 py-1 rounded-lg bg-slate-900/90 border border-slate-800 text-slate-300 text-xs font-medium flex items-center gap-1.5">
-              <Brain className="w-3.5 h-3.5 text-indigo-400" /> Süni İntellektlə Test
+          <div className="flex flex-wrap items-center justify-center gap-1.5 max-w-xl">
+            <span className="px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-800 text-slate-300 text-[10px] font-medium flex items-center gap-1">
+              <Brain className="w-3 h-3 text-indigo-400" /> Süni İntellekt
             </span>
-            <span className="px-3 py-1 rounded-lg bg-slate-900/90 border border-slate-800 text-slate-300 text-xs font-medium flex items-center gap-1.5">
-              <FileCheck className="w-3.5 h-3.5 text-sky-400" /> OMR Optik Kart
+            <span className="px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-800 text-slate-300 text-[10px] font-medium flex items-center gap-1">
+              <FileCheck className="w-3 h-3 text-sky-400" /> OMR Optik Kart
             </span>
-            <span className="px-3 py-1 rounded-lg bg-slate-900/90 border border-slate-800 text-slate-300 text-xs font-medium flex items-center gap-1.5">
-              <Award className="w-3.5 h-3.5 text-emerald-400" /> 3 Pilləli Reytinq
+            <span className="px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-800 text-slate-300 text-[10px] font-medium flex items-center gap-1">
+              <Award className="w-3 h-3 text-emerald-400" /> 3 Pilləli Reytinq
             </span>
-            <span className="px-3 py-1 rounded-lg bg-slate-900/90 border border-slate-800 text-slate-300 text-xs font-medium flex items-center gap-1.5">
-              <Printer className="w-3.5 h-3.5 text-amber-400" /> Standart A4 Çap
+            <span className="px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-800 text-slate-300 text-[10px] font-medium flex items-center gap-1">
+              <Printer className="w-3 h-3 text-amber-400" /> Standart A4 Çap
             </span>
           </div>
         </section>
 
         {/* =========================================================================
-            2. EDUNEX HAQQINDA TƏQDİMAT (RƏSMİ MƏTN)
+            2. EDUNEX HAQQINDA TƏQDİMAT (Yığcam Rəsmi Mətn Bloku)
            ========================================================================= */}
-        <section className="relative rounded-3xl bg-gradient-to-b from-slate-900/90 to-slate-900/50 border border-slate-800/80 p-6 sm:p-10 shadow-2xl backdrop-blur-xl overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
-          
-          <div className="max-w-4xl mx-auto flex flex-col gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-                <Compass className="w-5 h-5" />
+        <section className="relative rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-900/50 border border-slate-800/80 p-3.5 sm:p-5 shadow-xl backdrop-blur-lg overflow-hidden">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+                <Compass className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                <h2 className="text-xs sm:text-sm font-black text-white tracking-tight">
                   EDUNEX — Təhsilin rəqəmsal inkişaf platforması
                 </h2>
-                <span className="text-xs text-sky-400 font-semibold uppercase tracking-wider">
+                <span className="text-[10px] text-sky-400 font-semibold uppercase tracking-wider block">
                   Platformanın Yaradılma Məqsədi və Fəlsəfəsi
                 </span>
               </div>
             </div>
 
-            <div className="space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed font-normal">
-              <p className="bg-slate-950/60 p-4 sm:p-6 rounded-2xl border border-slate-800/60 text-slate-200 shadow-inner">
+            <div className="space-y-2 text-slate-300 text-xs sm:text-[13px] leading-relaxed">
+              <p className="bg-slate-950/60 p-3 sm:p-3.5 rounded-xl border border-slate-800/60 text-slate-200">
                 <strong className="text-white font-bold">EDUNEX</strong> təhsil prosesinin rəqəmsallaşdırılması, qiymətləndirmə imkanlarının genişləndirilməsi, test və imtahanların hazırlanması, şagird nəticələrinin təhlili və tədris prosesinə müasir texnologiyaların tətbiqi məqsədilə yaradılmış platformadır.
               </p>
               <p className="text-slate-300 px-1">
@@ -225,31 +224,31 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
               </p>
             </div>
 
-            {/* Quick Action Buttons to key modules */}
+            {/* Quick Navigation Buttons */}
             {onNavigateTab && (
-              <div className="pt-2 flex flex-wrap items-center gap-3 border-t border-slate-800/80">
+              <div className="pt-2 flex flex-wrap items-center gap-2 border-t border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => onNavigateTab('ai_test')}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-2 transition-all shadow-md shadow-indigo-600/20 cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <Sparkles className="w-3 h-3" />
                   AI Test Yarat
                 </button>
                 <button
                   type="button"
                   onClick={() => onNavigateTab('regional_stats')}
-                  className="px-4 py-2 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-2 transition-all shadow-md shadow-emerald-600/20 cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg bg-emerald-600/90 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
                 >
-                  <Award className="w-3.5 h-3.5" />
+                  <Award className="w-3 h-3" />
                   Regional Statistika (NMR)
                 </button>
                 <button
                   type="button"
                   onClick={() => onNavigateTab('exams_hub')}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-2 transition-all cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer"
                 >
-                  <Layers className="w-3.5 h-3.5 text-indigo-400" />
+                  <Layers className="w-3 h-3 text-indigo-400" />
                   Sınaq İmtahanları
                 </button>
               </div>
@@ -258,105 +257,106 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
         </section>
 
         {/* =========================================================================
-            3. EDUNEX-İ TANI — SÜNİ İNTELLEKT TANITIM VİDEOSU
+            3. EDUNEX-İ TANI — MONTAJ EDİLMİŞ AI TANITIM VİDEOSU (16:9 Kompakt Sahə)
            ========================================================================= */}
-        <section className="flex flex-col gap-6">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <section className="flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <div className="inline-flex items-center gap-2 text-sky-400 text-xs font-black uppercase tracking-wider mb-2">
-                <Sparkles className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-1.5 text-sky-400 text-[10px] font-black uppercase tracking-wider mb-0.5">
+                <Sparkles className="w-3 h-3" />
                 <span>MULTİMEDİA TƏQDİMATI</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
+              <h2 className="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
                 <span>EDUNEX-i tanı</span>
-                <span className="text-xs px-2.5 py-1 rounded-md bg-sky-500/20 text-sky-300 font-mono font-bold border border-sky-500/30">
-                  56 SANİSİYƏ
+                <span className="text-[9px] px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono font-bold border border-sky-500/30">
+                  34 SANİYƏ
                 </span>
               </h2>
-              <p className="text-sm text-slate-400 mt-1">
-                Süni intellekt tərəfindən hazırlanmış dinamik video nümayişi, peşəkar səs müşayiəti və canlı interfeys animasiyaları.
+              <p className="text-[11px] text-slate-400">
+                Süni intellektlə hazırlanmış dinamik video nümayişi, fasiləsiz qadın səsi və canlı interfeys animasiyaları.
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() => setShowVideoModal(true)}
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-black flex items-center gap-2 transition-all shadow-lg shadow-sky-500/20 cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-[11px] font-black flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
               >
-                <Play className="w-4 h-4 fill-current" />
-                <span>Videonu Pəncərədə Aç</span>
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Pəncərədə Aç</span>
               </button>
             </div>
           </div>
 
-          {/* Embedded Video Showcase Player */}
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-2 sm:p-4 shadow-2xl shadow-indigo-950/40">
+          {/* Embedded Video Showcase Player - Kompakt 16:9 çərçivə */}
+          <div className="max-w-2xl mx-auto w-full rounded-2xl border border-slate-800 bg-slate-900/50 p-1 sm:p-1.5 shadow-xl">
             <AboutVideoShowcase />
           </div>
         </section>
 
         {/* =========================================================================
-            4. EDUNEX-İN İMKANLARI (10 ƏSAS FUNKSİYA)
+            4. EDUNEX-İN İMKANLARI (10 Əsas Funksiya - Yığcam Şəbəkə)
            ========================================================================= */}
-        <section className="flex flex-col gap-8">
-          <div className="text-center max-w-2xl mx-auto flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 text-indigo-400 text-xs font-black uppercase tracking-wider mb-2">
-              <Cpu className="w-3.5 h-3.5" />
+        <section className="flex flex-col gap-3">
+          <div className="text-center max-w-xl mx-auto flex flex-col items-center">
+            <div className="inline-flex items-center gap-1.5 text-indigo-400 text-[10px] font-black uppercase tracking-wider mb-0.5">
+              <Cpu className="w-3 h-3" />
               <span>FUNKSİONAL ARXİTEKTURA</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+            <h2 className="text-base sm:text-xl font-black text-white tracking-tight">
               EDUNEX-in 10 Əsas İmkanı
             </h2>
-            <p className="text-sm sm:text-base text-slate-400 mt-2">
+            <p className="text-[11px] sm:text-xs text-slate-400">
               Müəllim, şagird və təhsil idarələri üçün vahid rəqəmsal ekosistemdə birləşdirilmiş ən müasir texnoloji həllər.
             </p>
           </div>
 
-          {/* Grid of 10 Capabilities */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Yığcam 10 Kartlıq Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {EDUNEX_CAPABILITIES.map((cap) => {
               const IconComp = cap.icon;
               return (
                 <div
                   key={cap.id}
-                  className="group relative rounded-2xl bg-gradient-to-b from-slate-900/80 to-slate-950/90 border border-slate-800/80 hover:border-indigo-500/50 p-6 transition-all duration-200 hover:shadow-xl hover:shadow-indigo-950/30 flex flex-col justify-between"
+                  className="group relative rounded-xl bg-gradient-to-b from-slate-900/80 to-slate-950/90 border border-slate-800/80 hover:border-indigo-500/50 p-3 sm:p-3.5 transition-all duration-150 flex flex-col justify-between"
                 >
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${cap.color} p-0.5 shadow-lg flex items-center justify-center shrink-0`}>
-                        <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-white group-hover:scale-105 transition-transform">
-                          <IconComp className="w-5 h-5 text-indigo-400" />
-                        </div>
-                      </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                        <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${cap.color} p-0.5 shadow flex items-center justify-center shrink-0`}>
+                          <div className="w-full h-full bg-slate-950 rounded-[6px] flex items-center justify-center text-white">
+                            <IconComp className="w-3.5 h-3.5 text-indigo-400" />
+                          </div>
+                        </div>
+                        <span className="text-[9px] font-mono font-black px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
                           № {cap.id < 10 ? `0${cap.id}` : cap.id}
                         </span>
-                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-300 border border-indigo-700/50 tracking-wide">
-                          {cap.badge}
-                        </span>
                       </div>
+                      
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-700/50 tracking-wide">
+                        {cap.badge}
+                      </span>
                     </div>
 
                     <div>
-                      <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-sky-300 transition-colors">
+                      <h3 className="text-xs sm:text-[13px] font-bold text-white group-hover:text-sky-300 transition-colors">
                         {cap.title}
                       </h3>
-                      <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mt-2 font-normal">
+                      <p className="text-[11px] text-slate-300 leading-snug mt-1 font-normal">
                         {cap.desc}
                       </p>
                     </div>
                   </div>
 
-                  {/* Highlights list */}
-                  <div className="mt-5 pt-4 border-t border-slate-800/80 flex flex-wrap gap-2">
+                  {/* Highlights mini-chips */}
+                  <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex flex-wrap gap-1">
                     {cap.highlights.map((h, i) => (
                       <span
                         key={i}
-                        className="text-[11px] font-medium text-slate-300 bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800/90 flex items-center gap-1.5"
+                        className="text-[9px] font-medium text-slate-300 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800/90 flex items-center gap-1"
                       >
-                        <Check className="w-3 h-3 text-sky-400 shrink-0" />
+                        <Check className="w-2.5 h-2.5 text-sky-400 shrink-0" />
                         <span>{h}</span>
                       </span>
                     ))}
@@ -368,107 +368,99 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
         </section>
 
         {/* =========================================================================
-            5. PROQRAMIN MÜƏLLİFİ BÖLMƏSİ (RƏŞAD KİRMANOĞLU)
+            5. PROQRAMIN MÜƏLLİFİ BÖLMƏSİ (RƏŞAD KİRMANOĞLU - Yığcam və Zərif)
            ========================================================================= */}
-        <section className="relative rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-950 border-2 border-indigo-500/40 p-8 sm:p-12 shadow-2xl shadow-indigo-950/60 overflow-hidden">
-          {/* Ambient Author Glow */}
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
+        <section className="relative rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-950 border border-indigo-500/40 p-4 sm:p-6 shadow-xl shadow-indigo-950/50 overflow-hidden">
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6">
             
             {/* Left: Author Credentials & Bio */}
-            <div className="flex-1 flex flex-col gap-4 text-center md:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider mx-auto md:mx-0 w-fit">
-                <ShieldCheck className="w-4 h-4 text-amber-400" />
+            <div className="flex-1 flex flex-col gap-2.5 text-center md:text-left">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-bold uppercase tracking-wider mx-auto md:mx-0 w-fit">
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
                 <span>MÜƏLLİFLİK VƏ YARADICI HEYƏT</span>
               </div>
 
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-widest text-slate-400 font-semibold">
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
                   EDUNEX — Proqramın ideya müəllifi, tərtibatçısı və dizayneri:
                 </p>
-                <h3 className="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-sky-200 to-indigo-100 tracking-tight py-1 font-serif">
+                <h3 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-sky-200 to-indigo-100 tracking-tight font-serif mt-0.5">
                   Rəşad Kirmanoğlu
                 </h3>
               </div>
 
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-xl">
-                Təhsilin rəqəmsallaşdırılması, müasir qiymətləndirmə texnologiyaları və süni intellektin tədris prosesinə inteqrasiyası istiqamətində hazırlanmış milli EDUNEX platforması müəllimlərin iş yükünü yüngülləşdirmək, şagirdlərin real potensialını üzə çıxarmaq və regional təhsil keyfiyyətini qabaqcıl səviyyəyə çatdırmaq məqsədi daşıyır.
+              <p className="text-xs sm:text-[13px] text-slate-300 leading-relaxed max-w-md">
+                Təhsilin rəqəmsallaşdırılması, müasir qiymətləndirmə texnologiyaları və süni intellektin tədris prosesinə inteqrasiyası istiqamətində hazırlanmış milli EDUNEX platforması müəllimlərin iş yükünü yüngülləşdirmək və regional təhsil keyfiyyətini yüksəltmək məqsədi daşıyır.
               </p>
 
-              <div className="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-slate-400">
-                <div className="flex items-center gap-1.5 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="pt-1 flex flex-wrap items-center justify-center md:justify-start gap-2 text-[10px] text-slate-400">
+                <div className="flex items-center gap-1 bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-800">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                   <span>İdeya Müəllifi</span>
                 </div>
-                <div className="flex items-center gap-1.5 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-sky-400" />
+                <div className="flex items-center gap-1 bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-800">
+                  <CheckCircle2 className="w-3 h-3 text-sky-400" />
                   <span>Sistem Tərtibatçısı</span>
                 </div>
-                <div className="flex items-center gap-1.5 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400" />
+                <div className="flex items-center gap-1 bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-800">
+                  <CheckCircle2 className="w-3 h-3 text-indigo-400" />
                   <span>UI/UX Dizayneri</span>
                 </div>
               </div>
             </div>
 
             {/* Right: Digital Signature & Verification Seal */}
-            <div className="flex flex-col items-center justify-center gap-6 p-6 rounded-2xl bg-slate-950/80 border border-slate-800/90 shadow-xl min-w-[280px] sm:min-w-[320px]">
+            <div className="flex flex-col items-center justify-center gap-3 p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/90 shadow-lg shrink-0">
               
               {/* Official Seal Graphic */}
-              <div className="relative w-32 h-32 flex items-center justify-center">
-                {/* Rotating Outer Ring */}
-                <div className="absolute inset-0 rounded-full border-2 border-dashed border-sky-400/30 animate-spin" style={{ animationDuration: '24s' }} />
-                {/* Inner Ring */}
-                <div className="absolute inset-2 rounded-full border border-indigo-400/40 bg-gradient-to-tr from-indigo-950 via-slate-950 to-sky-950" />
+              <div className="relative w-20 h-20 flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full border border-dashed border-sky-400/40 animate-spin" style={{ animationDuration: '24s' }} />
+                <div className="absolute inset-1.5 rounded-full border border-indigo-400/30 bg-gradient-to-tr from-indigo-950 via-slate-950 to-sky-950" />
                 
-                {/* Center Seal Content */}
-                <div className="relative z-10 flex flex-col items-center justify-center text-center p-2">
-                  <ShieldCheck className="w-7 h-7 text-amber-300 mb-0.5" />
-                  <span className="text-[9px] font-black tracking-widest text-sky-300 uppercase">EDUNEX</span>
-                  <span className="text-[7px] font-mono font-bold text-slate-400 uppercase tracking-tighter">VERIFIED ARCHITECT</span>
-                  <span className="text-[8px] font-black text-amber-300 font-mono mt-0.5">2026</span>
+                <div className="relative z-10 flex flex-col items-center justify-center text-center p-1">
+                  <ShieldCheck className="w-4 h-4 text-amber-300 mb-0.5" />
+                  <span className="text-[7px] font-black tracking-widest text-sky-300 uppercase">EDUNEX</span>
+                  <span className="text-[6px] font-mono font-bold text-slate-400 uppercase tracking-tighter">ARCHITECT</span>
+                  <span className="text-[7px] font-black text-amber-300 font-mono">2026</span>
                 </div>
               </div>
 
               {/* Artistic Digital Calligraphic Signature (SVG) */}
-              <div className="w-full flex flex-col items-center gap-1 pt-2 border-t border-slate-800/80">
-                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+              <div className="w-full flex flex-col items-center gap-0.5 pt-1.5 border-t border-slate-800/80">
+                <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">
                   RƏQƏMSAL TƏSDİQ İMZASI
                 </span>
                 
-                <div className="w-56 h-16 flex items-center justify-center">
+                <div className="w-36 h-9 flex items-center justify-center">
                   <svg
                     viewBox="0 0 240 70"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     className="w-full h-full text-sky-300"
                   >
-                    {/* Calligraphic curves for "Rəşad Kirmanoğlu" */}
                     <path
                       d="M20,48 C28,18 42,12 50,28 C55,38 45,55 35,52 C26,50 38,32 60,35 C72,37 80,48 95,44 C108,40 115,22 125,28 C135,34 140,48 155,42 C170,36 180,24 195,30 C205,34 215,48 225,45"
-                      stroke="url(#sigGradient)"
+                      stroke="url(#sigGradientCompact)"
                       strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
                       d="M15,55 Q90,52 225,38"
-                      stroke="url(#sigGradient)"
+                      stroke="url(#sigGradientCompact)"
                       strokeWidth="1.5"
                       strokeLinecap="round"
                     />
                     <path
                       d="M58,15 Q64,28 60,42"
-                      stroke="url(#sigGradient)"
+                      stroke="url(#sigGradientCompact)"
                       strokeWidth="2"
                       strokeLinecap="round"
                     />
                     <circle cx="120" cy="22" r="2.5" fill="#38bdf8" />
                     <circle cx="160" cy="20" r="2.5" fill="#38bdf8" />
                     <defs>
-                      <linearGradient id="sigGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <linearGradient id="sigGradientCompact" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stopColor="#38bdf8" />
                         <stop offset="50%" stopColor="#818cf8" />
                         <stop offset="100%" stopColor="#f59e0b" />
@@ -477,10 +469,10 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
                   </svg>
                 </div>
 
-                <div className="text-xs font-semibold text-slate-300 tracking-wide flex items-center gap-1.5">
+                <div className="text-[10px] font-semibold text-slate-300 tracking-wide flex items-center gap-1">
                   <span>Rəşad Kirmanoğlu</span>
                   <span className="w-1 h-1 rounded-full bg-sky-400" />
-                  <span className="text-[10px] text-slate-400 font-mono">Bütün Hüquqlar Qorunur</span>
+                  <span className="text-[9px] text-slate-400 font-mono">Bütün Hüquqlar Qorunur</span>
                 </div>
               </div>
 
@@ -492,9 +484,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
         {/* =========================================================================
             6. FOOTER NOTES
            ========================================================================= */}
-        <footer className="text-center py-6 border-t border-slate-900 text-xs text-slate-400 flex flex-col items-center gap-2">
+        <footer className="text-center py-3 border-t border-slate-900 text-[10px] text-slate-500 flex flex-col items-center gap-1">
           <p>© 2026 EDUNEX Platforması. Bütün hüquqlar qorunur.</p>
-          <p className="text-[11px] text-slate-400">
+          <p className="text-[9px] text-slate-600">
             Təhsilin rəqəmsallaşdırılması və müasir qiymətləndirmə ekosistemi.
           </p>
         </footer>
