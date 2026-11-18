@@ -8,6 +8,7 @@ import { FormulaEditorModal } from './FormulaEditorModal';
 import { SituationQuestionModal } from './SituationQuestionModal';
 import { DocSnippetModal } from './DocSnippetModal';
 import { QUESTION_TYPES } from '../lib/constants';
+import { ALL_SCHOOL_SUBJECTS } from '../lib/curriculumData';
 import {
   Calculator,
   Compass,
@@ -32,6 +33,7 @@ import {
 interface QuestionEditorProps {
   questions: Question[];
   activeQuestionIndex: number;
+  availableSubjects?: string[];
   onSelectQuestion: (index: number) => void;
   onUpdateQuestion: (index: number, updated: Question) => void;
   onAddQuestion: () => void;
@@ -44,6 +46,7 @@ interface QuestionEditorProps {
 export const QuestionEditor: React.FC<QuestionEditorProps> = ({
   questions,
   activeQuestionIndex,
+  availableSubjects,
   onSelectQuestion,
   onUpdateQuestion,
   onAddQuestion,
@@ -289,7 +292,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
 
       {/* 2. QUESTION EDITOR BODY */}
       <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-4">
-        {/* Top bar: Question Type & Points */}
+        {/* Top bar: Question Type, Subject & Points */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2">
             <span className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center">
@@ -298,12 +301,26 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
             <select
               value={currentQ.question_type}
               onChange={(e) => onUpdateQuestion(activeQuestionIndex, { ...currentQ, question_type: e.target.value as QuestionType })}
-              className="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
             >
               {QUESTION_TYPES.map(qt => (
                 <option key={qt.type} value={qt.type}>{qt.label}</option>
               ))}
             </select>
+
+            {/* Subject Selector for Multi-Subject Support */}
+            <div className="flex items-center gap-1.5 ml-1">
+              <span className="text-[11px] font-bold text-slate-400">Fənn:</span>
+              <select
+                value={currentQ.subject || 'Riyaziyyat'}
+                onChange={(e) => onUpdateQuestion(activeQuestionIndex, { ...currentQ, subject: e.target.value })}
+                className="bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
+              >
+                {(availableSubjects && availableSubjects.length > 0 ? availableSubjects : ALL_SCHOOL_SUBJECTS.map(s => s.name)).map(sub => (
+                  <option key={sub} value={sub}>{sub}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">

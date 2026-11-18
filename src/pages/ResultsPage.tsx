@@ -2,7 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { User, TestSession, StudentAnswerDetail } from '../types';
 import { api } from '../lib/api';
-import { exportResultsToExcel, formatDuration } from '../lib/export-utils';
+import { exportMultiSubjectResultsToExcel, exportResultsToExcel, formatDuration } from '../lib/export-utils';
+import { MultiSubjectResultsTable } from '../components/MultiSubjectResultsTable';
+import { calculateMultiSubjectStats } from '../lib/multiSubjectAnalytics';
 import { MathRenderer } from '../components/MathRenderer';
 import {
   FileSpreadsheet,
@@ -225,27 +227,61 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
 
             {loadingDetail || !sessionDetail ? (
               <div className="py-12 text-center text-xs text-slate-400">Yüklənir...</div>
-            ) : (
-              <div className="flex flex-col gap-4 max-h-[500px] overflow-y-auto pr-2">
-                {sessionDetail.answers.map((ans: any, idx: number) => {
-                  const isCorrect = ans.is_correct === 1;
-                  return (
-                    <div
-                      key={ans.question_id || idx}
-                      className={`p-4 rounded-xl border text-xs ${
-                        isCorrect ? 'bg-emerald-50/30 border-emerald-200' : 'bg-rose-50/30 border-rose-200'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="font-bold text-slate-900">
-                          Sual {idx + 1}:
-                        </span>
-                        <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
-                          isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-                        }`}>
-                          {isCorrect ? 'Düzgün Cavab' : 'Səhv Cavab'}
-                        </span>
-                      </div>
+            ) : (() => {
+              const questionsForStats = sessionDetail.answers.map((a: any) => ({
+                id: a.question_id,
+                subject: a.subject || sessionDetail.test?.subject || 'Ümumi',
+                points: a.points || 1,
+                correct_answer: a.correct_answer,
+                question_text: a.question_text,
+                question_type: 'single_choice' as any,
+                options: a.options || []
+              }));
+              const answersForStats: Record<string, any> = {};
+              sessionDetail.answers.forEach((a: any) => {
+                answersForStats[a.question_id] = a.selected_answer;
+              });
+              const multiSubEval = calculateMultiSubjectStats(questionsForStats, answersForStats, sessionDetail.test?.grading_rule);
+
+              return (
+                <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto pr-2">
+                  {/* Fənlər Üzrə Nəticələr Cədvəli və Faiz Qrafikləri (Tələb 4) */}
+                  <MultiSubjectResultsTable
+                    evaluation={multiSubEval}
+                    studentName={`${sessionDetail.session.student_name} ${sessionDetail.session.student_surname}`}
+                    testTitle={sessionDetail.session.test_title}
+                  />
+
+                  {/* Sual-Sual Detallar */}
+                  <h4 className="font-extrabold text-xs text-slate-800 uppercase tracking-wider mt-2">
+                    Sual-Cavab Ətraflı Təhlili
+                  </h4>
+                  {sessionDetail.answers.map((ans: any, idx: number) => {
+                    const isCorrect = ans.is_correct === 1;
+                    return (
+                      <div
+                        key={ans.question_id || idx}
+                        className={`p-4 rounded-xl border text-xs ${
+                          isCorrect ? 'bg-emerald-50/30 border-emerald-200' : 'bg-rose-50/30 border-rose-200'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-slate-900">
+                              Sual {idx + 1}:
+                            </span>
+                            {ans.subject && (
+                              <span className="px-2 py-0.2 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[10px]">
+                                {ans.subject}
+                              </span>
+                            )}
+                          </div>
+                          <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                            isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                          }`}>
+                            {isCorrect ? 'Düzgün Cavab' : 'Səhv Cavab'}
+                          </span>
+                        </div>
 
                       <div className="mb-2 text-slate-800 font-medium leading-relaxed">
                         <MathRenderer content={ans.question_text} />
@@ -286,7 +322,8 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                   );
                 })}
               </div>
-            )}
+            );
+          })()}
           </div>
         </div>
       )}

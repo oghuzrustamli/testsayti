@@ -1129,7 +1129,8 @@ app.get('/api/exam/session/:id', (req, res) => {
   // Get student answers with question details and explanations
   const answers = db.prepare(`
     SELECT sa.question_id, sa.selected_answer, sa.is_correct,
-           q.question_text, q.options_json, q.correct_answer, q.explanation, q.image_url
+           q.question_text, q.options_json, q.correct_answer, q.explanation, q.image_url,
+           q.subject, q.topic, q.points
     FROM StudentAnswers sa
     JOIN Questions q ON sa.question_id = q.id
     WHERE sa.session_id = ?

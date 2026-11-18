@@ -9,6 +9,7 @@ import { api } from '../lib/api';
 import { SituationQuestionModal } from '../components/SituationQuestionModal';
 import { DocSnippetModal } from '../components/DocSnippetModal';
 import { evaluateSituationAnswer } from '../lib/situationEvaluator';
+import { MultiSubjectSelector, SubjectConfig } from '../components/MultiSubjectSelector';
 import {
   FileText,
   Upload,
@@ -207,6 +208,13 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
   const [variant, setVariant] = useState<string>('A');
   const [durationMinutes, setDurationMinutes] = useState<number>(45);
   const [questionCount, setQuestionCount] = useState<number>(25);
+
+  // Çoxfənli Test Rejimi (Tələb 1, 2, 3)
+  const [isMultiSubject, setIsMultiSubject] = useState<boolean>(false);
+  const [selectedSubjects, setSelectedSubjects] = useState<SubjectConfig[]>([
+    { subject: 'Azərbaycan dili', questionCount: 15 },
+    { subject: 'Riyaziyyat', questionCount: 15 },
+  ]);
 
   // 5 & 6. ƏSAS MENYU (Blok, Buraxılış, Məktəbdaxili, Liseylər)
   const [selectedCategory, setSelectedCategory] = useState<string>('buraxilis');
@@ -877,8 +885,21 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
   const handleSaveToTests = async () => {
     try {
       const totalPoints = omrRows.reduce((sum, r) => sum + (r.points || 4), 0);
+      // Compute question-to-subject map for multi-subject tests
+      const questionSubjectMap = new Map<number, string>();
+      if (isMultiSubject && selectedSubjects.length > 0) {
+        let currentNum = 1;
+        selectedSubjects.forEach(sub => {
+          for (let k = 0; k < sub.questionCount; k++) {
+            questionSubjectMap.set(currentNum, sub.subject);
+            currentNum++;
+          }
+        });
+      }
+
       const questionsToSave = omrRows.map((r, i) => ({
         id: `new-omr-${Date.now()}-${r.number}`,
+        subject: questionSubjectMap.get(r.number) || (r as any).subject || subject,
         question_text: `Sual №${r.number}`,
         question_type: r.type === 'numeric_grid' ? ('numeric' as const) : ('single_choice' as const),
         options: r.type === 'numeric_grid'
@@ -902,7 +923,7 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
         title,
         exam_model: 'Buraxılış imtahanı',
         grade_group: gradeGroup,
-        subject,
+        subject: isMultiSubject && selectedSubjects.length > 0 ? selectedSubjects.map(s => s.subject).join(', ') : subject,
         topic: fileName || 'OMR Sınaq Testi',
         duration_minutes: durationMinutes,
         total_questions: questionCount,
@@ -1228,6 +1249,20 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
               <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   type="button"
+                  onClick={() => setIsMultiSubject(!isMultiSubject)}
+                  className={`h-8 px-2.5 rounded-lg font-bold text-xs shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer border ${
+                    isMultiSubject
+                      ? 'bg-indigo-600 text-white border-indigo-600'
+                      : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300'
+                  }`}
+                  title="Çoxfənli OMR test rejimini aç"
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>{isMultiSubject ? 'Çoxfənli' : 'Çoxfənli Seç'}</span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={handleAddOpenQuestion}
                   className="h-8 px-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg shadow-2xs flex items-center gap-1.5 transition-all"
                   title="Rəqəmli 6-sütunlu açıq sual əlavə et"
@@ -1337,6 +1372,22 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Çoxfənli OMR Seçim Paneli (Tələb 1, 2, 3) */}
+          {isMultiSubject && (
+            <div className="p-2 bg-slate-50 border-b border-slate-200">
+              <MultiSubjectSelector
+                selectedSubjects={selectedSubjects}
+                onChange={(newSubs) => {
+                  setSelectedSubjects(newSubs);
+                  const count = newSubs.reduce((sum, s) => sum + (s.questionCount || 0), 0);
+                  if (count > 0) {
+                    handleQuestionCountChange(count);
+                  }
+                }}
+              />
+            </div>
+          )}
 
           {/* OMR Question Rows: DƏQİQ SEKSİYALI SƏLİQƏLİ NİZAMLAMA (Qapalı 3 sütun + Açıq 6-sütunlu grid + Situasiya) */}
           <div className="flex-1 overflow-y-auto overscroll-contain independent-scroll p-3 scrollbar-thin min-h-0">

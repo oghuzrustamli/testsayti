@@ -4,6 +4,8 @@ import { User, Test, Question, ExamModel, GradingRule, TestMode, TestStatus } fr
 import { EXAM_MODELS, OMR_CATEGORIES_DATA } from '../lib/constants';
 import { QuestionEditor } from '../components/QuestionEditor';
 import { MathRenderer } from '../components/MathRenderer';
+import { MultiSubjectSelector, SubjectConfig } from '../components/MultiSubjectSelector';
+import { DocumentQuestionImportModal } from '../components/DocumentQuestionImportModal';
 import { api } from '../lib/api';
 import {
   Save,
@@ -27,7 +29,8 @@ import {
   GraduationCap,
   Sliders,
   FileSpreadsheet,
-  Compass
+  Compass,
+  FileUp
 } from 'lucide-react';
 
 interface TestCreatorPageProps {
@@ -98,6 +101,15 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
 
   // Preview Modal State
   const [showPreviewModal, setShowPreviewModal] = useState<boolean>(false);
+
+  // Multi-Subject State (Tələb 1, 2)
+  const [isMultiSubject, setIsMultiSubject] = useState<boolean>(false);
+  const [selectedSubjects, setSelectedSubjects] = useState<SubjectConfig[]>([
+    { subject: 'Riyaziyyat', questionCount: 20 }
+  ]);
+
+  // Word / PDF Importer Modal State (Tələb 6)
+  const [showWordPdfModal, setShowWordPdfModal] = useState<boolean>(false);
   const [previewQIndex, setPreviewQIndex] = useState<number>(0);
   const [previewAnswers, setPreviewAnswers] = useState<Record<string, string>>({});
 
@@ -221,13 +233,37 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
   // Calculate totals
   const totalPoints = questions.reduce((acc, q) => acc + (parseFloat(q.points as any) || 0), 0);
 
+  // Handle imported questions from Word / PDF
+  const handleImportQuestions = (imported: Question[]) => {
+    if (imported.length === 0) return;
+    setQuestions(prev => [...prev, ...imported]);
+
+    // Sync newly imported subjects into selectedSubjects if not already present
+    const uniqueImportedSubjects = Array.from(new Set(imported.map(q => q.subject).filter(Boolean)));
+    if (uniqueImportedSubjects.length > 1) {
+      setIsMultiSubject(true);
+    }
+    setSelectedSubjects(prev => {
+      const existingNames = new Set(prev.map(p => p.subject));
+      const additions = uniqueImportedSubjects
+        .filter(sub => !existingNames.has(sub))
+        .map(sub => ({ subject: sub, questionCount: imported.filter(q => q.subject === sub).length }));
+      return [...prev, ...additions];
+    });
+  };
+
   // Save / Publish
   const handleSave = async (publish: boolean) => {
     if (!title.trim()) {
       setErrorMsg('Zəhmət olmasa testin adını daxil edin');
       return;
     }
-    if (!subject) {
+
+    const finalSubject = isMultiSubject && selectedSubjects.length > 0
+      ? selectedSubjects.map(s => s.subject).join(', ')
+      : subject;
+
+    if (!finalSubject) {
       setErrorMsg('Fənn seçilməlidir');
       return;
     }
@@ -241,7 +277,7 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
         title: title.trim(),
         exam_model: examModel,
         grade_group: gradeGroup,
-        subject,
+        subject: finalSubject,
         topic: topic.trim(),
         duration_minutes: durationMinutes,
         total_points: totalPoints,
@@ -299,7 +335,18 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Word / PDF-dən Sual Əlavə Et Düyməsi (Tələb 6) */}
+          <button
+            type="button"
+            onClick={() => setShowWordPdfModal(true)}
+            className="px-3.5 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-black text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
+            title="Word (.docx, .doc) və ya PDF faylından sualları avtomatik testə əlavə et"
+          >
+            <FileUp className="w-4 h-4" />
+            <span>Word / PDF-dən sual əlavə et</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setShowPreviewModal(true)}
@@ -432,27 +479,46 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
             )}
           </div>
 
-          {/* 2. FƏNN SEÇİMİ */}
+          {/* 2. FƏNN SEÇİMİ (Tək Fənn və ya Çoxfənli Seçim) */}
           <div className="flex items-center gap-1.5 shrink-0">
             <span className="text-xs font-bold text-slate-600">Fənn:</span>
-            <select
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              className="h-9 px-2.5 bg-slate-50 hover:bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-800 shadow-2xs focus:border-indigo-500 focus:outline-none cursor-pointer"
+            {!isMultiSubject ? (
+              <select
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                className="h-9 px-2.5 bg-slate-50 hover:bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-800 shadow-2xs focus:border-indigo-500 focus:outline-none cursor-pointer"
+              >
+                <option value="Riyaziyyat">Riyaziyyat</option>
+                <option value="Azərbaycan dili">Azərbaycan dili</option>
+                <option value="İngilis dili">İngilis dili</option>
+                <option value="Fizika">Fizika</option>
+                <option value="Kimya">Kimya</option>
+                <option value="Biologiya">Biologiya</option>
+                <option value="Tarix">Tarix</option>
+                <option value="Coğrafiya">Coğrafiya</option>
+                <option value="İnformatika">İnformatika</option>
+                <option value="Ədəbiyyat">Ədəbiyyat</option>
+                <option value="Rus dili">Rus dili</option>
+                <option value="Məntiq">Məntiq</option>
+              </select>
+            ) : (
+              <span className="px-2.5 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-xl text-xs font-black">
+                {selectedSubjects.length} Fənn Seçilib
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => setIsMultiSubject(!isMultiSubject)}
+              className={`h-9 px-2.5 rounded-xl text-xs font-bold transition-all border flex items-center gap-1 cursor-pointer ${
+                isMultiSubject
+                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-2xs'
+                  : 'bg-white hover:bg-indigo-50 border-slate-300 text-slate-700 hover:text-indigo-700'
+              }`}
+              title="Çoxfənli test rejiminə keç və fənləri seç"
             >
-              <option value="Riyaziyyat">Riyaziyyat</option>
-              <option value="Azərbaycan dili">Azərbaycan dili</option>
-              <option value="İngilis dili">İngilis dili</option>
-              <option value="Fizika">Fizika</option>
-              <option value="Kimya">Kimya</option>
-              <option value="Biologiya">Biologiya</option>
-              <option value="Tarix">Tarix</option>
-              <option value="Coğrafiya">Coğrafiya</option>
-              <option value="İnformatika">İnformatika</option>
-              <option value="Ədəbiyyat">Ədəbiyyat</option>
-              <option value="Rus dili">Rus dili</option>
-              <option value="Məntiq">Məntiq</option>
-            </select>
+              <Layers className="w-3.5 h-3.5" />
+              <span>{isMultiSubject ? 'Çoxfənli Aktiv' : '+ Çoxfənli Seç'}</span>
+            </button>
           </div>
 
           {/* 3. TESTİN ADI */}
@@ -513,11 +579,25 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
         </div>
       </div>
 
+      {/* Çoxfənli Test Seçim Paneli (Tələb 1, 2) */}
+      {isMultiSubject && (
+        <MultiSubjectSelector
+          selectedSubjects={selectedSubjects}
+          onChange={(newSubs) => {
+            setSelectedSubjects(newSubs);
+            if (newSubs.length > 0 && !newSubs.some(s => s.subject === subject)) {
+              setSubject(newSubs[0].subject);
+            }
+          }}
+        />
+      )}
+
       {/* FULL WIDTH QUESTION EDITOR */}
       <div className="w-full max-w-6xl mx-auto flex flex-col gap-4">
         <QuestionEditor
           questions={questions}
           activeQuestionIndex={activeQuestionIndex}
+          availableSubjects={isMultiSubject && selectedSubjects.length > 0 ? selectedSubjects.map(s => s.subject) : undefined}
           onSelectQuestion={setActiveQuestionIndex}
           onUpdateQuestion={handleUpdateQuestion}
           onAddQuestion={handleAddQuestion}
@@ -702,6 +782,15 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
           </div>
         </div>
       )}
+
+      {/* Word və ya PDF-dən Sual Əlavə Etmə Modalı (Tələb 6) */}
+      <DocumentQuestionImportModal
+        isOpen={showWordPdfModal}
+        onClose={() => setShowWordPdfModal(false)}
+        onImportQuestions={handleImportQuestions}
+        defaultSubject={subject}
+        startIndex={questions.length}
+      />
     </div>
   );
 };

@@ -63,12 +63,12 @@ export const ProActivationModal: React.FC<ProActivationModalProps> = ({
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-150"
     >
       {/* Modal Dialog Container - 1.5x kiçildilmiş kompakt ölçü (max-w-md, sıx padding) */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-md w-full flex flex-col max-h-[94vh] overflow-hidden my-4 sm:my-auto animate-in zoom-in-95 duration-150 relative"
+        className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-md w-full flex flex-col max-h-[88vh] overflow-hidden my-auto animate-in zoom-in-95 duration-150 relative"
       >
         {/* Sabit Yuxarı Başlıq və Çıxış (X) Düyməsi */}
         <div className="bg-gradient-to-r from-amber-500 via-indigo-600 to-indigo-800 px-3.5 py-2 text-white flex items-center justify-between shrink-0 shadow-xs relative z-10">

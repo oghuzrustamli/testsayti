@@ -6,6 +6,8 @@ import { Test, Question, SituationEvaluationResult } from '../types';
 import { api } from '../lib/api';
 import { evaluateSituationAnswer } from '../lib/situationEvaluator';
 import { MathRenderer } from '../components/MathRenderer';
+import { MultiSubjectResultsTable } from '../components/MultiSubjectResultsTable';
+import { calculateMultiSubjectStats } from '../lib/multiSubjectAnalytics';
 import confetti from 'canvas-confetti';
 import {
   Clock,
@@ -597,9 +599,11 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
   // 2. Completed Results Screen
   if (examResult) {
     const isPassing = examResult.percentage >= 60;
+    const multiSubStats = calculateMultiSubjectStats(questions, answers, test?.grading_rule);
+
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white border border-slate-200 rounded-3xl shadow-xl max-w-lg w-full p-6 sm:p-8 text-center animate-in fade-in zoom-in-95">
+        <div className="bg-white border border-slate-200 rounded-3xl shadow-xl max-w-2xl w-full p-6 sm:p-8 text-center animate-in fade-in zoom-in-95 my-6">
           <div className={`w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4 ${
             isPassing ? 'bg-emerald-100 text-emerald-600 shadow-emerald-100' : 'bg-amber-100 text-amber-600'
           } shadow-lg`}>
@@ -615,6 +619,15 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
           <p className="text-xs text-slate-500 mt-1 mb-6">
             Nəticələriniz avtomatik hesablandı və sistemdə qeydə alındı.
           </p>
+
+          {/* Çoxfənli və Fənlər Üzrə Rəsmi Nəticə Cədvəli (Tələb 4) */}
+          <div className="mb-6">
+            <MultiSubjectResultsTable
+              evaluation={multiSubStats}
+              studentName={`${studentName} ${studentSurname}`}
+              testTitle={test?.title}
+            />
+          </div>
 
           {/* Results Score Box */}
           <div className="p-6 bg-gradient-to-b from-indigo-50/50 to-white rounded-2xl border border-indigo-100 shadow-sm mb-6">
@@ -1219,12 +1232,19 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs flex flex-col gap-5">
                   {/* Question Header & Points */}
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                    <span className="font-extrabold text-sm text-indigo-700 flex items-center gap-1.5">
-                      <span className="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs">
-                        {currentIndex + 1}
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-sm text-indigo-700 flex items-center gap-1.5">
+                        <span className="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs">
+                          {currentIndex + 1}
+                        </span>
+                        Sual №{currentIndex + 1}
                       </span>
-                      Sual №{currentIndex + 1}
-                    </span>
+                      {currentQ.subject && (
+                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700">
+                          {currentQ.subject}
+                        </span>
+                      )}
+                    </div>
                     <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-0.5 rounded-full">
                       {currentQ.points} bal
                     </span>

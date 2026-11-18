@@ -13,6 +13,7 @@ import {
   getSubjectMetadata
 } from '../lib/curriculumData';
 import { generateAiTest, GeneratedAiTestResult } from '../lib/aiTestGenerator';
+import { MultiSubjectSelector, SubjectConfig } from '../components/MultiSubjectSelector';
 import { api } from '../lib/api';
 import { MathRenderer } from '../components/MathRenderer';
 import { jsPDF } from 'jspdf';
@@ -86,6 +87,14 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
 }) => {
   // Step: 1 = Fənn və Parametrlər, 2 = AI Generasiyası, 3 = Testə Baxış və Saxlama
   const [currentStep, setCurrentStep] = useState<number>(1);
+
+  // Tək Fənn vs Çoxfənli Rejim (Tələb 1, 2, 3)
+  const [creationMode, setCreationMode] = useState<'single' | 'multi'>('single');
+  const [multiSubjects, setMultiSubjects] = useState<SubjectConfig[]>([
+    { subject: 'Azərbaycan dili', questionCount: 20 },
+    { subject: 'Riyaziyyat', questionCount: 20 },
+    { subject: 'Azərbaycan tarixi', questionCount: 20 },
+  ]);
 
   // 1. Fənn Seçimi və Filtrlər
   const [selectedCategory, setSelectedCategory] = useState<SubjectCategory | 'all'>('all');
@@ -182,8 +191,87 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
 
   const totalCount = closedCount + openCount;
 
-  // AI ilə Test Hazırla Funksiyası
+  // AI ilə Test Hazırla Funksiyası (Tək və Çoxfənli İnteqrasiyası)
   const handleGenerate = async () => {
+    // ÇOXFƏNLİ TEST GENERASİYASI (Tələb 3: AI Test Yaratma)
+    if (creationMode === 'multi') {
+      if (multiSubjects.length === 0) {
+        alert('Zəhmət olmasa ən azı bir fənn seçin.');
+        return;
+      }
+      const totalMultiCount = multiSubjects.reduce((sum, s) => sum + (s.questionCount || 0), 0);
+      if (totalMultiCount <= 0) {
+        alert('Ümumi sual sayı 0-dan böyük olmalıdır.');
+        return;
+      }
+
+      setGenerating(true);
+      setCurrentStep(2);
+
+      const allGeneratedQuestions: Question[] = [];
+
+      try {
+        for (let i = 0; i < multiSubjects.length; i++) {
+          const subConfig = multiSubjects[i];
+          setProgressMsg(`«${subConfig.subject}» fənni üzrə ${subConfig.questionCount} sual hazırlanır (${i + 1}/${multiSubjects.length})...`);
+          await new Promise(r => setTimeout(r, 400));
+
+          const subTopics = getTopicsFor(subConfig.subject, selectedGrade);
+          const subClosedCount = Math.max(1, Math.round(subConfig.questionCount * 0.8));
+          const subOpenCount = Math.max(0, subConfig.questionCount - subClosedCount);
+
+          const subResult = await generateAiTest({
+            grade: selectedGrade,
+            subject: subConfig.subject,
+            selectedTopics: subTopics.length > 0 ? subTopics : [subConfig.subject],
+            testMode: 'interactive',
+            closedCount: subClosedCount,
+            openCount: subOpenCount,
+            difficulty
+          });
+
+          // Hər sualın məlumatında fənnin adı saxlanılır və digər fənlərlə qarışdırılmır
+          const tagged = subResult.questions.map((q, qIdx) => ({
+            ...q,
+            subject: subConfig.subject,
+            order_index: allGeneratedQuestions.length + qIdx
+          }));
+          allGeneratedQuestions.push(...tagged);
+        }
+
+        const combinedSubject = multiSubjects.map(s => s.subject).join(', ');
+        const combinedTitle = `${selectedGrade} Çoxfənli Sınaq İmtahanı (${multiSubjects.map(s => `${s.subject}: ${s.questionCount}`).join(', ')})`;
+
+        setGeneratedResult({
+          title: combinedTitle,
+          exam_model: 'Buraxılış imtahanı',
+          grade_group: selectedGrade,
+          subject: combinedSubject,
+          topics: multiSubjects.map(s => s.subject),
+          duration_minutes: Math.max(15, allGeneratedQuestions.length * 2),
+          total_questions: allGeneratedQuestions.length,
+          closed_questions_count: allGeneratedQuestions.filter(q => q.question_type === 'single_choice').length,
+          open_questions_count: allGeneratedQuestions.filter(q => q.question_type !== 'single_choice').length,
+          total_points: allGeneratedQuestions.reduce((sum, q) => sum + (q.points || 1), 0),
+          test_mode: 'interactive',
+          questions: allGeneratedQuestions,
+          answer_key: {},
+          topic_breakdown: {},
+          summary: `${selectedGrade} üzrə ${multiSubjects.length} fəndən ümumi ${allGeneratedQuestions.length} sual tərtib edildi.`
+        });
+        setEditableQuestions(allGeneratedQuestions);
+        setTestTitle(combinedTitle);
+        setCurrentStep(3);
+      } catch (err: any) {
+        alert('Xəta: ' + (err.message || 'Çoxfənli test hazırlanarkən xəta baş verdi'));
+        setCurrentStep(1);
+      } finally {
+        setGenerating(false);
+      }
+      return;
+    }
+
+    // TƏK FƏNN TEST GENERASİYASI
     if (selectedTopics.length === 0) {
       alert('Zəhmət olmasa dərslik proqramından ən azı bir mövzu seçin.');
       return;
@@ -464,14 +552,109 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="hidden sm:inline-flex text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-xl">
-                23 Tədris Fənni • I–XI Siniflər
-              </span>
+              <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setCreationMode('single')}
+                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                    creationMode === 'single'
+                      ? 'bg-white text-indigo-700 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Tək Fənn
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCreationMode('multi')}
+                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    creationMode === 'multi'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Çoxfənli Test</span>
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Əsas İki Panelli İnterfeys (Sol: Fənn Kataloqu, Sağ: Kontekst Menyu və Mövzular) */}
-          <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
+          {/* ÇOXFƏNLİ REJİM GÖRÜNÜŞÜ (Tələb 1, 2, 3) */}
+          {creationMode === 'multi' ? (
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 max-w-5xl mx-auto w-full flex flex-col gap-5 scrollbar-thin">
+              {/* Çoxfənli Komponent */}
+              <MultiSubjectSelector
+                selectedSubjects={multiSubjects}
+                onChange={setMultiSubjects}
+              />
+
+              {/* Sinif və Çətinlik Parametrləri */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  {/* Sinif Seçimi */}
+                  <div className="flex flex-col gap-1.5 flex-1 min-w-[240px]">
+                    <label className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                      <GraduationCap className="w-4 h-4 text-indigo-600" />
+                      Sinif Seçimi (I–XI Siniflər)
+                    </label>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {['1-ci sinif', '2-ci sinif', '3-cü sinif', '4-cü sinif', '5-ci sinif', '6-cı sinif', '7-ci sinif', '8-ci sinif', '9-cu sinif', '10-cu sinif', '11-ci sinif'].map((grade) => (
+                        <button
+                          key={grade}
+                          type="button"
+                          onClick={() => setSelectedGrade(grade)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                            selectedGrade === grade
+                              ? 'bg-slate-900 text-white shadow-2xs'
+                              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          }`}
+                        >
+                          {grade}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Çətinlik */}
+                  <div className="flex flex-col gap-1.5 min-w-[200px]">
+                    <label className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-indigo-600" />
+                      Çətinlik Dərəcəsi
+                    </label>
+                    <select
+                      value={difficulty}
+                      onChange={(e) => setDifficulty(e.target.value as any)}
+                      className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-indigo-600 cursor-pointer"
+                    >
+                      <option value="mixed">Qarışıq (Standart DİM balansı)</option>
+                      <option value="easy">Asan (Baza biliklər)</option>
+                      <option value="medium">Orta (Tətbiq və hesablama)</option>
+                      <option value="hard">Çətin (Lisey və olimpiada)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Əsas Hərəkət Düyməsi */}
+              <div className="pt-1 pb-6 flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleGenerate}
+                  disabled={multiSubjects.length === 0}
+                  className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 hover:from-indigo-700 hover:to-violet-800 text-white font-black text-sm rounded-2xl shadow-xl shadow-indigo-200 flex items-center justify-center gap-2.5 transition-all cursor-pointer transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
+                >
+                  <Sparkles className="w-5 h-5 fill-white" />
+                  <span>
+                    AI ilə Çoxfənli Test Hazırla (Cəmi {multiSubjects.reduce((sum, s) => sum + (s.questionCount || 0), 0)} Sual • {multiSubjects.length} Fənn)
+                  </span>
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* TƏK FƏNN REJİMİ (İki Panelli Fənn Kataloqu və Kontekst Menyu) */
+            <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
             {/* ==============================================================
                 SOL PANEL: FƏNN SEÇİMİ (Fənn Kataloqu & Axtarış)
                 ============================================================== */}
@@ -794,6 +977,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
               </div>
             </div>
           </div>
+          )}
         </div>
       )}
 
@@ -876,12 +1060,21 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
 
           {/* Məlumat Paneli */}
           <div className="shrink-0 bg-slate-100/90 border-b border-slate-200/80 px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-700">
-            <div className="flex items-center gap-3">
-              <span><strong>Fənn:</strong> {selectedSubject} ({selectedGrade})</span>
+            <div className="flex flex-wrap items-center gap-3">
+              <span><strong>Fənn:</strong> {creationMode === 'multi' ? multiSubjects.map(s => s.subject).join(', ') : `${selectedSubject} (${selectedGrade})`}</span>
               <span className="text-slate-300">•</span>
-              <span><strong>Suallar:</strong> {closedCount} qapalı + {openCount} açıq ({totalCount} cəmi)</span>
-              <span className="text-slate-300">•</span>
-              <span><strong>Mövzular:</strong> {selectedTopics.length} mövzu əhatə olundu</span>
+              <span><strong>Cəmi Suallar:</strong> {editableQuestions.length} sual</span>
+              {creationMode === 'single' ? (
+                <>
+                  <span className="text-slate-300">•</span>
+                  <span><strong>Mövzular:</strong> {selectedTopics.length} mövzu əhatə olundu</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-slate-300">•</span>
+                  <span><strong>Çoxfənli Bölgü:</strong> {multiSubjects.map(s => `${s.subject}: ${s.questionCount}`).join(' • ')}</span>
+                </>
+              )}
             </div>
             {saveSuccessMsg && (
               <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md animate-fade-in">
@@ -920,6 +1113,11 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                         }`}>
                           #{idx + 1}
                         </span>
+                        {q.subject && (
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800">
+                            {q.subject}
+                          </span>
+                        )}
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                           {q.topic}
                         </span>
