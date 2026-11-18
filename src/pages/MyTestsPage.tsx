@@ -31,7 +31,8 @@ import {
   Brain,
   CheckCircle2,
   Eye,
-  FileQuestion
+  FileQuestion,
+  Award
 } from 'lucide-react';
 
 interface MyTestsPageProps {
@@ -77,6 +78,45 @@ const GRADES_CONFIG = [
   'Abituriyent'
 ];
 
+export const EXAM_MODELS_CONFIG = [
+  {
+    id: 'buraxilis',
+    label: 'Buraxılış İmtahanı',
+    badge: 'DİM 9 & 11',
+    icon: Award,
+    color: 'from-blue-600 to-indigo-600',
+    desc: '9 və 11-ci siniflər üzrə dövlət buraxılış imtahanları və mövzu sınaqları (MSİ/ÜSİ)',
+    keywords: ['buraxılış', 'buraxilis', 'msi', 'üsi']
+  },
+  {
+    id: 'blok',
+    label: 'Blok İmtahanı',
+    badge: 'I - IV Qruplar',
+    icon: Layers,
+    color: 'from-violet-600 to-purple-600',
+    desc: 'Ali məktəblərə qəbul üzrə 1-ci, 2-ci, 3-cü və 4-cü ixtisas qrupları blok fənləri',
+    keywords: ['blok', 'qrup', 'ixtisas']
+  },
+  {
+    id: 'mektebdaxili',
+    label: 'Məktəbdaxili Qiymətləndirmə',
+    badge: 'KSQ & BSQ',
+    icon: BookOpen,
+    color: 'from-emerald-600 to-teal-600',
+    desc: 'Bütün fənlər üzrə Kiçik Summativ, Böyük Summativ və Diaqnostik monitorinqlər',
+    keywords: ['ksq', 'bsq', 'məktəbdaxili', 'summativ', 'monitoring', 'diaqnostik']
+  },
+  {
+    id: 'liseyler',
+    label: 'Liseylərə Qəbul',
+    badge: 'FRTL, KBTL, Hərbi',
+    icon: Compass,
+    color: 'from-amber-600 to-orange-600',
+    desc: 'Fizika-Riyaziyyat, Kimya-Biologiya və H.Əliyev adına Hərbi Lisey sınaqları',
+    keywords: ['lisey', 'frtl', 'kbtl', 'hərbi']
+  }
+];
+
 export const MyTestsPage: React.FC<MyTestsPageProps> = ({
   user,
   initialTab = 'all',
@@ -90,9 +130,12 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
 }) => {
   const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [activePortalTab, setActivePortalTab] = useState<'subjects' | 'grades' | 'all'>(initialTab);
+  const [activePortalTab, setActivePortalTab] = useState<'subjects' | 'grades' | 'models' | 'all'>(
+    (initialTab as any) === 'models' ? 'models' : initialTab
+  );
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [selectedGrade, setSelectedGrade] = useState<string>('all');
+  const [selectedModel, setSelectedModel] = useState<string>('all');
   const [testTypeFilter, setTestTypeFilter] = useState<'all' | 'ai' | 'standard' | 'omr'>('all');
   const [activeStatus, setActiveStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -220,7 +263,7 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
 
   const filteredTests = tests.filter((t) => {
     // Portal tab filter: AI tests do NOT automatically show up in "Sınaq imtahanları"
-    if (activePortalTab === 'subjects' || activePortalTab === 'grades') {
+    if (activePortalTab === 'subjects' || activePortalTab === 'grades' || activePortalTab === 'models') {
       if (isAiTest(t)) return false;
     }
 
@@ -231,6 +274,17 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
       const clean = selectedGrade.replace(/[^0-9]/g, '');
       const matchGrade = clean ? t.grade_group?.includes(clean) : t.grade_group?.toLowerCase().includes(selectedGrade.toLowerCase());
       if (!matchGrade) return false;
+    }
+    if (activePortalTab === 'models' && selectedModel !== 'all') {
+      const modelObj = EXAM_MODELS_CONFIG.find(m => m.id === selectedModel);
+      if (modelObj) {
+        const matches = modelObj.keywords.some(kw => 
+          (t.exam_model && t.exam_model.toLowerCase().includes(kw)) ||
+          (t.title && t.title.toLowerCase().includes(kw)) ||
+          (t.topic && t.topic.toLowerCase().includes(kw))
+        );
+        if (!matches) return false;
+      }
     }
 
     // In "Bütün Testlərim" tab, filter by test type pill if selected
@@ -321,10 +375,24 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
 
           <button
             type="button"
+            onClick={() => setActivePortalTab('models')}
+            className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 transition-all cursor-pointer ${
+              activePortalTab === 'models'
+                ? 'bg-white text-indigo-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Award className="w-4 h-4" />
+            <span>İmtahan Modelləri</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => {
               setActivePortalTab('all');
               setSelectedSubject('all');
               setSelectedGrade('all');
+              setSelectedModel('all');
             }}
             className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 transition-all cursor-pointer ${
               activePortalTab === 'all'
@@ -506,6 +574,74 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
                   }`}>
                     {count}
                   </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ==============================================================
+          BÖLMƏ 3: İMTAHAN MODELLƏRİ (Buraxılış, Blok, Məktəbdaxili, Liseylər)
+          ============================================================== */}
+      {activePortalTab === 'models' && (
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black uppercase tracking-wider text-slate-700">
+              İmtahan Modelini Seçin:
+            </span>
+            {selectedModel !== 'all' && (
+              <button
+                onClick={() => setSelectedModel('all')}
+                className="text-xs text-indigo-600 hover:underline font-bold cursor-pointer"
+              >
+                Filtrləməni sıfırla (Bütün modellər)
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {EXAM_MODELS_CONFIG.map((model) => {
+              const IconComp = model.icon;
+              const isSelected = selectedModel === model.id;
+
+              return (
+                <div
+                  key={model.id}
+                  onClick={() => setSelectedModel(isSelected ? 'all' : model.id)}
+                  className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between group ${
+                    isSelected
+                      ? 'bg-slate-900 text-white border-slate-900 shadow-lg'
+                      : 'bg-white border-slate-200 hover:border-indigo-300 hover:shadow-xs'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                        isSelected ? 'bg-white/10 text-white' : 'bg-indigo-50 text-indigo-600'
+                      }`}>
+                        <IconComp className="w-5 h-5" />
+                      </div>
+                      <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                        isSelected ? 'bg-white/15 text-indigo-200' : 'bg-slate-100 text-slate-600'
+                      }`}>
+                        {model.badge}
+                      </span>
+                    </div>
+
+                    <h4 className="font-black text-sm group-hover:text-indigo-600 leading-tight">
+                      {model.label}
+                    </h4>
+                    <p className={`text-[11px] mt-1.5 leading-relaxed ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
+                      {model.desc}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-100/20 flex items-center justify-between text-xs font-bold">
+                    <span className={isSelected ? 'text-indigo-300' : 'text-indigo-600'}>
+                      {isSelected ? '✓ Seçilib' : 'Sınaqlara Bax →'}
+                    </span>
+                  </div>
                 </div>
               );
             })}

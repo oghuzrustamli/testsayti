@@ -1,15 +1,15 @@
 // src/components/Sidebar.tsx
+// ATROQ Education - Modern SaaS Collapsible Navigation Sidebar
+
 import React, { useState } from 'react';
 import { UserRole } from '../types';
 import {
-  FileCheck,
   LayoutDashboard,
   PlusCircle,
   FileQuestion,
   Database,
   Users2,
   GraduationCap,
-  Share2,
   BarChart3,
   TrendingUp,
   Archive,
@@ -22,22 +22,25 @@ import {
   CheckCircle2,
   UserCheck,
   ChevronDown,
-  ChevronRight,
   Layers,
   Sparkles,
   Award,
-  Cpu
+  Cpu,
+  Edit3,
+  Printer,
+  ChevronRight,
+  HelpCircle
 } from 'lucide-react';
 
 export type TeacherTab =
   | 'dashboard'
   | 'create_test'
   | 'ai_test'
+  | 'omr_test'
   | 'exams_hub'
   | 'exams_subjects'
   | 'exams_grades'
   | 'my_tests'
-  | 'omr_test'
   | 'question_bank'
   | 'classes'
   | 'results'
@@ -70,6 +73,8 @@ export type StudentTab =
 interface SidebarProps {
   role: UserRole;
   activeTab: string;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
   onSelectTab: (tab: any) => void;
   className?: string;
 }
@@ -85,193 +90,316 @@ interface NavItem {
   id: string;
   label: string;
   icon: any;
-  highlight?: boolean;
   badge?: string;
+  highlight?: boolean;
   subItems?: NavSubItem[];
+}
+
+interface NavGroup {
+  groupTitle: string;
+  items: NavItem[];
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   role,
   activeTab,
+  isCollapsed = false,
   onSelectTab,
   className = '',
 }) => {
-  // Accordion state for Sınaq İmtahanları
-  const isExamsActive = activeTab === 'exams_hub' || activeTab === 'exams_subjects' || activeTab === 'exams_grades' || activeTab === 'my_tests';
-  const [examsExpanded, setExamsExpanded] = useState<boolean>(true);
+  // Accordion state for collapsible groups
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    test_creator_group: true,
+    exams_group: true,
+  });
 
-  // Navigation menus based on user role
-  const teacherNav: NavItem[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'create_test', label: 'Yeni test yarat', icon: PlusCircle, highlight: true },
-    { id: 'ai_test', label: 'AI ilə test yarat', icon: Sparkles, badge: 'AI', highlight: false },
+  const toggleGroup = (groupId: string) => {
+    setOpenGroups(prev => ({ ...prev, [groupId]: !prev[groupId] }));
+  };
+
+  // 1. MÜƏLLİM MENYULARI (Məntiqli Qruplaşdırma və Sıfır Təkrar)
+  const teacherGroups: NavGroup[] = [
     {
-      id: 'exams_hub',
-      label: 'Sınaq imtahanları',
-      icon: BookOpen,
-      subItems: [
-        { id: 'exams_subjects', label: 'Fənlər', icon: Layers },
-        { id: 'exams_grades', label: 'Siniflər', icon: GraduationCap },
-        { id: 'my_tests', label: 'Bütün Testlərim', icon: FileQuestion },
+      groupTitle: 'Əsas',
+      items: [
+        { id: 'dashboard', label: 'İdarəetmə Paneli', icon: LayoutDashboard },
       ]
     },
-    { id: 'classes', label: 'Sinif və Şagirdlər', icon: Users2 },
-    { id: 'results', label: 'Nəticələr', icon: BarChart3 },
-    { id: 'statistics', label: 'Statistika', icon: TrendingUp },
-    { id: 'regional_stats', label: 'Regional statistika', icon: Award, badge: 'NMR' },
-    { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'ATROQ', highlight: false },
-    { id: 'archive', label: 'Arxiv', icon: Archive },
-    { id: 'settings', label: 'Parametrlər', icon: Settings },
+    {
+      groupTitle: 'Testlərin Hazırlanması',
+      items: [
+        {
+          id: 'test_creator_group',
+          label: 'Test Yarat',
+          icon: PlusCircle,
+          subItems: [
+            { id: 'ai_test', label: 'AI ilə Test Yarat', icon: Sparkles, badge: 'AI' },
+            { id: 'create_test', label: 'İnteraktiv Test Yarat', icon: Edit3 },
+            { id: 'omr_test', label: 'OMR / Cavablı Test', icon: Printer, badge: 'PDF' },
+          ]
+        },
+      ]
+    },
+    {
+      groupTitle: 'İmtahanlar & Arxiv',
+      items: [
+        {
+          id: 'exams_group',
+          label: 'Sınaq İmtahanları',
+          icon: BookOpen,
+          subItems: [
+            { id: 'exams_hub', label: 'Sınaq Portalı', icon: Layers },
+            { id: 'my_tests', label: 'Bütün Testlərim', icon: FileQuestion },
+            { id: 'question_bank', label: 'Sual Bankı', icon: Database },
+          ]
+        },
+      ]
+    },
+    {
+      groupTitle: 'Tədris və Nəzarət',
+      items: [
+        { id: 'classes', label: 'Sinif və Şagirdlər', icon: Users2 },
+        { id: 'results', label: 'Nəticələr və Jurnal', icon: BarChart3 },
+        { id: 'statistics', label: 'Akademik Statistika', icon: TrendingUp },
+      ]
+    },
+    {
+      groupTitle: 'Regional Təhsil',
+      items: [
+        { id: 'regional_stats', label: 'Regional Statistika', icon: Award, badge: 'NMR' },
+      ]
+    },
+    {
+      groupTitle: 'Sistem',
+      items: [
+        { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'ATROQ' },
+        { id: 'archive', label: 'Arxiv', icon: Archive },
+        { id: 'settings', label: 'Parametrlər', icon: Settings },
+      ]
+    }
   ];
 
-  const adminNav: NavItem[] = [
-    { id: 'users', label: 'İstifadəçilər', icon: Users2 },
-    { id: 'activation_codes', label: 'Aktivasiya kodları', icon: Key, badge: 'PRO' },
-    { id: 'packages', label: 'Paketlər və Qiymətlər', icon: CreditCard },
-    { id: 'subscriptions', label: 'Abunəliklər & Ödənişlər', icon: Shield },
-    { id: 'stats', label: 'İstifadə statistikası', icon: TrendingUp },
-    { id: 'regional_stats', label: 'Regional statistika', icon: Award, badge: 'NMR' },
-    { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'ATROQ', highlight: false },
-    { id: 'audit', label: 'Audit jurnalı', icon: History },
-    { id: 'settings', label: 'Sistem parametrləri', icon: Settings },
+  // 2. ADMINISTRATOR MENYULARI
+  const adminGroups: NavGroup[] = [
+    {
+      groupTitle: 'İdarəetmə',
+      items: [
+        { id: 'users', label: 'İstifadəçilər', icon: Users2 },
+        { id: 'activation_codes', label: 'Aktivasiya Kodları', icon: Key, badge: 'PRO' },
+        { id: 'packages', label: 'Paketlər və Qiymətlər', icon: CreditCard },
+        { id: 'subscriptions', label: 'Abunəliklər & Ödənişlər', icon: Shield },
+      ]
+    },
+    {
+      groupTitle: 'Təhlil və Monitorinq',
+      items: [
+        { id: 'stats', label: 'İstifadə Statistikası', icon: TrendingUp },
+        { id: 'regional_stats', label: 'Regional Statistika', icon: Award, badge: 'NMR' },
+        { id: 'audit', label: 'Audit Jurnalı', icon: History },
+      ]
+    },
+    {
+      groupTitle: 'Sistem',
+      items: [
+        { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'ATROQ' },
+        { id: 'settings', label: 'Sistem Parametrləri', icon: Settings },
+      ]
+    }
   ];
 
-  const studentNav: NavItem[] = [
-    { id: 'enter_test', label: 'Testə daxil ol', icon: PlusCircle, highlight: true },
-    { id: 'active_tests', label: 'Aktiv testlər', icon: BookOpen },
-    { id: 'completed_tests', label: 'Tamamlanmış testlər', icon: CheckCircle2 },
-    { id: 'results', label: 'Nəticələrim', icon: BarChart3 },
-    { id: 'regional_stats', label: 'Regional statistika', icon: Award, badge: 'NMR' },
-    { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'ATROQ', highlight: false },
-    { id: 'profile', label: 'Şəxsi məlumatlar', icon: UserCheck },
+  // 3. ŞAGİRD MENYULARI
+  const studentGroups: NavGroup[] = [
+    {
+      groupTitle: 'İmtahan',
+      items: [
+        { id: 'enter_test', label: 'Testə Daxil Ol', icon: PlusCircle, highlight: true },
+        { id: 'active_tests', label: 'Aktiv Sınaqlar', icon: BookOpen },
+        { id: 'completed_tests', label: 'Tamamlanmış Sınaqlar', icon: CheckCircle2 },
+        { id: 'results', label: 'Nəticələrim', icon: BarChart3 },
+      ]
+    },
+    {
+      groupTitle: 'Təhsil & Reytinq',
+      items: [
+        { id: 'regional_stats', label: 'Regional Reytinq', icon: Award, badge: 'NMR' },
+        { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'ATROQ' },
+        { id: 'profile', label: 'Şəxsi Məlumatlar', icon: UserCheck },
+      ]
+    }
   ];
 
-  const navItems = role === 'admin' ? adminNav : role === 'student' ? studentNav : teacherNav;
+  const currentGroups = role === 'admin' ? adminGroups : role === 'student' ? studentGroups : teacherGroups;
 
   return (
-    <aside className={`w-64 bg-white border-r border-slate-200 flex flex-col justify-between py-4 px-3 shrink-0 ${className}`}>
-      <div className="flex flex-col gap-1">
-        <div className="px-3 pb-2 text-[11px] font-black uppercase tracking-wider text-slate-400">
-          {role === 'admin' ? 'Administrator İdarəsi' : role === 'student' ? 'Şagird Portalı' : 'Müəllim Kabineti'}
-        </div>
+    <aside
+      className={`bg-white border-r border-slate-200/90 flex flex-col justify-between select-none transition-all duration-200 ${
+        isCollapsed ? 'w-18' : 'w-64'
+      } ${className}`}
+    >
+      {/* Scrollable Navigation Area */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-3 py-4 scrollbar-thin flex flex-col gap-5">
+        {currentGroups.map((group, gIdx) => (
+          <div key={gIdx} className="flex flex-col gap-1">
+            {/* Group Header (only when expanded) */}
+            {!isCollapsed && (
+              <div className="px-3 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                {group.groupTitle}
+              </div>
+            )}
 
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const hasChildren = item.subItems && item.subItems.length > 0;
-          const isParentActive = activeTab === item.id || (hasChildren && item.subItems?.some(s => s.id === activeTab));
+            {group.items.map(item => {
+              const Icon = item.icon;
+              const hasSub = item.subItems && item.subItems.length > 0;
+              const isGroupOpen = openGroups[item.id] ?? true;
+              const isParentActive =
+                activeTab === item.id ||
+                (hasSub && item.subItems?.some(s => s.id === activeTab));
 
-          if (hasChildren) {
-            return (
-              <div key={item.id} className="flex flex-col gap-0.5">
+              if (hasSub) {
+                return (
+                  <div key={item.id} className="flex flex-col gap-0.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (isCollapsed) {
+                          onSelectTab(item.subItems![0].id);
+                        } else {
+                          toggleGroup(item.id);
+                        }
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer group ${
+                        isParentActive
+                          ? 'bg-slate-900 text-white shadow-xs'
+                          : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                      }`}
+                      title={item.label}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Icon className={`w-4 h-4 shrink-0 transition-colors ${
+                          isParentActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-indigo-600'
+                        }`} />
+                        {!isCollapsed && <span className="truncate">{item.label}</span>}
+                      </div>
+
+                      {!isCollapsed && (
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {item.badge && (
+                            <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
+                              {item.badge}
+                            </span>
+                          )}
+                          <ChevronDown
+                            className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                              isGroupOpen ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </div>
+                      )}
+                    </button>
+
+                    {/* Submenu Items */}
+                    {!isCollapsed && isGroupOpen && (
+                      <div className="flex flex-col gap-0.5 pl-3 mt-0.5 border-l-2 border-slate-100 ml-4">
+                        {item.subItems!.map(sub => {
+                          const SubIcon = sub.icon;
+                          const isSubActive = activeTab === sub.id;
+
+                          return (
+                            <button
+                              key={sub.id}
+                              type="button"
+                              onClick={() => onSelectTab(sub.id)}
+                              className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                                isSubActive
+                                  ? 'bg-indigo-50 text-indigo-700 font-bold'
+                                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 truncate">
+                                <SubIcon className={`w-3.5 h-3.5 shrink-0 ${isSubActive ? 'text-indigo-600' : 'text-slate-400'}`} />
+                                <span className="truncate">{sub.label}</span>
+                              </div>
+
+                              {sub.badge && (
+                                <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded-full ${
+                                  sub.badge === 'AI'
+                                    ? 'bg-gradient-to-r from-violet-500 to-indigo-600 text-white'
+                                    : 'bg-slate-200 text-slate-700'
+                                }`}>
+                                  {sub.badge}
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              // Normal single item
+              const isItemActive = activeTab === item.id;
+              return (
                 <button
+                  key={item.id}
                   type="button"
-                  onClick={() => {
-                    setExamsExpanded(!examsExpanded);
-                    onSelectTab(item.id);
-                  }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13px] font-bold transition-all cursor-pointer ${
-                    isParentActive
+                  onClick={() => onSelectTab(item.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer group ${
+                    isItemActive
                       ? 'bg-slate-900 text-white shadow-xs'
-                      : 'text-slate-800 hover:bg-slate-100 hover:text-black'
+                      : item.highlight
+                      ? 'bg-gradient-to-r from-indigo-50 to-violet-50 text-indigo-700 hover:from-indigo-100 hover:to-violet-100 border border-indigo-200/60'
+                      : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                   }`}
+                  title={item.label}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${isParentActive ? 'text-indigo-400' : 'text-slate-600'}`} />
-                    <span>{item.label}</span>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Icon className={`w-4 h-4 shrink-0 transition-colors ${
+                      isItemActive
+                        ? 'text-indigo-400'
+                        : item.highlight
+                        ? 'text-indigo-600'
+                        : 'text-slate-500 group-hover:text-indigo-600'
+                    }`} />
+                    {!isCollapsed && <span className="truncate">{item.label}</span>}
                   </div>
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                      examsExpanded ? 'rotate-180' : ''
-                    } ${isParentActive ? 'text-white' : 'text-slate-400'}`}
-                  />
+
+                  {!isCollapsed && item.badge && (
+                    <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${
+                      item.badge === 'NMR'
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                        : item.badge === 'ATROQ'
+                        ? 'bg-sky-100 text-sky-800 border border-sky-200'
+                        : item.badge === 'PRO'
+                        ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                        : 'bg-indigo-100 text-indigo-800'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
                 </button>
-
-                {/* Açılıb-bağlanan Alt Menyular: Fənlər, Siniflər, Bütün Testlərim */}
-                {examsExpanded && (
-                  <div className="flex flex-col gap-0.5 pl-3 py-1 border-l-2 border-slate-200 ml-4 my-0.5 animate-in fade-in duration-150">
-                    {item.subItems?.map((sub) => {
-                      const SubIcon = sub.icon;
-                      const isSubActive = activeTab === sub.id;
-
-                      return (
-                        <button
-                          key={sub.id}
-                          type="button"
-                          onClick={() => onSelectTab(sub.id)}
-                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                            isSubActive
-                              ? 'bg-indigo-600 text-white shadow-2xs font-bold'
-                              : 'text-slate-600 hover:bg-indigo-50/70 hover:text-indigo-900'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <SubIcon className={`w-3.5 h-3.5 ${isSubActive ? 'text-white' : 'text-slate-400'}`} />
-                            <span>{sub.label}</span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          }
-
-          const isActive = activeTab === item.id;
-          const isAbout = item.id === 'about';
-
-          return (
-            <button
-              key={item.id}
-              onClick={() => onSelectTab(item.id)}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13px] font-bold transition-all cursor-pointer ${
-                isActive
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : item.highlight
-                  ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm shadow-indigo-100 font-extrabold'
-                  : isAbout
-                  ? 'bg-gradient-to-r from-sky-50/90 to-indigo-50/80 text-indigo-950 hover:bg-sky-100 border border-sky-200/70 shadow-2xs font-extrabold'
-                  : 'text-slate-800 hover:bg-slate-100 hover:text-black'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <Icon className={`w-4 h-4 ${
-                  isActive
-                    ? 'text-indigo-400'
-                    : item.highlight
-                    ? 'text-white'
-                    : isAbout
-                    ? 'text-sky-600'
-                    : 'text-slate-600'
-                }`} />
-                <span>{item.label}</span>
-              </div>
-
-              {item.badge && (
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
-                  isActive
-                    ? 'bg-indigo-700 text-white'
-                    : isAbout
-                    ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-xs font-black'
-                    : 'bg-slate-100 text-slate-500'
-                }`}>
-                  {item.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
+              );
+            })}
+          </div>
+        ))}
       </div>
 
-      {/* Footer Info */}
-      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-[11px] text-slate-500">
-        <div className="flex items-center justify-between mb-1">
-          <span className="font-bold text-slate-700">ATROQ Education</span>
-          <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">v2.5</span>
-        </div>
-        <p className="text-[10px] text-slate-400 leading-tight">
-          Avtomatik qiymətləndirmə və sual bankı mühərriki.
-        </p>
+      {/* Sidebar Footer info */}
+      <div className="p-3 border-t border-slate-100 flex flex-col gap-2 shrink-0">
+        {!isCollapsed ? (
+          <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/70 flex items-center justify-between text-[11px]">
+            <div>
+              <span className="font-black text-slate-800 block">ATROQ Education</span>
+              <span className="text-[10px] text-slate-400 font-medium">v2.5 Professional</span>
+            </div>
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Sistem aktivdir" />
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="Sistem aktivdir" />
+          </div>
+        )}
       </div>
     </aside>
   );

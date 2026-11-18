@@ -59,6 +59,7 @@ export function App() {
   // Navigation tab state
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
 
   // Sub-views & Modals
   const [editingTestId, setEditingTestId] = useState<string | null>(null);
@@ -126,6 +127,9 @@ export function App() {
       {/* Top Navigation - Immovably Fixed at the top across all pages */}
       <Navbar
         currentUser={currentUser}
+        activeTab={activeTab}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onToggleSidebarCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         onSwitchRole={handleSwitchRole}
         onOpenProModal={() => setShowProModal(true)}
         onOpenAdminAuth={() => setShowAdminAuthModal(true)}
@@ -150,6 +154,8 @@ export function App() {
         <Sidebar
           role={currentUser.role}
           activeTab={activeTab}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           onSelectTab={(tab) => {
             if (viewingAnsweredTestId) setViewingAnsweredTestId(null);
             setActiveTab(tab);
