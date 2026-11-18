@@ -269,11 +269,11 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
               <h2 className="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
                 <span>EDUNEX-i tanı</span>
                 <span className="text-[9px] px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono font-bold border border-sky-500/30">
-                  34 SANİYƏ
+                  48 SANİYƏ • VİRTUAL APARICI
                 </span>
               </h2>
               <p className="text-[11px] text-slate-400">
-                Süni intellektlə hazırlanmış dinamik video nümayişi, fasiləsiz qadın səsi və canlı interfeys animasiyaları.
+                Virtual qadın aparıcının təqdimatında EDUNEX-in real proqram görüntüləri, canlı lip-sync və səs müşayiəti.
               </p>
             </div>
 
