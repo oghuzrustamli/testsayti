@@ -152,7 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div
           onClick={handleLogoClick}
           className="flex items-center gap-2.5 cursor-pointer select-none group"
-          title="EDUNEX Quiz Creator"
+          title="ATROQ Education"
         >
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-700 via-indigo-600 to-violet-500 text-white flex items-center justify-center shadow-md shadow-indigo-200 group-hover:scale-105 transition-transform">
             <GraduationCap className="w-6 h-6" />
@@ -160,10 +160,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-black text-lg text-slate-900 tracking-tight leading-none font-sans">
-                EDUNEX
+                ATROQ
               </span>
               <span className="text-[10px] uppercase font-black px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200/60 leading-none">
-                Quiz Creator
+                Education
               </span>
             </div>
             <p className="text-[10px] text-slate-400 font-medium leading-none mt-0.5">
@@ -233,12 +233,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             }
           }}
           className="px-3 py-2 rounded-xl text-[13px] font-black tracking-tight bg-gradient-to-r from-sky-50 to-indigo-50 hover:from-sky-100 hover:to-indigo-100 text-indigo-950 border border-sky-300/80 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs group"
-          title="EDUNEX Haqqında, Müəllif və AI Tanıtım Videosu"
+          title="ATROQ Education Haqqında, Müəllif və AI Tanıtım Videosu"
         >
           <Cpu className="w-4 h-4 text-sky-600 group-hover:rotate-12 transition-transform" />
           <span>Haqqında</span>
           <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-2xs">
-            EDUNEX
+            ATROQ
           </span>
         </button>
 

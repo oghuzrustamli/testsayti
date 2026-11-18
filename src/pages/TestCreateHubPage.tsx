@@ -180,7 +180,7 @@ export const TestCreateHubPage: React.FC<TestCreateHubPageProps> = ({
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold mb-3 shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-            <span>EDUNEX İmtahan və Test Sistemi</span>
+            <span>ATROQ Education İmtahan və Test Sistemi</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
             Test Yaratmaq Üsulunu Seçin

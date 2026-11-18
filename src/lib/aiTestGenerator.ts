@@ -732,7 +732,7 @@ export async function generateAiTest(params: AiTestGenerationParams): Promise<Ge
   else if (gNum <= 4) examModel = 'Sinif imtahanı';
   else examModel = 'Məktəbdaxili test';
 
-  const title = `EDUNEX AI: ${subject} (${grade}) – Sınaq İmtahanı`;
+  const title = `ATROQ AI: ${subject} (${grade}) – Sınaq İmtahanı`;
   const summary = `${grade} fənni üzrə «${topicsToUse.join(', ')}» mövzularını əhatə edən ${totalQuestions} suallıq (${closedCount} qapalı, ${openCount} açıq) tam tədris proqramına uyğun imtahan uğurla formalaşdırıldı.`;
 
   return {

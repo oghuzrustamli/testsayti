@@ -74,7 +74,7 @@ export const ProActivationModal: React.FC<ProActivationModalProps> = ({
         <div className="bg-gradient-to-r from-amber-500 via-indigo-600 to-indigo-800 px-3.5 py-2 text-white flex items-center justify-between shrink-0 shadow-xs relative z-10">
           <div className="flex items-center gap-1.5">
             <span className="px-2 py-0.5 bg-amber-400 text-slate-950 rounded-md font-black text-[10px] flex items-center gap-1 shadow-2xs">
-              <Crown className="w-3 h-3 fill-current" /> EDUNEX PRO
+              <Crown className="w-3 h-3 fill-current" /> ATROQ Education PRO
             </span>
             <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full font-semibold">
               Abunəlik
@@ -151,7 +151,7 @@ export const ProActivationModal: React.FC<ProActivationModalProps> = ({
           {/* Rəsmi PRO Paketlər Cədvəli (2x2 Kompakt Qrid) */}
           <div>
             <h4 className="text-[10px] font-black text-slate-800 uppercase tracking-wider mb-1.5">
-              Rəsmi EDUNEX PRO Paketləri və Qiymətləri
+              Rəsmi ATROQ Education PRO Paketləri və Qiymətləri
             </h4>
             <div className="grid grid-cols-2 gap-2">
               {PRO_PACKAGES.map((pkg) => (

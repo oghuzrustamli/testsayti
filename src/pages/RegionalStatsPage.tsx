@@ -491,10 +491,10 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
             <Sparkles className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
             <div>
               <h4 className="text-xs font-black uppercase text-amber-900 tracking-wider">
-                EDUNEX Canlı Reytinq Sistemi: Yalnız Faktiki İmtahan Nəticələrinə Əsaslanır
+                ATROQ Education Canlı Reytinq Sistemi: Yalnız Faktiki İmtahan Nəticələrinə Əsaslanır
               </h4>
               <p className="text-xs text-amber-800 mt-1 leading-relaxed">
-                Bu sistemdə demo və ya uydurma nəticələr göstərilmir. Şagirdlər EDUNEX-də qeydiyyatdan keçərək (Rayon, Məktəb, Sinif və 7 rəqəmli UTİS kodu ilə) test və imtahanlarda iştirak etdikdə, onların topladıqları real ballar əsasında həm şagird, həm məktəblərarası, həm də rayonlararası reytinqlər burada canlı və avtomatik formalaşacaqdır.
+                Bu sistemdə demo və ya uydurma nəticələr göstərilmir. Şagirdlər ATROQ Education platformasında qeydiyyatdan keçərək (Rayon, Məktəb, Sinif və 7 rəqəmli UTİS kodu ilə) test və imtahanlarda iştirak etdikdə, onların topladıqları real ballar əsasında həm şagird, həm məktəblərarası, həm də rayonlararası reytinqlər burada canlı və avtomatik formalaşacaqdır.
               </p>
             </div>
           </div>
@@ -1048,7 +1048,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                   <GraduationCap className="w-12 h-12 text-slate-300" />
                   <span className="text-sm font-black text-slate-700">Məlumat yoxdur</span>
                   <span className="text-xs text-slate-400 max-w-md">
-                    «{selectedSchoolName}» üzrə hələlik EDUNEX sistemində imtahan nəticəsi qeydə alınmayıb.
+                    «{selectedSchoolName}» üzrə hələlik ATROQ Education sistemində imtahan nəticəsi qeydə alınmayıb.
                   </span>
                 </div>
               ) : (
@@ -1174,7 +1174,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                       {currentDistrictRecord.studentsCount > 0 ? (
                         <>Naxçıvan MR üzrə reytinq mövqeyi: <strong>8 rayondan {currentDistrictRecord.nmrRank}-ci yer</strong></>
                       ) : (
-                        <span className="text-slate-400">Bu rayon üzrə hələlik EDUNEX imtahan nəticəsi qeydə alınmayıb</span>
+                        <span className="text-slate-400">Bu rayon üzrə hələlik ATROQ Education imtahan nəticəsi qeydə alınmayıb</span>
                       )}
                     </p>
                   </div>
@@ -1316,7 +1316,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                 <div className="divide-y divide-slate-100">
                   {schools.filter(s => s.studentsCount > 0 && s.gradeScores[selectedGrade] > 0).length === 0 ? (
                     <div className="p-8 text-center text-slate-400 text-xs font-semibold">
-                      {selectedGrade} üzrə hələlik EDUNEX imtahan nəticəsi qeydə alınmayıb
+                      {selectedGrade} üzrə hələlik ATROQ Education imtahan nəticəsi qeydə alınmayıb
                     </div>
                   ) : (
                     [...schools]

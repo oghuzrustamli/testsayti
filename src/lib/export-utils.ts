@@ -43,7 +43,7 @@ export function formatDuration(seconds: number): string {
  */
 export function exportMultiSubjectResultsToExcel(
   detailedResults: StudentDetailedResult[],
-  testTitle: string = 'EDUNEX_Imtahan_Netice'
+  testTitle: string = 'ATROQ_Imtahan_Netice'
 ) {
   const workbook = XLSX.utils.book_new();
 
@@ -155,7 +155,7 @@ export function exportMultiSubjectResultsToExcel(
     XLSX.utils.book_append_sheet(workbook, worksheet2, 'Sual-Cavab Detalları');
   }
 
-  const cleanTitle = (testTitle || 'EDUNEX_Imtahan_Netice').replace(/[^a-zA-Z0-9_ğüşıöçĞÜŞİÖÇ\-]/g, '_');
+  const cleanTitle = (testTitle || 'ATROQ_Imtahan_Netice').replace(/[^a-zA-Z0-9_ğüşıöçĞÜŞİÖÇ\-]/g, '_');
   XLSX.writeFile(workbook, `${cleanTitle}_Fənlər_Üzrə_Nəticə.xlsx`);
 }
 

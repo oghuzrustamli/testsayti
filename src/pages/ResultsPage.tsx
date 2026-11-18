@@ -81,7 +81,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
       alert('İxrac etmək üçün heç bir nəticə yoxdur');
       return;
     }
-    const title = initialTestId && filteredResults[0] ? filteredResults[0].test_title : 'EDUNEX_Bütün_Nəticələr';
+    const title = initialTestId && filteredResults[0] ? filteredResults[0].test_title : 'ATROQ_Bütün_Nəticələr';
     exportResultsToExcel(filteredResults, title || 'Nəticələr');
   };
 

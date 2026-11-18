@@ -168,7 +168,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-[10px] font-mono tracking-widest text-cyan-300 uppercase shadow-[0_0_15px_rgba(6,182,212,0.3)] mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
             <Cpu className="w-3 h-3 text-cyan-400" />
-            <span>EDUNEX QUANTUM v2.5 • AI PORTAL</span>
+            <span>ATROQ EDUCATION v2.5 • AI PORTAL</span>
           </div>
 
           <h2 className="text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-cyan-300 via-indigo-200 to-purple-300 bg-clip-text text-transparent">
@@ -177,7 +177,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <p className="text-xs text-slate-400 mt-1">
             {mode === 'login'
               ? 'Hesabınıza daxil olaraq sınaqlar və OMR kartlarını idarə edin'
-              : 'EDUNEX platformasına qoşularaq innovativ imtahanlar yaradın'}
+              : 'ATROQ Education platformasına qoşularaq innovativ imtahanlar yaradın'}
           </p>
         </div>
 
@@ -249,7 +249,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="məsələn: muellim@edunex.az"
+                  placeholder="məsələn: muellim@atroq.edu.az"
                   className="w-full pl-10 pr-3 py-2.5 text-xs bg-slate-950/70 border border-slate-700/80 hover:border-cyan-500/50 focus:border-cyan-400 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 shadow-inner transition-all font-sans"
                 />
               </div>
@@ -397,7 +397,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ad@edunex.az"
+                    placeholder="ad@atroq.edu.az"
                     className="w-full pl-9 pr-2.5 py-2 text-xs bg-slate-950/70 border border-slate-700/80 hover:border-cyan-500/50 focus:border-cyan-400 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all font-sans"
                   />
                 </div>
@@ -537,7 +537,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* Footer */}
         <div className="mt-4 pt-3 border-t border-slate-800 text-center">
           <p className="text-[10px] text-slate-500">
-            © 2026 EDUNEX AI Neural Test Suite • Bütün hüquqlar qorunur.
+            © 2026 ATROQ Education • Bütün hüquqlar qorunur.
           </p>
         </div>
       </div>

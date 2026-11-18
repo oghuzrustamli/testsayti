@@ -783,7 +783,7 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
     let y = margin;
 
     doc.setFontSize(16);
-    doc.text('EDUNEX - OMR OPTİK CAVAB KARTI', margin, y + 4);
+    doc.text('ATROQ EDUCATION - OMR OPTİK CAVAB KARTI', margin, y + 4);
     y += 10;
 
     doc.setFontSize(10);
@@ -837,7 +837,7 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
 
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
-    doc.text('EDUNEX Quiz Creator - OMR Test Vərəqi Sistemi • Standart 3 Sütunlu Optik Format', margin, 285);
+    doc.text('ATROQ Education - OMR Test Vərəqi Sistemi • Standart 3 Sütunlu Optik Format', margin, 285);
 
     doc.save(`${title.replace(/[^a-zA-Z0-9_]/g, '_')}_OMR_Cavab_Karti.pdf`);
   };
@@ -849,7 +849,7 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
     let y = margin;
 
     doc.setFontSize(16);
-    doc.text('EDUNEX - DÜZGÜN CAVAB AÇARLARI', margin, y + 4);
+    doc.text('ATROQ EDUCATION - DÜZGÜN CAVAB AÇARLARI', margin, y + 4);
     y += 10;
 
     doc.setFontSize(10);

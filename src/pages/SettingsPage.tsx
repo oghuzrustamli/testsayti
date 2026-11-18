@@ -76,7 +76,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           </div>
           <div>
             <h3 className="font-bold text-slate-900 text-sm">
-              {user.is_pro ? 'EDUNEX PRO Abunəliyi Aktivdir' : 'Standart Hesab'}
+              {user.is_pro ? 'ATROQ Education PRO Abunəliyi Aktivdir' : 'Standart Hesab'}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
               {user.is_pro && user.pro_expires_at

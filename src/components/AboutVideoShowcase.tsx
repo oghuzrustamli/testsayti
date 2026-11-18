@@ -1,7 +1,7 @@
 // src/components/AboutVideoShowcase.tsx
-// EDUNEX – Virtual Qadın Aparıcılı Peşəkar Televiziya Tele-Təqdimat Videosu
+// ATROQ Education – Virtual Qadın Aparıcılı Peşəkar Televiziya Tele-Təqdimat Videosu
 // 48 saniyəlik dinamik 16:9 Full HD studiya təqdimatı, dodaq hərəkətləri (lip-sync),
-// canlı EDUNEX proqram görüntüləri, Azərbaycan dilində qadın səsi və tam idarəetmə elementləri
+// canlı ATROQ Education proqram görüntüləri, Azərbaycan dilində qadın səsi və tam idarəetmə elementləri
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Play,
@@ -48,11 +48,11 @@ const VIDEO_SCENES: VideoScene[] = [
     id: 1,
     startSec: 0,
     endSec: 9.0,
-    title: 'Giriş və EDUNEX Rəqəmsal Ekosistemi',
+    title: 'Giriş və ATROQ Education Rəqəmsal Ekosistemi',
     badge: 'CANLI XƏBƏRLƏR',
-    newsTicker: '► EDUNEX: TƏHSİLDƏ RƏQƏMSAL İNKİŞAF VƏ YENİ YANAŞMA ► MİLLİ KURİKULUM STANDARTLARI',
-    speechText: 'Xoş gəlmisiniz! Bu gün sizə ölkəmizin ən müasir rəqəmsal təhsil platforması olan EDUNEX-i təqdim edirik. EDUNEX tədris və qiymətləndirmə prosesini tamamilə avtomatlaşdırır.',
-    subtitle: 'Xoş gəlmisiniz! EDUNEX tədris və qiymətləndirmə prosesini tamamilə rəqəmsallaşdırır.'
+    newsTicker: '► ATROQ EDUCATION: TƏHSİLDƏ RƏQƏMSAL İNKİŞAF VƏ YENİ YANAŞMA ► MİLLİ KURİKULUM STANDARTLARI',
+    speechText: 'Xoş gəlmisiniz! Bu gün sizə ölkəmizin ən müasir rəqəmsal təhsil platforması olan ATROQ Education-ı təqdim edirik. ATROQ Education tədris və qiymətləndirmə prosesini tamamilə avtomatlaşdırır.',
+    subtitle: 'Xoş gəlmisiniz! ATROQ Education tədris və qiymətləndirmə prosesini tamamilə rəqəmsallaşdırır.'
   },
   {
     id: 2,
@@ -90,9 +90,9 @@ const VIDEO_SCENES: VideoScene[] = [
     endSec: 48.0,
     title: 'Müəllif və Gələcəyə Baxış',
     badge: 'LAYİHƏ MÜƏLLİFİ',
-    newsTicker: '► İDEYA MÜƏLLİFİ, TƏRTİBATÇISI VƏ DİZAYNERİ: RƏŞAD KİRMANOĞLU ► EDUNEX 2026',
-    speechText: 'EDUNEX — təhsildə rəqəmsal imkanlar və yeni yanaşma. Bu platformanın ideya müəllifi, tərtibatçısı və dizayneri Rəşad Kirmanoğludur.',
-    subtitle: 'EDUNEX — təhsildə rəqəmsal imkanlar və yeni yanaşma. İdeya müəllifi, tərtibatçısı və dizayneri Rəşad Kirmanoğludur.'
+    newsTicker: '► İDEYA MÜƏLLİFİ, TƏRTİBATÇISI VƏ DİZAYNERİ: RƏŞAD KİRMANOĞLU ► ATROQ EDUCATION 2026',
+    speechText: 'ATROQ Education — təhsildə rəqəmsal imkanlar və yeni yanaşma. Bu platformanın ideya müəllifi, tərtibatçısı və dizayneri Rəşad Kirmanoğludur.',
+    subtitle: 'ATROQ Education — təhsildə rəqəmsal imkanlar və yeni yanaşma. İdeya müəllifi, tərtibatçısı və dizayneri Rəşad Kirmanoğludur.'
   }
 ];
 
@@ -103,12 +103,12 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  
+
   // Virtual Presenter Realism States (Lip-Sync, Blinking, Head Motion)
   const [isBlinking, setIsBlinking] = useState<boolean>(false);
   const [mouthOpenPhase, setMouthOpenPhase] = useState<number>(0); // 0: closed, 1: half, 2: wide, 3: round
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const synthNodesRef = useRef<{ gain: GainNode; oscs: OscillatorNode[] } | null>(null);
@@ -205,7 +205,7 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
     try {
       if (synthNodesRef.current) {
         synthNodesRef.current.oscs.forEach((o) => {
-          try { o.stop(); o.disconnect(); } catch {}
+          try { o.stop(); o.disconnect(); } catch { }
         });
         synthNodesRef.current = null;
       }
@@ -232,8 +232,8 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
         const lang = v.lang.toLowerCase();
         const isLang = lang.startsWith('az') || lang.startsWith('tr');
         const isFem = name.includes('female') || name.includes('kadın') || name.includes('qadın') ||
-                      name.includes('dilara') || name.includes('yelda') || name.includes('filiz') ||
-                      name.includes('seda') || name.includes('zira') || name.includes('aylin');
+          name.includes('dilara') || name.includes('yelda') || name.includes('filiz') ||
+          name.includes('seda') || name.includes('zira') || name.includes('aylin');
         return isLang && isFem;
       }) || voices.find(v => {
         const lang = v.lang.toLowerCase();
@@ -337,10 +337,10 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
   const handleToggleFullscreen = () => {
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen().catch(() => {});
+      containerRef.current.requestFullscreen().catch(() => { });
       setIsFullscreen(true);
     } else {
-      document.exitFullscreen().catch(() => {});
+      document.exitFullscreen().catch(() => { });
       setIsFullscreen(false);
     }
   };
@@ -364,9 +364,8 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
   return (
     <div
       ref={containerRef}
-      className={`w-full overflow-hidden bg-slate-950 text-white rounded-2xl border border-slate-800 shadow-2xl flex flex-col relative select-none ${
-        isFullscreen ? 'fixed inset-0 z-50 rounded-none' : ''
-      }`}
+      className={`w-full overflow-hidden bg-slate-950 text-white rounded-2xl border border-slate-800 shadow-2xl flex flex-col relative select-none ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : ''
+        }`}
     >
       {/* ==============================================================
           STUDIO TOP BROADCAST HEADER (TV Live Stream)
@@ -380,7 +379,7 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
           </div>
 
           <div className="flex items-center gap-1.5 pl-1">
-            <span className="font-black text-[11px] tracking-wider text-white">EDUNEX TV STUDİO</span>
+            <span className="font-black text-[11px] tracking-wider text-white">ATROQ TV STUDİO</span>
             <span className="text-[8px] font-mono font-bold px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
               FULL HD 1080p
             </span>
@@ -418,7 +417,7 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
           Right: Dynamic Synchronized EDUNEX UI Screens
           ============================================================== */}
       <div className="relative w-full aspect-video min-h-[250px] sm:min-h-[340px] max-h-[460px] bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/80 overflow-hidden flex items-stretch">
-        
+
         {/* Background Virtual Studio Ambient Lights */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_50%,rgba(14,165,233,0.12),transparent_60%)] pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_75%_50%,rgba(99,102,241,0.15),transparent_60%)] pointer-events-none" />
@@ -429,13 +428,12 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
         <div className="relative w-[38%] sm:w-[42%] shrink-0 h-full overflow-hidden flex items-end justify-center select-none border-r border-slate-800/80">
           {/* High-Definition Photorealistic Presenter Portrait */}
           <div
-            className={`relative w-full h-full flex items-end justify-center transition-transform duration-500 ${
-              isSpeaking ? 'scale-[1.012] -translate-y-0.5' : 'scale-100'
-            }`}
+            className={`relative w-full h-full flex items-end justify-center transition-transform duration-500 ${isSpeaking ? 'scale-[1.012] -translate-y-0.5' : 'scale-100'
+              }`}
           >
             <img
               src="/images/edunex_presenter.jpg"
-              alt="EDUNEX Virtual Aparıcı"
+              alt="ATROQ Virtual Aparıcı"
               className="w-full h-full object-cover object-top filter brightness-[1.02] contrast-[1.04]"
               onError={(e) => {
                 // Fallback in case of asset path
@@ -517,13 +515,13 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
             <div className="absolute bottom-10 left-2.5 z-20 flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-700/80 backdrop-blur-md shadow-lg">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-[9px] font-black tracking-wide text-white">Aygün M.</span>
-              <span className="text-[8px] text-sky-300 font-mono">EDUNEX Anchor</span>
+              <span className="text-[8px] text-sky-300 font-mono">ATROQ Anchor</span>
             </div>
           </div>
         </div>
 
         {/* ==========================================================
-            RIGHT COLUMN: REAL EDUNEX PROQRAM GÖRÜNTÜLƏRİ VƏ ANİMASİYALAR
+            RIGHT COLUMN: REAL ATROQ EDUCATION PROQRAM GÖRÜNTÜLƏRİ VƏ ANİMASİYALAR
             Aparıcı izah etdikcə müvafiq proqram görüntüləri canlanır
             ========================================================== */}
         <div className="flex-1 h-full p-2.5 sm:p-4 flex flex-col justify-between relative overflow-hidden bg-slate-950/70">
@@ -543,14 +541,14 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
             </span>
           </div>
 
-          {/* ==================== SƏHNƏ 1: EDUNEX GİRİŞ VƏ LOQO ==================== */}
+          {/* ==================== SƏHNƏ 1: ATROQ EDUCATION GİRİŞ VƏ LOQO ==================== */}
           {currentScene.id === 1 && (
             <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center p-2 animate-in fade-in zoom-in-95 duration-300">
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-xl shadow-indigo-500/30 border border-white/20 animate-pulse mb-1.5">
                 <Cpu className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
               <h3 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-sky-300">
-                EDUNEX
+                ATROQ Education
               </h3>
               <p className="text-[11px] sm:text-xs font-bold text-sky-300 mt-0.5 max-w-xs">
                 Təhsilin Rəqəmsal İnkişaf Platforması
@@ -676,9 +674,8 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
                   ].map((item, idx) => (
                     <div key={item.name} className="flex flex-col items-center gap-0.5">
                       <div
-                        className={`w-full max-w-[16px] rounded-t ${
-                          idx === 0 ? 'bg-gradient-to-t from-amber-500 to-amber-300' : 'bg-indigo-600/80'
-                        }`}
+                        className={`w-full max-w-[16px] rounded-t ${idx === 0 ? 'bg-gradient-to-t from-amber-500 to-amber-300' : 'bg-indigo-600/80'
+                          }`}
                         style={{ height: `${item.val * 0.48}px` }}
                       />
                       <span className="text-[7px] font-bold text-slate-400 truncate max-w-full">{item.name}</span>
@@ -701,7 +698,7 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
               </h4>
 
               <p className="text-[10px] text-slate-300 mt-0.5 max-w-xs leading-tight font-serif italic">
-                “EDUNEX — təhsildə rəqəmsal imkanlar və yeni yanaşma.”
+                “ATROQ Education — təhsildə rəqəmsal imkanlar və yeni yanaşma.”
               </p>
 
               <div className="mt-1.5 flex items-center gap-1 text-[8px] text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
@@ -768,9 +765,8 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
               key={scene.id}
               type="button"
               onClick={() => handleSeek(scene.startSec)}
-              className={`hover:text-cyan-300 transition-colors cursor-pointer ${
-                currentScene.id === scene.id ? 'text-cyan-400 font-black' : ''
-              }`}
+              className={`hover:text-cyan-300 transition-colors cursor-pointer ${currentScene.id === scene.id ? 'text-cyan-400 font-black' : ''
+                }`}
             >
               {scene.id}. {scene.badge}
             </button>
@@ -804,9 +800,8 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
             <button
               type="button"
               onClick={handleToggleMute}
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                isMuted ? 'bg-rose-950/60 text-rose-400 border border-rose-800' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-              }`}
+              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${isMuted ? 'bg-rose-950/60 text-rose-400 border border-rose-800' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                }`}
               title={isMuted ? 'Səsi aç' : 'Səsi bağla'}
             >
               {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}

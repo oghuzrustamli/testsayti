@@ -263,7 +263,7 @@ export const AnsweredTestPage: React.FC<AnsweredTestPageProps> = ({
 
     // Header
     doc.setFontSize(16);
-    doc.text('EDUNEX SINAQ İMTAHANI VƏ TEST VƏRƏQİ', margin, y + 5);
+    doc.text('ATROQ EDUCATION SINAQ İMTAHANI VƏ TEST VƏRƏQİ', margin, y + 5);
     y += 10;
 
     doc.setFontSize(11);
@@ -343,7 +343,7 @@ export const AnsweredTestPage: React.FC<AnsweredTestPageProps> = ({
     // Page footer
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
-    doc.text('EDUNEX Quiz Creator - Çap üçün Test Sistemi', margin, pageHeight - 8);
+    doc.text('ATROQ Education - Çap üçün Test Sistemi', margin, pageHeight - 8);
     doc.text(`Səhifə 1`, pageWidth - margin - 20, pageHeight - 8);
     doc.setTextColor(0, 0, 0);
   };
@@ -356,7 +356,7 @@ export const AnsweredTestPage: React.FC<AnsweredTestPageProps> = ({
     let y = margin;
 
     doc.setFontSize(16);
-    doc.text('EDUNEX DÜZGÜN CAVAB AÇARI', margin, y);
+    doc.text('ATROQ EDUCATION DÜZGÜN CAVAB AÇARI', margin, y);
     y += 8;
 
     doc.setFontSize(11);
@@ -391,7 +391,7 @@ export const AnsweredTestPage: React.FC<AnsweredTestPageProps> = ({
     // Footer
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
-    doc.text('EDUNEX Quiz Creator - Cavab Açarı Vərəqi', margin, pageHeight - 10);
+    doc.text('ATROQ Education - Cavab Açarı Vərəqi', margin, pageHeight - 10);
     doc.setTextColor(0, 0, 0);
   };
 
@@ -786,7 +786,7 @@ export const AnsweredTestPage: React.FC<AnsweredTestPageProps> = ({
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-extrabold text-lg tracking-wider text-slate-950 uppercase">EDUNEX</span>
+                    <span className="font-extrabold text-lg tracking-wider text-slate-950 uppercase">ATROQ Education</span>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-300">
                       SINAQ İMTAHANI VƏ TEST VƏRƏQİ
                     </span>
@@ -913,7 +913,7 @@ export const AnsweredTestPage: React.FC<AnsweredTestPageProps> = ({
 
             {/* A4 Footer */}
             <div className="mt-10 pt-4 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-400">
-              <span>EDUNEX Quiz Creator Təhsil Platforması</span>
+              <span>ATROQ Education Təhsil Platforması</span>
               <span>A4 İmtahan Formatı • Səhifə 1 / 1</span>
             </div>
           </div>

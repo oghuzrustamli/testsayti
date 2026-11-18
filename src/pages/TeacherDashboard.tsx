@@ -74,7 +74,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             <span>Xoş gəlmisiniz, {user.full_name}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-            EDUNEX Quiz Creator Təhsil Portalı
+            ATROQ Education Təhsil Portalı
           </h1>
           <p className="text-indigo-200 text-xs sm:text-sm mt-2 leading-relaxed">
             Buraxılış, Blok və Lisey qəbul imtahanları üçün saniyələr ərzində peşəkar testlər hazırlayın, riyazi düstur və qrafikləri asanlıqla suallara daxil edin və nəticələri real vaxtda izləyin.

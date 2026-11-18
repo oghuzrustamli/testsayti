@@ -98,7 +98,7 @@ export const PdfQuestionSelector: React.FC<PdfQuestionSelectorProps> = ({
 
   // Load Sample Demo Exam PDF
   const handleLoadSamplePdf = () => {
-    loadPdfData('/sample_exam.pdf', 'EDUNEX_Numune_Sinaq.pdf');
+    loadPdfData('/sample_exam.pdf', 'ATROQ_Numune_Sinaq.pdf');
   };
 
   // Render current PDF page

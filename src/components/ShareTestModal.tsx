@@ -36,7 +36,7 @@ export const ShareTestModal: React.FC<ShareTestModalProps> = ({
   };
 
   const handleWhatsAppShare = () => {
-    const text = `Salam! EDUNEX platformasında sizin üçün "${test.title}" imtahan testi hazırdır.\n\nİmtahana daxil olmaq üçün bu linkə keçid edin:\n${shareUrl}\n\nUğurlar arzulayırıq!`;
+    const text = `Salam! ATROQ Education platformasında sizin üçün "${test.title}" imtahan testi hazırdır.\n\nİmtahana daxil olmaq üçün bu linkə keçid edin:\n${shareUrl}\n\nUğurlar arzulayırıq!`;
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };

@@ -1,5 +1,5 @@
 // src/pages/AboutPage.tsx
-// EDUNEX – “Haqqında” Səhifəsi
+// ATROQ Education – “Haqqında” Səhifəsi
 // Proqramın müəllifi: Rəşad Kirmanoğlu, yaradılma məqsədi, imkanları və AI Tanıtım Videosu
 // Dizayn düzəlişi: Bütün çərçivələr, kartlar, mətnlər və boşluqlar mütənasib şəkildə kiçildilib, yığcamlaşdırılıb
 import React, { useState } from 'react';
@@ -43,7 +43,7 @@ interface CapabilityItem {
   highlights: string[];
 }
 
-const EDUNEX_CAPABILITIES: CapabilityItem[] = [
+const ATROQ_CAPABILITIES: CapabilityItem[] = [
   {
     id: 1,
     title: 'Süni intellektlə testlərin hazırlanması',
@@ -149,7 +149,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
 
       {/* Yığcam və Mütənasib Konteyner */}
       <div className="max-w-3xl sm:max-w-4xl mx-auto w-full px-3 sm:px-6 py-5 relative z-10 flex flex-col gap-5 sm:gap-6">
-        
+
         {/* =========================================================================
             1. HERO & MOTTO HEADER (Yığcamlaşdırılmış)
            ========================================================================= */}
@@ -170,7 +170,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
               </div>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-sky-300">
-              EDUNEX
+              ATROQ Education
             </h1>
           </div>
 
@@ -197,7 +197,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
         </section>
 
         {/* =========================================================================
-            2. EDUNEX HAQQINDA TƏQDİMAT (Yığcam Rəsmi Mətn Bloku)
+            2. ATROQ EDUCATION HAQQINDA TƏQDİMAT (Yığcam Rəsmi Mətn Bloku)
            ========================================================================= */}
         <section className="relative rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-900/50 border border-slate-800/80 p-3.5 sm:p-5 shadow-xl backdrop-blur-lg overflow-hidden">
           <div className="flex flex-col gap-3">
@@ -207,7 +207,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
               </div>
               <div>
                 <h2 className="text-xs sm:text-sm font-black text-white tracking-tight">
-                  EDUNEX — Təhsilin rəqəmsal inkişaf platforması
+                  ATROQ Education — Təhsilin rəqəmsal inkişaf platforması
                 </h2>
                 <span className="text-[10px] text-sky-400 font-semibold uppercase tracking-wider block">
                   Platformanın Yaradılma Məqsədi və Fəlsəfəsi
@@ -217,7 +217,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
 
             <div className="space-y-2 text-slate-300 text-xs sm:text-[13px] leading-relaxed">
               <p className="bg-slate-950/60 p-3 sm:p-3.5 rounded-xl border border-slate-800/60 text-slate-200">
-                <strong className="text-white font-bold">EDUNEX</strong> təhsil prosesinin rəqəmsallaşdırılması, qiymətləndirmə imkanlarının genişləndirilməsi, test və imtahanların hazırlanması, şagird nəticələrinin təhlili və tədris prosesinə müasir texnologiyaların tətbiqi məqsədilə yaradılmış platformadır.
+                <strong className="text-white font-bold">ATROQ Education</strong> təhsil prosesinin rəqəmsallaşdırılması, qiymətləndirmə imkanlarının genişləndirilməsi, test və imtahanların hazırlanması, şagird nəticələrinin təhlili və tədris prosesinə müasir texnologiyaların tətbiqi məqsədilə yaradılmış platformadır.
               </p>
               <p className="text-slate-300 px-1">
                 Platforma müəllim və şagirdlərə biliklərin yoxlanılması, müxtəlif formatlarda tapşırıqların hazırlanması, avtomatlaşdırılmış qiymətləndirmə və regional təhsil statistikasının aparılması üçün geniş imkanlar təqdim edir.
@@ -257,7 +257,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
         </section>
 
         {/* =========================================================================
-            3. EDUNEX-İ TANI — MONTAJ EDİLMİŞ AI TANITIM VİDEOSU (16:9 Kompakt Sahə)
+            3. ATROQ EDUCATION-I TANI — MONTAJ EDİLMİŞ AI TANITIM VİDEOSU (16:9 Kompakt Sahə)
            ========================================================================= */}
         <section className="flex flex-col gap-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -267,13 +267,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
                 <span>MULTİMEDİA TƏQDİMATI</span>
               </div>
               <h2 className="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
-                <span>EDUNEX-i tanı</span>
+                <span>ATROQ Education-ı tanı</span>
                 <span className="text-[9px] px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono font-bold border border-sky-500/30">
                   48 SANİYƏ • VİRTUAL APARICI
                 </span>
               </h2>
               <p className="text-[11px] text-slate-400">
-                Virtual qadın aparıcının təqdimatında EDUNEX-in real proqram görüntüləri, canlı lip-sync və səs müşayiəti.
+                Virtual qadın aparıcının təqdimatında ATROQ Education-ın real proqram görüntüləri, canlı lip-sync və səs müşayiəti.
               </p>
             </div>
 
@@ -296,7 +296,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
         </section>
 
         {/* =========================================================================
-            4. EDUNEX-İN İMKANLARI (10 Əsas Funksiya - Yığcam Şəbəkə)
+            4. ATROQ EDUCATION-IN İMKANLARI (10 Əsas Funksiya - Yığcam Şəbəkə)
            ========================================================================= */}
         <section className="flex flex-col gap-3">
           <div className="text-center max-w-xl mx-auto flex flex-col items-center">
@@ -305,7 +305,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
               <span>FUNKSİONAL ARXİTEKTURA</span>
             </div>
             <h2 className="text-base sm:text-xl font-black text-white tracking-tight">
-              EDUNEX-in 10 Əsas İmkanı
+              ATROQ Education-ın 10 Əsas İmkanı
             </h2>
             <p className="text-[11px] sm:text-xs text-slate-400">
               Müəllim, şagird və təhsil idarələri üçün vahid rəqəmsal ekosistemdə birləşdirilmiş ən müasir texnoloji həllər.
@@ -314,7 +314,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
 
           {/* Yığcam 10 Kartlıq Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {EDUNEX_CAPABILITIES.map((cap) => {
+            {ATROQ_CAPABILITIES.map((cap) => {
               const IconComp = cap.icon;
               return (
                 <div
@@ -333,7 +333,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
                           № {cap.id < 10 ? `0${cap.id}` : cap.id}
                         </span>
                       </div>
-                      
+
                       <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-700/50 tracking-wide">
                         {cap.badge}
                       </span>
@@ -372,7 +372,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
            ========================================================================= */}
         <section className="relative rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-950 border border-indigo-500/40 p-4 sm:p-6 shadow-xl shadow-indigo-950/50 overflow-hidden">
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6">
-            
+
             {/* Left: Author Credentials & Bio */}
             <div className="flex-1 flex flex-col gap-2.5 text-center md:text-left">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-bold uppercase tracking-wider mx-auto md:mx-0 w-fit">
@@ -382,7 +382,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
 
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
-                  EDUNEX — Proqramın ideya müəllifi, tərtibatçısı və dizayneri:
+                  ATROQ Education — Proqramın ideya müəllifi, tərtibatçısı və dizayneri:
                 </p>
                 <h3 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-sky-200 to-indigo-100 tracking-tight font-serif mt-0.5">
                   Rəşad Kirmanoğlu
@@ -390,7 +390,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
               </div>
 
               <p className="text-xs sm:text-[13px] text-slate-300 leading-relaxed max-w-md">
-                Təhsilin rəqəmsallaşdırılması, müasir qiymətləndirmə texnologiyaları və süni intellektin tədris prosesinə inteqrasiyası istiqamətində hazırlanmış milli EDUNEX platforması müəllimlərin iş yükünü yüngülləşdirmək və regional təhsil keyfiyyətini yüksəltmək məqsədi daşıyır.
+                Təhsilin rəqəmsallaşdırılması, müasir qiymətləndirmə texnologiyaları və süni intellektin tədris prosesinə inteqrasiyası istiqamətində hazırlanmış milli ATROQ Education platforması müəllimlərin iş yükünü yüngülləşdirmək və regional təhsil keyfiyyətini yüksəltmək məqsədi daşıyır.
               </p>
 
               <div className="pt-1 flex flex-wrap items-center justify-center md:justify-start gap-2 text-[10px] text-slate-400">
@@ -411,15 +411,15 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
 
             {/* Right: Digital Signature & Verification Seal */}
             <div className="flex flex-col items-center justify-center gap-3 p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/90 shadow-lg shrink-0">
-              
+
               {/* Official Seal Graphic */}
               <div className="relative w-20 h-20 flex items-center justify-center">
                 <div className="absolute inset-0 rounded-full border border-dashed border-sky-400/40 animate-spin" style={{ animationDuration: '24s' }} />
                 <div className="absolute inset-1.5 rounded-full border border-indigo-400/30 bg-gradient-to-tr from-indigo-950 via-slate-950 to-sky-950" />
-                
+
                 <div className="relative z-10 flex flex-col items-center justify-center text-center p-1">
                   <ShieldCheck className="w-4 h-4 text-amber-300 mb-0.5" />
-                  <span className="text-[7px] font-black tracking-widest text-sky-300 uppercase">EDUNEX</span>
+                  <span className="text-[7px] font-black tracking-widest text-sky-300 uppercase">ATROQ</span>
                   <span className="text-[6px] font-mono font-bold text-slate-400 uppercase tracking-tighter">ARCHITECT</span>
                   <span className="text-[7px] font-black text-amber-300 font-mono">2026</span>
                 </div>
@@ -430,7 +430,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
                 <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">
                   RƏQƏMSAL TƏSDİQ İMZASI
                 </span>
-                
+
                 <div className="w-36 h-9 flex items-center justify-center">
                   <svg
                     viewBox="0 0 240 70"
@@ -485,7 +485,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
             6. FOOTER NOTES
            ========================================================================= */}
         <footer className="text-center py-3 border-t border-slate-900 text-[10px] text-slate-500 flex flex-col items-center gap-1">
-          <p>© 2026 EDUNEX Platforması. Bütün hüquqlar qorunur.</p>
+          <p>© 2026 ATROQ Education Platforması. Bütün hüquqlar qorunur.</p>
           <p className="text-[9px] text-slate-600">
             Təhsilin rəqəmsallaşdırılması və müasir qiymətləndirmə ekosistemi.
           </p>

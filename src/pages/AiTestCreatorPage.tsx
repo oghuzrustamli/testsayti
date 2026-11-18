@@ -340,7 +340,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.setTextColor(31, 41, 55);
-      doc.text(sanitizeForPdf(testTitle || 'EDUNEX IMTAHAN TESTI'), margin + 4, y);
+      doc.text(sanitizeForPdf(testTitle || 'ATROQ EDUCATION IMTAHAN TESTI'), margin + 4, y);
 
       y += 6;
       doc.setFont('helvetica', 'normal');
@@ -997,7 +997,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
             </div>
 
             <h3 className="text-lg font-black text-slate-900 mb-2">
-              EDUNEX AI Sualları Tərtib Edir...
+              ATROQ Education AI Sualları Tərtib Edir...
             </h3>
             <p className="text-xs text-indigo-700 font-bold mb-4 font-mono animate-pulse">
               {progressMsg}

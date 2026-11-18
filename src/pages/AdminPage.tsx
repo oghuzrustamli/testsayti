@@ -173,7 +173,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ currentUser }) => {
             <Shield className="w-6 h-6 text-amber-400" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900">EDUNEX Administrator Paneli</h1>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900">ATROQ Education Administrator Paneli</h1>
             <p className="text-xs text-slate-500">
               İstifadəçi idarəsi, PRO aktivasiya kodları generatoru və təhlükəsizlik audit jurnalı
             </p>
@@ -532,7 +532,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ currentUser }) => {
                   required
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  placeholder="email@edunex.az"
+                  placeholder="email@atroq.edu.az"
                   className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl"
                 />
               </div>

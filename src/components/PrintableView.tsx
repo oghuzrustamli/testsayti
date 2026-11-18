@@ -73,7 +73,7 @@ export const PrintableView: React.FC<PrintableViewProps> = ({ test, onBack }) =>
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-lg text-indigo-950 uppercase tracking-wider">EDUNEX</span>
+                <span className="font-extrabold text-lg text-indigo-950 uppercase tracking-wider">ATROQ Education</span>
                 <span className="text-xs px-2 py-0.5 bg-slate-100 rounded text-slate-600 font-semibold border border-slate-200">
                   {test.exam_model}
                 </span>
@@ -189,7 +189,7 @@ export const PrintableView: React.FC<PrintableViewProps> = ({ test, onBack }) =>
 
         {/* Footer */}
         <div className="mt-8 pt-4 border-t border-slate-200 text-center text-[10px] text-slate-400 flex items-center justify-between">
-          <span>EDUNEX Quiz Creator Təhsil Sistemi</span>
+          <span>ATROQ Education Təhsil Sistemi</span>
           <span>Səhifə 1 / 1</span>
         </div>
       </div>

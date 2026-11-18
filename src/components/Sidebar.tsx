@@ -119,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'results', label: 'Nəticələr', icon: BarChart3 },
     { id: 'statistics', label: 'Statistika', icon: TrendingUp },
     { id: 'regional_stats', label: 'Regional statistika', icon: Award, badge: 'NMR' },
-    { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'EDUNEX', highlight: false },
+    { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'ATROQ', highlight: false },
     { id: 'archive', label: 'Arxiv', icon: Archive },
     { id: 'settings', label: 'Parametrlər', icon: Settings },
   ];
@@ -131,7 +131,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'subscriptions', label: 'Abunəliklər & Ödənişlər', icon: Shield },
     { id: 'stats', label: 'İstifadə statistikası', icon: TrendingUp },
     { id: 'regional_stats', label: 'Regional statistika', icon: Award, badge: 'NMR' },
-    { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'EDUNEX', highlight: false },
+    { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'ATROQ', highlight: false },
     { id: 'audit', label: 'Audit jurnalı', icon: History },
     { id: 'settings', label: 'Sistem parametrləri', icon: Settings },
   ];
@@ -142,7 +142,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'completed_tests', label: 'Tamamlanmış testlər', icon: CheckCircle2 },
     { id: 'results', label: 'Nəticələrim', icon: BarChart3 },
     { id: 'regional_stats', label: 'Regional statistika', icon: Award, badge: 'NMR' },
-    { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'EDUNEX', highlight: false },
+    { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'ATROQ', highlight: false },
     { id: 'profile', label: 'Şəxsi məlumatlar', icon: UserCheck },
   ];
 
@@ -266,7 +266,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Footer Info */}
       <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-[11px] text-slate-500">
         <div className="flex items-center justify-between mb-1">
-          <span className="font-bold text-slate-700">EDUNEX Platforması</span>
+          <span className="font-bold text-slate-700">ATROQ Education</span>
           <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">v2.5</span>
         </div>
         <p className="text-[10px] text-slate-400 leading-tight">
