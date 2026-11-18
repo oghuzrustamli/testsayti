@@ -152,45 +152,68 @@ export function parseQuestionsFromRawText(rawText: string, defaultSubject: strin
       body = body.replace(answerInChunkRegex, '').trim();
     }
 
-    // Now extract options: A), B), C), D), E)
-    // Supports both multiline options and inline options (e.g. A) Baki B) Gəncə C) Şuşa)
+    // Extract options: A, B, C, D, E
+    // Robust sequential detection: find A, then B, then C, then D, then E
     const options: QuestionOption[] = [];
-    const optionLabels = ['A', 'B', 'C', 'D', 'E'];
-
-    // Regex to detect options like:
-    // A) text, A. text, [A] text, (A) text, A - text
-    // Also flags if marked with asterisk e.g. A*) or [x] A
-    const optionPattern = /(?:^|\s)(?:(\*|\[x\]\s*))?([A-Ea-e])[\)\.\:\-]\s*([^\n]+?)(?=(?:\s+(?:(?:\*|\[x\]\s*))?[A-Ea-e][\)\.\:\-]|\n\s*(?:(?:\*|\[x\]\s*))?[A-Ea-e][\)\.\:\-]|$))/g;
-
     let questionStem = body;
-    const optionMatches: Array<{ label: string; text: string; isMarked: boolean; index: number }> = [];
 
-    let optExec: RegExpExecArray | null;
-    while ((optExec = optionPattern.exec(body)) !== null) {
-      const isMarked = Boolean(optExec[1]);
-      const label = optExec[2].toUpperCase();
-      const text = optExec[3].trim();
-      optionMatches.push({ label, text, isMarked, index: optExec.index });
+    // Pattern to find option headers: line-start or preceded by whitespace
+    const headerRegex = /(?:^|\n|\r|[ \t]+)(?:(\*|\[x\]\s*))?([A-Ea-e])[\)\.\:\-][ \t]*/g;
+    const rawMatches: Array<{ fullMatch: string; isMarked: boolean; letter: string; index: number; contentStartIndex: number }> = [];
+
+    let hm: RegExpExecArray | null;
+    while ((hm = headerRegex.exec(body)) !== null) {
+      const isMarked = Boolean(hm[1]);
+      const letter = hm[2].toUpperCase();
+      const matchIndex = hm.index;
+      const contentStartIndex = matchIndex + hm[0].length;
+      rawMatches.push({
+        fullMatch: hm[0],
+        isMarked,
+        letter,
+        index: matchIndex,
+        contentStartIndex
+      });
     }
 
-    if (optionMatches.length >= 2) {
-      // Find where first option starts in the body to isolate question stem
-      const firstOptIndex = optionMatches[0].index;
-      questionStem = body.substring(0, firstOptIndex).trim();
+    // Verify sequential presence of A -> B -> C -> D -> (E)
+    let seqMatches: typeof rawMatches = [];
+    const expectedOrder = ['A', 'B', 'C', 'D', 'E'];
+    let nextExpectedIdx = 0;
 
-      // Collect options
-      optionMatches.forEach((om) => {
-        if (om.isMarked && !identifiedCorrectAnswer) {
-          identifiedCorrectAnswer = om.label;
+    for (const m of rawMatches) {
+      if (m.letter === expectedOrder[nextExpectedIdx]) {
+        seqMatches.push(m);
+        nextExpectedIdx++;
+      }
+    }
+
+    // Require at least A, B and C to form valid options
+    if (seqMatches.length >= 2) {
+      const firstOpt = seqMatches[0];
+      questionStem = body.substring(0, firstOpt.index).trim();
+
+      for (let i = 0; i < seqMatches.length; i++) {
+        const cur = seqMatches[i];
+        const next = seqMatches[i + 1];
+        const optTextRaw = next
+          ? body.substring(cur.contentStartIndex, next.index)
+          : body.substring(cur.contentStartIndex);
+
+        const cleanOptText = optTextRaw.replace(/\s+/g, ' ').trim();
+
+        if (cur.isMarked && !identifiedCorrectAnswer) {
+          identifiedCorrectAnswer = cur.letter;
         }
+
         options.push({
-          id: om.label,
-          text: om.text,
+          id: cur.letter,
+          text: cleanOptText || `Variant ${cur.letter}`,
           is_correct: false
         });
-      });
+      }
     } else {
-      // If regex pattern didn't match cleanly, check line-by-line fallback
+      // Line-by-line fallback parser
       const lines = body.split('\n');
       const stemLines: string[] = [];
 
@@ -212,7 +235,6 @@ export function parseQuestionsFromRawText(rawText: string, defaultSubject: strin
         } else if (options.length === 0) {
           stemLines.push(line);
         } else {
-          // Continuation of previous option
           if (options.length > 0) {
             options[options.length - 1].text += ' ' + lineTrim;
           }

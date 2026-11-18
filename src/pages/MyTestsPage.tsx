@@ -556,11 +556,16 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
                       </span>
                     </div>
 
-                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
-                      isAnsweredMode ? 'bg-amber-50 text-amber-700 border border-amber-200/80' : 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
-                    }`}>
-                      {isAnsweredMode ? 'OMR Test' : 'İnteraktiv Test'}
-                    </span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                        isAnsweredMode ? 'bg-amber-50 text-amber-700 border border-amber-200/80' : 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
+                      }`}>
+                        {test.title.includes('AI') ? 'AI Sınaq' : (isAnsweredMode ? 'OMR Test' : 'İnteraktiv Test')}
+                      </span>
+                      <span className="text-[9px] font-mono font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
+                        ID: {test.id}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Test Title */}
@@ -579,8 +584,8 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
                     {test.title}
                   </h3>
 
-                  {/* Subject and Grade Pills */}
-                  <div className="flex flex-wrap items-center gap-2 text-xs mb-4">
+                  {/* Subject, Grade, and Topic Pills */}
+                  <div className="flex flex-wrap items-center gap-1.5 text-xs mb-3">
                     <span className="font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200 flex items-center gap-1">
                       <BookOpen className="w-3 h-3 text-indigo-600" />
                       {test.subject}
@@ -589,6 +594,11 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
                       <GraduationCap className="w-3 h-3 text-indigo-600" />
                       {test.grade_group || 'Ümumi'}
                     </span>
+                    {test.topic && (
+                      <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-200 truncate max-w-[180px]" title={test.topic}>
+                        {test.topic}
+                      </span>
+                    )}
                   </div>
 
                   {/* Metrics bar: Oxuyan.az style Clean Statistics */}

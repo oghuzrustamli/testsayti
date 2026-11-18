@@ -463,40 +463,55 @@ export const api = {
 
   // Share & Exam Taking
   async getTestByShareCode(code: string): Promise<{ test: Partial<Test>; questions: Question[] }> {
-    const cleanCode = code.trim().toUpperCase();
+    const rawCode = (code || '').trim();
+    const cleanCode = rawCode.toUpperCase();
     try {
-      const res = await fetch(`${API_BASE}/share/${cleanCode}`);
+      const res = await fetch(`${API_BASE}/share/${encodeURIComponent(rawCode)}`);
       if (res.ok) return await res.json();
     } catch {}
 
-    const cached = localStorage.getItem(LS_TESTS_KEY);
-    const tests: Test[] = cached ? JSON.parse(cached) : DEFAULT_SAMPLE_TESTS;
-    const found = tests.find(t => (t.share_code && t.share_code.toUpperCase() === cleanCode) || t.id === cleanCode);
-    if (found) {
-      let qList: Question[] = (found as any).questions || [];
-      if (!qList || qList.length === 0) {
-        const count = found.total_questions || 25;
-        qList = Array.from({ length: count }, (_, i) => ({
-          id: `q-${found.id}-${i + 1}`,
-          subject: found.subject || 'Ümumi',
-          question_text: `Sual №${i + 1}`,
-          question_type: 'single_choice' as const,
-          options: [
-            { id: 'A', text: 'A' },
-            { id: 'B', text: 'B' },
-            { id: 'C', text: 'C' },
-            { id: 'D', text: 'D' },
-            { id: 'E', text: 'E' },
-          ],
-          correct_answer: 'A',
-          points: 4,
-          order_index: i
-        }));
+    // Fallback: If code is a direct test id, fetch via /api/tests/:id
+    try {
+      const res = await fetch(`${API_BASE}/tests/${encodeURIComponent(rawCode)}`);
+      if (res.ok) {
+        const testObj = await res.json();
+        return { test: testObj, questions: testObj.questions || [] };
       }
-      return {
-        test: found,
-        questions: qList
-      };
+    } catch {}
+
+    const cached = localStorage.getItem(LS_TESTS_KEY);
+    if (cached) {
+      try {
+        const tests: Test[] = JSON.parse(cached);
+        const found = tests.find(
+          t => (t.share_code && t.share_code.toUpperCase() === cleanCode) ||
+               t.id === rawCode ||
+               (t.id && t.id.toLowerCase() === rawCode.toLowerCase())
+        );
+        if (found) {
+          let qList: Question[] = (found as any).questions || [];
+          if (!qList || qList.length === 0) {
+            const count = found.total_questions || 25;
+            qList = Array.from({ length: count }, (_, i) => ({
+              id: `q-${found.id}-${i + 1}`,
+              subject: found.subject || 'Ümumi',
+              question_text: `Sual №${i + 1}`,
+              question_type: 'single_choice' as const,
+              options: [
+                { id: 'A', text: 'A' },
+                { id: 'B', text: 'B' },
+                { id: 'C', text: 'C' },
+                { id: 'D', text: 'D' },
+                { id: 'E', text: 'E' },
+              ],
+              correct_answer: 'A',
+              points: 4,
+              order_index: i
+            }));
+          }
+          return { test: found, questions: qList };
+        }
+      } catch {}
     }
     throw new Error('Test linki tapılmadı və ya aktiv deyil');
   },

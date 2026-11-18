@@ -100,6 +100,7 @@ export function App() {
     return (
       <InteractiveTestTaking
         shareCode={examShareCode}
+        testId={examShareCode}
         onExit={() => {
           setExamShareCode(null);
           window.history.replaceState({}, document.title, window.location.pathname);

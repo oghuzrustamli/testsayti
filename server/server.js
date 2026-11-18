@@ -424,9 +424,9 @@ app.post('/api/tests', (req, res) => {
           qId,
           validTeacherId,
           exam_model,
-          subject,
-          topic || '',
-          parseInt(grade_group) || 9,
+          q.subject || subject,
+          q.topic || topic || '',
+          parseInt(q.grade || grade_group) || 9,
           q.question_text || `Sual №${i + 1}`,
           q.question_type || 'single_choice',
           JSON.stringify(q.options || [
@@ -832,25 +832,48 @@ app.post('/api/question-banks/send-to-test', (req, res) => {
 // ==========================================
 app.get('/api/share/:code', (req, res) => {
   const { code } = req.params;
-  const cleanCode = code.trim().toUpperCase();
+  const rawCode = (code || '').trim();
+  const cleanCode = rawCode.toUpperCase();
 
-  const shareLink = db.prepare('SELECT * FROM ShareLinks WHERE unique_code = ?').get(cleanCode);
+  // 1. Try finding by ShareLinks unique_code
+  let shareLink = db.prepare('SELECT * FROM ShareLinks WHERE unique_code = ? OR unique_code = ?').get(cleanCode, rawCode);
+
+  // 2. If not found, try finding by ShareLinks test_id
   if (!shareLink) {
+    shareLink = db.prepare('SELECT * FROM ShareLinks WHERE test_id = ? OR test_id = ? ORDER BY created_at DESC LIMIT 1').get(rawCode, cleanCode);
+  }
+
+  // 3. If still not found, check if a Test exists directly with this id
+  let test = null;
+  if (shareLink) {
+    test = db.prepare('SELECT * FROM Tests WHERE id = ?').get(shareLink.test_id);
+  } else {
+    test = db.prepare('SELECT * FROM Tests WHERE id = ? OR id = ?').get(rawCode, cleanCode.toLowerCase());
+    if (test) {
+      const now = new Date().toISOString();
+      const newShareCode = 'EDX-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000);
+      const linkId = 'shr-' + Math.random().toString(36).substring(2, 9);
+      try {
+        db.prepare('INSERT INTO ShareLinks (id, test_id, unique_code, is_active, created_at) VALUES (?, ?, ?, 1, ?)').run(linkId, test.id, newShareCode, now);
+        shareLink = { id: linkId, test_id: test.id, unique_code: newShareCode, is_active: 1, created_at: now };
+      } catch (e) {
+        shareLink = { id: linkId, test_id: test.id, unique_code: newShareCode, is_active: 1, created_at: now };
+      }
+    }
+  }
+
+  if (!test) {
     return res.status(404).json({ error: 'Paylaşım linki və ya sınaq kodu tapılmadı' });
   }
 
-  if (shareLink.is_active !== 1) {
+  if (shareLink && shareLink.is_active !== 1) {
     return res.status(403).json({ error: 'Bu test üçün paylaşım linki müəllim tərəfindən deaktiv edilib' });
-  }
-
-  const test = db.prepare('SELECT * FROM Tests WHERE id = ?').get(shareLink.test_id);
-  if (!test) {
-    return res.status(404).json({ error: 'Əlaqəli test mövcud deyil' });
   }
 
   // Get questions without revealing correct answers to student!
   const questions = db.prepare(`
     SELECT q.id, q.question_text, q.question_type, q.options_json, q.points, q.image_url, q.graph_data_json,
+           q.subject, q.topic, q.grade,
            q.situation_text, q.situation_keywords_json, q.situation_synonyms_json, q.situation_grading_mode, q.situation_model_answer,
            tq.order_index
     FROM TestQuestions tq
@@ -872,6 +895,9 @@ app.get('/api/share/:code', (req, res) => {
     }
     return {
       id: q.id,
+      subject: q.subject || test.subject,
+      topic: q.topic || test.topic,
+      grade: q.grade || test.grade_group,
       question_text: q.question_text,
       question_type: q.question_type,
       options: opts,

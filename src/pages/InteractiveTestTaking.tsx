@@ -176,6 +176,11 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
       try {
         setLoading(true);
         setErrorMsg('');
+        setIsExamStarted(false);
+        setExamResult(null);
+        setAnswers({});
+        setCurrentIndex(0);
+        setSessionId(null);
         let testData: any;
         if (shareCode) {
           testData = await api.getTestByShareCode(shareCode);
@@ -336,6 +341,10 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
     e.preventDefault();
     if (!studentName.trim() || !studentSurname.trim()) {
       alert('Zəhmət olmasa ad və soyadınızı daxil edin');
+      return;
+    }
+    if (!questions || questions.length === 0) {
+      alert('Bu testdə sual mövcud deyil. Zəhmət olmasa müəllim kabinetindən suallar əlavə edin.');
       return;
     }
 
@@ -583,9 +592,17 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
               />
             </div>
 
+            {(!questions || questions.length === 0) && (
+              <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>Bu testdə hələlik sual mövcud deyil. Zəhmət olmasa müəllim kabinetindən testə suallar əlavə edin.</span>
+              </div>
+            )}
+
             <button
               type="submit"
-              className="mt-2 w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md shadow-indigo-100 transition-all flex items-center justify-center gap-2"
+              disabled={!questions || questions.length === 0 || loading}
+              className="mt-2 w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold text-xs shadow-md shadow-indigo-100 transition-all flex items-center justify-center gap-2"
             >
               <span>İmtahana Başla</span>
               <ChevronRight className="w-4 h-4" />

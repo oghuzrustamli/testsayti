@@ -1,10 +1,40 @@
 @import "tailwindcss";
 
 @layer base {
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
     @apply bg-slate-50 text-slate-900 antialiased min-h-screen selection:bg-indigo-500/20 selection:text-indigo-900;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   }
+}
+
+/* ==============================================================
+   EDUNEX Oxunaqlı Şrift Nizamlaması (Tələb 9 - 1px böyüdülməsi)
+   11px -> 12px, 13px -> 14px, digər kiçik şriftlər 1 pillə rahat oxunan
+   ============================================================== */
+.text-\[10px\] {
+  font-size: 11px !important;
+}
+
+.text-\[10\.5px\] {
+  font-size: 11.5px !important;
+}
+
+.text-\[11px\] {
+  font-size: 12px !important;
+}
+
+.text-\[13px\] {
+  font-size: 14px !important;
+}
+
+.text-xs {
+  font-size: 0.8125rem !important; /* 12px -> 13px */
+  line-height: 1.15rem !important;
 }
 
 /* Custom scrollbars */

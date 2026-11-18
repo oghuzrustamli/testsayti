@@ -474,14 +474,19 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
       setSaving(true);
       setSaveSuccessMsg('');
 
+      const isMulti = creationMode === 'multi';
+      const effectiveSubject = isMulti ? multiSubjects.map(s => s.subject).join(', ') : selectedSubject;
+      const effectiveTopic = isMulti ? multiSubjects.map(s => s.subject).join(', ') : selectedTopics.slice(0, 3).join(', ');
+      const effectiveTitle = testTitle.trim() || `${effectiveSubject} - ${selectedGrade} AI Sınaq`;
+
       const created = await api.createTest({
         teacher_id: user.id,
-        title: testTitle.trim() || `${selectedSubject} - ${selectedGrade} AI Sınaq`,
+        title: effectiveTitle,
         exam_model: 'Sinif imtahanı',
         grade_group: selectedGrade,
-        subject: selectedSubject,
-        topic: selectedTopics.slice(0, 3).join(', '),
-        duration_minutes: Math.max(15, totalCount * 2),
+        subject: effectiveSubject,
+        topic: effectiveTopic,
+        duration_minutes: Math.max(15, editableQuestions.length * 2),
         total_questions: editableQuestions.length,
         total_points: editableQuestions.reduce((sum, q) => sum + (q.points || 1), 0),
         grading_rule: 'standard',
@@ -497,12 +502,12 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
           id: created.id,
           share_code: created.share_code,
           teacher_id: user.id,
-          title: testTitle.trim() || `${selectedSubject} - ${selectedGrade} AI Sınaq`,
+          title: effectiveTitle,
           exam_model: 'Sinif imtahanı',
           grade_group: selectedGrade,
-          subject: selectedSubject,
-          topic: selectedTopics.slice(0, 3).join(', '),
-          duration_minutes: Math.max(15, totalCount * 2),
+          subject: effectiveSubject,
+          topic: effectiveTopic,
+          duration_minutes: Math.max(15, editableQuestions.length * 2),
           total_questions: editableQuestions.length,
           total_points: editableQuestions.reduce((sum, q) => sum + (q.points || 1), 0),
           grading_rule: 'standard',

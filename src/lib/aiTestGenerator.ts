@@ -307,7 +307,7 @@ function generateSubjectSpecificTemplate(subject: string, topic: string, index: 
   if (sLower.includes('kimya')) {
     const list = [
       {
-        qText: `«${topic}» mövzusuna əsasən, aşağıdakı maddələrdən hansı kovalent polyar rabitəli mürəkkəb maddədir?`,
+        qText: `Aşağıdakı maddələrdən hansı kovalent polyar rabitəli mürəkkəb maddədir?`,
         correct: 'Su (H₂O)',
         wrongs: ['Oksigen qazı (O₂)', 'Natrium-xlorid (NaCl)', 'Dəmir (Fe)', 'Azot qazı (N₂)']
       },
@@ -352,7 +352,7 @@ function generateSubjectSpecificTemplate(subject: string, topic: string, index: 
   // Tarix
   if (sLower.includes('tarix')) {
     return {
-      qText: `«${topic}» dövrünə aid baş vermiş tarixi hadisələrin xronoloji ardıcıllığını və əsas tarixi əhəmiyyətini müəyyən edin.`,
+      qText: `Dövrə aid baş vermiş tarixi hadisələrin xronoloji ardıcıllığını və əsas tarixi əhəmiyyətini müəyyən edin.`,
       correct: 'Milli dövlətçilik ənənələrinin möhkəmlənməsi və ərazi bütövlüyünün qorunması',
       wrongs: [
         'Dövlətin xarici asılılığa düşməsi və idarəetmənin iflası',
@@ -367,7 +367,7 @@ function generateSubjectSpecificTemplate(subject: string, topic: string, index: 
   // Coğrafiya
   if (sLower.includes('coğrafiya')) {
     return {
-      qText: `«${topic}» mövzusu üzrə ərazinin relyefi, iqlim xüsusiyyətləri və təbii ehtiyatları ilə bağlı hansı fikir doğrudur?`,
+      qText: `Ərazinin relyefi, iqlim xüsusiyyətləri və təbii ehtiyatları ilə bağlı hansı fikir doğrudur?`,
       correct: 'Mülayim və subtropik iqlim qurşaqlarının kəsişməsində zəngin təbii landşaft formalaşmışdır',
       wrongs: [
         'Ərazidə yalnız daimi donuşluq və qütb səhraları hökm sürür',
@@ -382,7 +382,7 @@ function generateSubjectSpecificTemplate(subject: string, topic: string, index: 
   // İnformatika
   if (sLower.includes('informatika')) {
     return {
-      qText: `«${topic}» mövzusu üzrə informasiya prosesləri və kompüter texnologiyalarına aid hansı müddəa doğrudur?`,
+      qText: `İnformasiya prosesləri və kompüter texnologiyalarına aid hansı müddəa doğrudur?`,
       correct: 'Alqoritmin xassələri: müəyyənlik, kütləvilik, nəticəvilik və diskretlikdir',
       wrongs: [
         'Kompüterin əməli yaddaşı (RAM) elektrik enerjisi kəsildikdə məlumatı daimi saxlayır',
@@ -397,7 +397,7 @@ function generateSubjectSpecificTemplate(subject: string, topic: string, index: 
   // İngilis dili
   if (sLower.includes('ingilis') || sLower.includes('english')) {
     return {
-      qText: `Choose the correct grammatical form according to the topic "${topic}": "If students ... more diligently, they will achieve high scores."`,
+      qText: `Choose the correct grammatical form: "If students ... more diligently, they will achieve high scores."`,
       correct: 'study',
       wrongs: ['studied', 'will study', 'had studied', 'studies'],
       explanation: 'First Conditional: If + Present Simple (study), Future Simple (will achieve).'
@@ -407,7 +407,7 @@ function generateSubjectSpecificTemplate(subject: string, topic: string, index: 
   // Ədəbiyyat
   if (sLower.includes('ədəbiyyat')) {
     return {
-      qText: `«${topic}» əsərinin ideya-məzmun xüsusiyyətləri və qəhrəmanların daxili ziddiyyətləri ilə bağlı hansı fikir doğrudur?`,
+      qText: `Əsərin ideya-məzmun xüsusiyyətləri və qəhrəmanların daxili ziddiyyətləri ilə bağlı hansı fikir doğrudur?`,
       correct: 'Əsərdə vətənpərvərlik, insanpərvərlik və milli azadlıq ideyaları aparıcı xətt təşkil edir',
       wrongs: [
         'Əsər sırf məişət komediyası janrında yazılmışdır',
@@ -422,7 +422,7 @@ function generateSubjectSpecificTemplate(subject: string, topic: string, index: 
   // Məntiq
   if (sLower.includes('məntiq')) {
     return {
-      qText: `«${topic}» üzrə verilmiş qanunauyğunluğa əsasən sual işarəsinin (?) yerinə uyğun gələn məntiqi cavabı müəyyən edin: 3, 7, 15, 31, ?`,
+      qText: `Verilmiş qanunauyğunluğa əsasən sual işarəsinin (?) yerinə uyğun gələn məntiqi cavabı müəyyən edin: 3, 7, 15, 31, ?`,
       correct: '63 ($x_{n+1} = 2x_n + 1$)',
       wrongs: ['55', '60', '65', '72'],
       explanation: 'Hər sonrakı hədd əvvəlki həddin iki mislindən 1 vahid çoxdur: $31 \\times 2 + 1 = 63$.'
@@ -432,7 +432,7 @@ function generateSubjectSpecificTemplate(subject: string, topic: string, index: 
   // Həyat bilgisi və ya Təbiət
   if (sLower.includes('həyat') || sLower.includes('təbiət')) {
     return {
-      qText: `«${topic}» mövzusu üzrə sağlam həyat tərzi və təbiətin qorunması qaydalarına əsasən hansı davranış düzgündür?`,
+      qText: `Sağlam həyat tərzi və təbiətin qorunması qaydalarına əsasən hansı davranış düzgündür?`,
       correct: 'Ətraf mühiti təmiz saxlamaq, tullantıları çeşidləmək və fövqəladə hallarda təlimatlara əməl etmək',
       wrongs: [
         'Fövqəladə hal zamanı liftlərdən istifadə etmək',
@@ -446,15 +446,15 @@ function generateSubjectSpecificTemplate(subject: string, topic: string, index: 
 
   // Standart fənn
   return {
-    qText: `«${topic}» mövzusu üzrə rəsmi məktəb dərslik kurikulumuna əsasən verilmiş müddəalardan hansı tamamilə doğrudur?`,
+    qText: `Rəsmi dərslik kurikulumuna əsasən verilmiş müddəalardan hansı tamamilə doğrudur?`,
     correct: `Nəzəri prinsiplər elmi dərslik standartlarına və praktiki tətbiq qaydalarına tam uyğundur`,
     wrongs: [
       `Qanunauyğunluqlar yalnız xüsusi laboratoriya şəraitində ödənilir`,
-      `Mövzuda irəli sürülən fərziyyə müasir elmi nəticələrlə ziddiyyət təşkil edir`,
+      `Müasir elmi nəticələrlə ziddiyyət təşkil edən fərziyyə qəbul edilmişdir`,
       `Kəmiyyətlər arasındakı asılılıq təsadüfi xarakter daşıyır`,
       `Əsas anlayışlar yalnız ilkin sinif səviyyəsində qüvvədədir`
     ],
-    explanation: `Seçilmiş mövzu üzrə Azərbaycan təhsil kurikulumunun dərslik tələblərinə əsasən tərtib edilmişdir.`
+    explanation: `Seçilmiş fənn üzrə Azərbaycan təhsil kurikulumunun dərslik tələblərinə əsasən tərtib edilmişdir.`
   };
 }
 
@@ -568,7 +568,7 @@ function generateOpenQuestionData(
       const U = (R1 + R2) * 5;
       return {
         topic,
-        question_text: `${qNum}. Müqaviməti $R_1 = ${R1}\\text{ Om}$ və $R_2 = ${R2}\\text{ Om}$ olan iki rezistor ardıcıl birləşdirilərək $U = ${U}\\text{ V}$ gərginlik mənbəyinə qoşulmuşdur. Dövrədəki cərəyan şiddətini ($I$) və ikinci rezistordakı gərginlik düşgüsünü ($U_2$) hesablayın.`,
+        question_text: `Müqaviməti $R_1 = ${R1}\\text{ Om}$ və $R_2 = ${R2}\\text{ Om}$ olan iki rezistor ardıcıl birləşdirilərək $U = ${U}\\text{ V}$ gərginlik mənbəyinə qoşulmuşdur. Dövrədəki cərəyan şiddətini ($I$) və ikinci rezistordakı gərginlik düşgüsünü ($U_2$) hesablayın.`,
         correct_answer: `I = 5 A, U2 = ${5 * R2} V`,
         explanation: `Ardıcıl birləşmədə $R_\\text{üm} = R_1 + R_2 = ${R1} + ${R2} = ${R1 + R2}\\text{ Om}$. Cərəyan şiddəti $I = \\frac{U}{R_\\text{üm}} = \\frac{${U}}{${R1 + R2}} = 5\\text{ A}$. İkinci rezistordakı gərginlik $U_2 = I \\cdot R_2 = 5 \\cdot ${R2} = ${5 * R2}\\text{ V}$.`,
         criteria: 'Tam doğru cavab (I = 5 A və U2): 4 bal.\nYalnız düsturlar düz yazılıb, lakin hesablama xətası var: 2 bal.\nYalnız bir kəmiyyət düz tapılıb: 2 bal.\nYanlış yanaşma: 0 bal.',
@@ -580,7 +580,7 @@ function generateOpenQuestionData(
       const Ep = m * 10 * h;
       return {
         topic,
-        question_text: `${qNum}. Kütləsi $m = ${m}\\text{ kq}$ olan cisim $h = ${h}\\text{ m}$ hündürlükdən sərbəst düşür. Yere çatan anda cismin kinetik enerjisini ($E_k$) Coul ilə hesablayın. ($g = 10\\text{ m/san}^2$, hava müqaviməti nəzərə alınmır)`,
+        question_text: `Kütləsi $m = ${m}\\text{ kq}$ olan cisim $h = ${h}\\text{ m}$ hündürlükdən sərbəst düşür. Yere çatan anda cismin kinetik enerjisini ($E_k$) Coul ilə hesablayın. ($g = 10\\text{ m/san}^2$, hava müqaviməti nəzərə alınmır)`,
         correct_answer: `${Ep} C`,
         explanation: `Tam mexaniki enerjinin saxlanması qanununa görə yerə çatan anda $E_k = E_p = mgh = ${m} \\cdot 10 \\cdot ${h} = ${Ep}\\text{ Coul}$.`,
         criteria: `Tam cavab (${Ep} C): 4 bal.\nEnerjinin saxlanması düsturu düzgün göstərilib, lakin riyazi hesablamada xəta var: 2 bal.\nYanlış cavab: 0 bal.`,
@@ -597,7 +597,7 @@ function generateOpenQuestionData(
     const bStr = b < 0 ? `${b}x` : `+ ${b}x`;
     return {
       topic,
-      question_text: `${qNum}. $x^2 ${bStr} + ${c} = 0$ kvadrat tənliyinin köklərinin cəmini və hasilini hesablayın.`,
+      question_text: `$x^2 ${bStr} + ${c} = 0$ kvadrat tənliyinin köklərinin cəmini və hasilini hesablayın.`,
       correct_answer: `Cəmi: ${x1 + x2}, Hasili: ${c}`,
       explanation: `Viyet teoreminə görə köklərin cəmi $x_1 + x_2 = ${x1 + x2}$, hasili $x_1 \\cdot x_2 = ${c}$-dir.`,
       criteria: `Hər iki qiymət düzgün tapılıb (${x1 + x2} və ${c}): 4 bal.\nYalnız biri düzgündür: 2 bal.\nYanlış: 0 bal.`,
@@ -607,7 +607,7 @@ function generateOpenQuestionData(
 
   return {
     topic,
-    question_text: `${qNum}. «${topic}» mövzusu üzrə əsas elmi qanunauyğunluğu və ya qaydanı şərh edin və onun praktiki tətbiqinə dair ən azı iki konkret faktiki nümunə göstərin.`,
+    question_text: `Əsas elmi qanunauyğunluğu və ya qaydanı şərh edin və onun praktiki tətbiqinə dair ən azı iki konkret faktiki nümunə göstərin.`,
     correct_answer: 'Nəzəri anlayışın tam şərhi və 2 düzgün faktiki nümunə.',
     explanation: 'Mövzunun əsas prinsipləri dərslik proqramına uyğun olaraq aydın şərh edilməli və real həyatla əlaqələndirilməlidir.',
     criteria: 'Mövzu dəqiq izah olunub və 2 düzgün nümunə var: 4 bal.\nYalnız 1 nümunə və ya natamam izah: 2 bal.\nCavab verilməyib: 0 bal.',
