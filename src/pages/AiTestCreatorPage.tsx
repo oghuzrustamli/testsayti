@@ -254,6 +254,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
           open_questions_count: allGeneratedQuestions.filter(q => q.question_type !== 'single_choice').length,
           total_points: allGeneratedQuestions.reduce((sum, q) => sum + (q.points || 1), 0),
           test_mode: 'interactive',
+          test_type: 'ai',
           questions: allGeneratedQuestions,
           answer_key: {},
           topic_breakdown: {},
@@ -491,11 +492,12 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
         total_points: editableQuestions.reduce((sum, q) => sum + (q.points || 1), 0),
         grading_rule: 'standard',
         test_mode: 'interactive',
+        test_type: 'ai',
         status: 'published',
         questions: editableQuestions
       });
 
-      setSaveSuccessMsg('İnteraktiv test uğurla yadda saxlanıldı!');
+      setSaveSuccessMsg(`İnteraktiv AI test uğurla yadda saxlanıldı! Link kodu: ${created.share_code}`);
 
       if (onTestSaved) {
         const fullSavedTest: Test = {
@@ -512,11 +514,13 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
           total_points: editableQuestions.reduce((sum, q) => sum + (q.points || 1), 0),
           grading_rule: 'standard',
           test_mode: 'interactive',
+          test_type: 'ai',
           status: 'published',
           result_display_mode: 'immediate',
+          is_link_active: true,
           questions: editableQuestions
         };
-        onTestSaved(fullSavedTest, false);
+        onTestSaved(fullSavedTest, true);
       }
     } catch (err: any) {
       alert('Yadda saxlanılarkən xəta baş verdi: ' + (err.message || 'Bilinməyən xəta'));

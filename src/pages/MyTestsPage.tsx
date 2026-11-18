@@ -93,6 +93,7 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
   const [activePortalTab, setActivePortalTab] = useState<'subjects' | 'grades' | 'all'>(initialTab);
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [selectedGrade, setSelectedGrade] = useState<string>('all');
+  const [testTypeFilter, setTestTypeFilter] = useState<'all' | 'ai' | 'standard' | 'omr'>('all');
   const [activeStatus, setActiveStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [actionSuccess, setActionSuccess] = useState<string>('');
@@ -196,14 +197,20 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
     }
   };
 
-  // Automated subject & grade matching
+  // Helper to distinguish AI tests from standard mock exams
+  const isAiTest = (t: Test) => {
+    return t.test_type === 'ai' || (t.title && t.title.startsWith('ATROQ AI:')) || (t.exam_model && t.exam_model.toLowerCase().includes('ai'));
+  };
+
+  // Automated subject & grade matching (excludes AI tests from Sınaq İmtahanları portal counts)
   const getSubjectTestCount = (subjectName: string) => {
-    return tests.filter(t => t.subject && t.subject.toLowerCase() === subjectName.toLowerCase()).length;
+    return tests.filter(t => !isAiTest(t) && t.subject && t.subject.toLowerCase() === subjectName.toLowerCase()).length;
   };
 
   const getGradeTestCount = (gradeName: string) => {
     const clean = gradeName.replace(/[^0-9]/g, '');
     return tests.filter(t => {
+      if (isAiTest(t)) return false;
       if (!t.grade_group) return false;
       if (clean && t.grade_group.includes(clean)) return true;
       if (gradeName.toLowerCase().includes('abituriyent') && t.grade_group.toLowerCase().includes('abituriyent')) return true;
@@ -212,7 +219,11 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
   };
 
   const filteredTests = tests.filter((t) => {
-    // Portal tab filter
+    // Portal tab filter: AI tests do NOT automatically show up in "Sınaq imtahanları"
+    if (activePortalTab === 'subjects' || activePortalTab === 'grades') {
+      if (isAiTest(t)) return false;
+    }
+
     if (activePortalTab === 'subjects' && selectedSubject !== 'all') {
       if (t.subject?.toLowerCase() !== selectedSubject.toLowerCase()) return false;
     }
@@ -220,6 +231,13 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
       const clean = selectedGrade.replace(/[^0-9]/g, '');
       const matchGrade = clean ? t.grade_group?.includes(clean) : t.grade_group?.toLowerCase().includes(selectedGrade.toLowerCase());
       if (!matchGrade) return false;
+    }
+
+    // In "Bütün Testlərim" tab, filter by test type pill if selected
+    if (activePortalTab === 'all' && testTypeFilter !== 'all') {
+      if (testTypeFilter === 'ai' && !isAiTest(t)) return false;
+      if (testTypeFilter === 'omr' && !(t.test_mode === 'answered' || !!t.pdf_url)) return false;
+      if (testTypeFilter === 'standard' && (isAiTest(t) || t.test_mode === 'answered' || !!t.pdf_url)) return false;
     }
 
     // Status filter
@@ -331,6 +349,59 @@ export const MyTestsPage: React.FC<MyTestsPageProps> = ({
           />
         </div>
       </div>
+
+      {/* Test Modulları Filtri (Bütün Testlərim bölməsində xüsusi kateqoriyalar) */}
+      {activePortalTab === 'all' && (
+        <div className="flex flex-wrap items-center gap-2 pb-1">
+          <button
+            type="button"
+            onClick={() => setTestTypeFilter('all')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              testTypeFilter === 'all'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            Hamısı ({tests.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setTestTypeFilter('ai')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              testTypeFilter === 'ai'
+                ? 'bg-indigo-600 text-white shadow-xs shadow-indigo-200'
+                : 'bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-50'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>AI Testləri ({tests.filter(isAiTest).length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setTestTypeFilter('standard')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              testTypeFilter === 'standard'
+                ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-200'
+                : 'bg-white text-emerald-700 border border-emerald-200 hover:bg-emerald-50'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Sınaq İmtahanları ({tests.filter(t => !isAiTest(t) && t.test_mode !== 'answered' && !t.pdf_url).length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setTestTypeFilter('omr')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              testTypeFilter === 'omr'
+                ? 'bg-violet-600 text-white shadow-xs shadow-violet-200'
+                : 'bg-white text-violet-700 border border-violet-200 hover:bg-violet-50'
+            }`}
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>OMR / Çap Testləri ({tests.filter(t => t.test_mode === 'answered' || !!t.pdf_url).length})</span>
+          </button>
+        </div>
+      )}
 
       {/* ==============================================================
           BÖLMƏ 1: FƏNLƏR ÜZRƏ SEÇİM PANESİ (Oxuyan.az dizaynı)

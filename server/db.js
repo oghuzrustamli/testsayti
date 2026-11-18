@@ -132,6 +132,7 @@ export function initDatabase() {
       result_display_mode TEXT DEFAULT 'immediate', -- immediate, after_deadline, manual
       test_mode TEXT DEFAULT 'interactive', -- interactive, answered
       status TEXT NOT NULL DEFAULT 'draft', -- draft, published, ongoing, completed, archived
+      test_type TEXT DEFAULT 'standard', -- standard, ai, omr
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL,
       FOREIGN KEY (teacher_id) REFERENCES Users(id) ON DELETE CASCADE
@@ -233,6 +234,10 @@ export function initDatabase() {
         created_at TEXT NOT NULL
       );
     `);
+  } catch (e) {}
+
+  try {
+    db.exec("ALTER TABLE Tests ADD COLUMN test_type TEXT DEFAULT 'standard';");
   } catch (e) {}
 
   seedInitialData();

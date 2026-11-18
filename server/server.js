@@ -360,6 +360,7 @@ app.post('/api/tests', (req, res) => {
 
   const testId = 'tst-' + Math.random().toString(36).substring(2, 9);
   const now = new Date().toISOString();
+  const test_type = req.body.test_type || (exam_model === 'AI Sınaq' || (title && title.includes('AI')) ? 'ai' : 'standard');
 
   // Validate teacher_id exists in Users table to avoid FOREIGN KEY failure
   let validTeacherId = teacher_id;
@@ -374,9 +375,9 @@ app.post('/api/tests', (req, res) => {
       id, teacher_id, title, exam_model, grade_group, subject, topic,
       duration_minutes, total_questions, total_points, grading_rule,
       start_time, end_time, result_display_mode, test_mode, status,
-      pdf_url, answer_key_json,
+      pdf_url, answer_key_json, test_type,
       created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     testId,
     validTeacherId,
@@ -396,78 +397,73 @@ app.post('/api/tests', (req, res) => {
     status || 'published',
     pdf_url || null,
     answer_key_json || null,
+    test_type,
     now,
     now
   );
 
-  // Attach questions
+  // Attach questions - guarantee 100% unique question IDs isolated to this specific test
   if (Array.isArray(questions) && questions.length > 0) {
     for (let i = 0; i < questions.length; i++) {
       let q = questions[i];
-      let qId = q.id;
+      // Generate a fresh unique question ID isolated to this test
+      const qId = 'q-' + testId.replace(/[^a-zA-Z0-9]/g, '') + '-' + (i + 1) + '-' + Math.random().toString(36).substring(2, 7);
 
-      // Check if question exists in Questions table
-      const existsInDb = qId && !qId.startsWith('new-') ? db.prepare('SELECT id FROM Questions WHERE id = ?').get(qId) : null;
-      if (!existsInDb) {
-        if (!qId || qId.startsWith('new-')) {
-          qId = 'q-' + Math.random().toString(36).substring(2, 9);
-        }
-        db.prepare(`
-          INSERT INTO Questions (
-            id, teacher_id, exam_model, subject, topic, grade,
-            question_text, question_type, options_json, correct_answer,
-            points, explanation, image_url, graph_data_json, order_index,
-            situation_text, situation_keywords_json, situation_synonyms_json, situation_grading_mode, situation_model_answer,
-            created_at, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(
-          qId,
-          validTeacherId,
-          exam_model,
-          q.subject || subject,
-          q.topic || topic || '',
-          parseInt(q.grade || grade_group) || 9,
-          q.question_text || `Sual №${i + 1}`,
-          q.question_type || 'single_choice',
-          JSON.stringify(q.options || [
-            { id: 'A', text: 'A' },
-            { id: 'B', text: 'B' },
-            { id: 'C', text: 'C' },
-            { id: 'D', text: 'D' },
-            { id: 'E', text: 'E' }
-          ]),
-          q.correct_answer || 'A',
-          parseFloat(q.points) || 1,
-          q.explanation || '',
-          q.image_url || '',
-          q.graph_data ? JSON.stringify(q.graph_data) : null,
-          i,
-          q.situation_text || null,
-          q.situation_keywords ? JSON.stringify(q.situation_keywords) : null,
-          q.situation_synonyms ? JSON.stringify(q.situation_synonyms) : null,
-          q.situation_grading_mode || 'keywords_10',
-          q.situation_model_answer || null,
-          now,
-          now
-        );
-      }
+      db.prepare(`
+        INSERT INTO Questions (
+          id, teacher_id, exam_model, subject, topic, grade,
+          question_text, question_type, options_json, correct_answer,
+          points, explanation, image_url, graph_data_json, order_index,
+          situation_text, situation_keywords_json, situation_synonyms_json, situation_grading_mode, situation_model_answer,
+          created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        qId,
+        validTeacherId,
+        exam_model,
+        q.subject || subject,
+        q.topic || topic || '',
+        parseInt(q.grade || grade_group) || 9,
+        q.question_text || `Sual №${i + 1}`,
+        q.question_type || 'single_choice',
+        JSON.stringify(q.options || [
+          { id: 'A', text: 'A' },
+          { id: 'B', text: 'B' },
+          { id: 'C', text: 'C' },
+          { id: 'D', text: 'D' },
+          { id: 'E', text: 'E' }
+        ]),
+        q.correct_answer || 'A',
+        parseFloat(q.points) || 1,
+        q.explanation || '',
+        q.image_url || '',
+        q.graph_data ? JSON.stringify(q.graph_data) : null,
+        i,
+        q.situation_text || null,
+        q.situation_keywords ? JSON.stringify(q.situation_keywords) : null,
+        q.situation_synonyms ? JSON.stringify(q.situation_synonyms) : null,
+        q.situation_grading_mode || 'keywords_10',
+        q.situation_model_answer || null,
+        now,
+        now
+      );
 
       db.prepare(`
         INSERT INTO TestQuestions (id, test_id, question_id, order_index, points)
         VALUES (?, ?, ?, ?, ?)
-      `).run('tq-' + Math.random().toString(36).substring(2, 9), testId, qId, i, parseFloat(q.points) || 1);
+      `).run('tq-' + testId.replace(/[^a-zA-Z0-9]/g, '') + '-' + (i + 1), testId, qId, i, parseFloat(q.points) || 1);
     }
   }
 
   // Generate unique share code
-  const shareCode = 'EDX-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000);
+  const shareCode = 'ATQ-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000);
   db.prepare(`
     INSERT INTO ShareLinks (id, test_id, unique_code, is_active, created_at)
     VALUES (?, ?, ?, 1, ?)
   `).run('shr-' + Math.random().toString(36).substring(2, 9), testId, shareCode, now);
 
   logAudit(teacher_id, 'Müəllim', 'Yeni Test Yaradıldı', `Test: ${title} (${questions ? questions.length : 0} sual)`, req);
-  res.status(201).json({ id: testId, share_code: shareCode, message: 'Test uğurla yaradıldı' });
+  res.status(201).json({ id: testId, share_code: shareCode, test_type, message: 'Test uğurla yaradıldı' });
 });
 
 app.put('/api/tests/:id', (req, res) => {
@@ -831,6 +827,10 @@ app.post('/api/question-banks/send-to-test', (req, res) => {
 // 5. SHARE LINKS & STUDENT EXAM SESSIONS
 // ==========================================
 app.get('/api/share/:code', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const { code } = req.params;
   const rawCode = (code || '').trim();
   const cleanCode = rawCode.toUpperCase();

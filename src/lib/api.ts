@@ -466,16 +466,23 @@ export const api = {
     const rawCode = (code || '').trim();
     const cleanCode = rawCode.toUpperCase();
     try {
-      const res = await fetch(`${API_BASE}/share/${encodeURIComponent(rawCode)}`);
-      if (res.ok) return await res.json();
+      const res = await fetch(`${API_BASE}/share/${encodeURIComponent(rawCode)}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.test && Array.isArray(data.questions) && data.questions.length > 0) {
+          return data;
+        }
+      }
     } catch {}
 
     // Fallback: If code is a direct test id, fetch via /api/tests/:id
     try {
-      const res = await fetch(`${API_BASE}/tests/${encodeURIComponent(rawCode)}`);
+      const res = await fetch(`${API_BASE}/tests/${encodeURIComponent(rawCode)}`, { cache: 'no-store' });
       if (res.ok) {
         const testObj = await res.json();
-        return { test: testObj, questions: testObj.questions || [] };
+        if (testObj && Array.isArray(testObj.questions) && testObj.questions.length > 0) {
+          return { test: testObj, questions: testObj.questions };
+        }
       }
     } catch {}
 

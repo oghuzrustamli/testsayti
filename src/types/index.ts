@@ -130,6 +130,7 @@ export interface Test {
   result_display_mode: 'immediate' | 'after_deadline' | 'manual';
   test_mode: TestMode;
   status: TestStatus;
+  test_type?: 'standard' | 'ai' | 'omr';
   questions?: Question[];
   share_code?: string;
   is_link_active?: boolean;
