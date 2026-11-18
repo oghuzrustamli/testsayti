@@ -326,10 +326,10 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
           </button>
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900">
-              {editTestId ? 'Testi Redaktə Et' : 'Yeni Test Yarat (Test Creator)'}
+              {editTestId ? 'İnteraktiv Testi Redaktə Et' : 'İnteraktiv Test Yarat'}
             </h1>
             <p className="text-xs text-slate-500">
-              İmtahan modelini, fənni və sualları tənzimləyərək tam işlək test hazırlayın
+              İmtahan modelini, fənni və sualları tənzimləyərək tam işlək interaktiv test hazırlayın
             </p>
           </div>
         </div>

@@ -128,16 +128,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       groupTitle: 'Testlərin Hazırlanması',
       items: [
-        {
-          id: 'test_creator_group',
-          label: 'Test Yarat',
-          icon: PlusCircle,
-          subItems: [
-            { id: 'ai_test', label: 'AI ilə Test Yarat', icon: Sparkles, badge: 'AI' },
-            { id: 'create_test', label: 'İnteraktiv Test Yarat', icon: Edit3 },
-            { id: 'omr_test', label: 'OMR / Cavablı Test', icon: Printer, badge: 'PDF' },
-          ]
-        },
+        { id: 'create_test', label: 'İnteraktiv Test Yarat', icon: Edit3 },
+        { id: 'ai_test', label: 'AI ilə Test Yarat', icon: Sparkles, badge: 'AI' },
+        { id: 'omr_test', label: 'OMR / Cavablı Test', icon: Printer, badge: 'PDF' },
       ]
     },
     {

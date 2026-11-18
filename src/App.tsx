@@ -218,7 +218,7 @@ export function App() {
               )}
 
               {activeTab === 'create_test' && (
-                <TestCreateHubPage
+                <TestCreatorPage
                   user={currentUser}
                   editTestId={editingTestId}
                   onBack={() => setActiveTab('my_tests')}
