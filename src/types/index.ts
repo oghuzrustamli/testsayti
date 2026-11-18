@@ -9,6 +9,8 @@ export interface User {
   phone?: string;
   role: UserRole;
   school?: string;
+  district?: string;
+  utis_code?: string;
   status: 'active' | 'inactive' | 'suspended';
   is_pro: boolean;
   pro_expires_at?: string | null;

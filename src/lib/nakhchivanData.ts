@@ -280,13 +280,37 @@ export function isValidUtisCode(code: string): { valid: boolean; message?: strin
 }
 
 // Analytical Data Structures
+export interface StudentRankingItem {
+  id: string;
+  fullName: string;
+  firstName: string;
+  lastName: string;
+  utisCode: string;
+  district: string;
+  school: string;
+  grade: string;
+  testsCount: number;
+  totalScore: number;
+  avgPercentage: number;
+  correctAnswersCount: number;
+  totalAnswersCount: number;
+  accuracyPercentage: number;
+  schoolRank: number;
+  districtRank: number;
+  nmrRank: number;
+  lastCompletedAt?: string;
+}
+
 export interface SchoolRecord {
   id: string;
   name: string;
   district: string;
   utisCode?: string;
   studentsCount: number;
+  totalTestsTaken: number;
+  totalScore: number;
   overallScore: number;
+  successRate: number;
   minScore: number;
   maxScore: number;
   gradeScores: Record<string, number>;
@@ -305,8 +329,12 @@ export interface DistrictRecord {
   id: string;
   name: string;
   schoolsCount: number;
+  participatingSchoolsCount: number;
   studentsCount: number;
+  totalTestsTaken: number;
+  totalScore: number;
   overallScore: number;
+  successRate: number;
   minScore: number;
   maxScore: number;
   gradeScores: Record<string, number>;

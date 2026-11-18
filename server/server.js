@@ -1464,7 +1464,8 @@ app.get('/api/regional-stats', (req, res) => {
     // Strictly monitoring grades: IV, VI, IX, XI
     const completedSessions = db.prepare(`
       SELECT ts.id, ts.student_name, ts.student_surname, ts.district, ts.school, ts.grade, ts.utis_code,
-             ts.percentage, ts.score, ts.monitoring_period, ts.completed_at,
+             ts.percentage, ts.score, ts.correct_count, ts.incorrect_count, ts.blank_count,
+             ts.monitoring_period, ts.completed_at,
              t.subject, t.title as test_title
       FROM TestSessions ts
       JOIN Tests t ON ts.test_id = t.id

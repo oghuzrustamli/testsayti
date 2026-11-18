@@ -175,85 +175,70 @@ export function exportResultsToExcel(sessions: TestSession[], testTitle: string)
 export function exportRegionalStatsToExcel(
   districts: any[],
   schools: any[],
-  selectedPeriod: string = 'Bütün Monitorinqlər'
+  selectedPeriod: string = 'Bütün Monitorinqlər',
+  students: any[] = []
 ) {
   const wb = XLSX.utils.book_new();
 
-  // Vərəq 1: Məktəblərin Reytinq Cədvəli
-  const schoolsData = schools.map((s, idx) => ({
-    'NMR Sırası': s.nmrRank || idx + 1,
-    'Rayon': s.district,
-    'Məktəb': s.name,
-    'İştirakçı Sayı': s.studentsCount,
-    'Ümumi Nəticə (%)': `${s.overallScore}%`,
-    'IV sinif (%)': `${s.gradeScores?.['IV sinif'] || '-'}%`,
-    'VI sinif (%)': `${s.gradeScores?.['VI sinif'] || '-'}%`,
-    'IX sinif (%)': `${s.gradeScores?.['IX sinif'] || '-'}%`,
-    'XI sinif (%)': `${s.gradeScores?.['XI sinif'] || '-'}%`,
-    'Rayon Sırası': s.districtRank || '-',
-    'Dinamika (I -> III)': `${s.dynamics?.changePct > 0 ? '+' : ''}${s.dynamics?.changePct || 0}%`
-  }));
-
-  const wsSchools = XLSX.utils.json_to_sheet(schoolsData);
-  wsSchools['!cols'] = [
-    { wch: 12 },
-    { wch: 20 },
-    { wch: 42 },
-    { wch: 15 },
-    { wch: 16 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 18 }
-  ];
-  XLSX.utils.book_append_sheet(wb, wsSchools, 'Məktəblərin Reytinqi');
-
-  // Vərəq 2: Rayonlar üzrə Xülasə və Fənlər
+  // Vərəq 1: Rayonlararası Reytinq Cədvəli
   const districtsData = districts.map((d, idx) => ({
-    'Reytinq Yeri': d.nmrRank || idx + 1,
+    'NMR Reytinqi': d.nmrRank > 0 ? d.nmrRank : idx + 1,
     'Rayon / Şəhər': d.name,
     'Məktəb Sayı': d.schoolsCount,
+    'İştirakçı Məktəblər': d.participatingSchoolsCount || 0,
     'İştirakçı Şagird': d.studentsCount,
-    'Ümumi Orta (%)': `${d.overallScore}%`,
+    'Test Sayı': d.totalTestsTaken || 0,
+    'Orta Bal (%)': `${d.overallScore}%`,
+    'Müvəffəqiyyət Faizi (%)': `${d.successRate || 0}%`,
     'IV sinif (%)': `${d.gradeScores?.['IV sinif'] || '-'}%`,
     'VI sinif (%)': `${d.gradeScores?.['VI sinif'] || '-'}%`,
     'IX sinif (%)': `${d.gradeScores?.['IX sinif'] || '-'}%`,
     'XI sinif (%)': `${d.gradeScores?.['XI sinif'] || '-'}%`,
-    'Azərbaycan dili (%)': `${d.subjectScores?.['Azərbaycan dili'] || '-'}%`,
-    'Riyaziyyat (%)': `${d.subjectScores?.['Riyaziyyat'] || '-'}%`,
-    'Xarici dil (%)': `${d.subjectScores?.['Xarici dil'] || '-'}%`,
-    'Təbiət / Həyat (%)': `${d.subjectScores?.['Təbiət / Həyat bilgisi'] || '-'}%`,
-    'Tarix (%)': `${d.subjectScores?.['Tarix'] || '-'}%`,
-    'Fizika (%)': `${d.subjectScores?.['Fizika'] || '-'}%`,
-    'Ən Yüksək Məktəb': typeof d.topSchool === 'object' ? `${d.topSchool?.name || ''} (${d.topSchool?.score || 0}%)` : d.topSchool,
-    'Ən Aşağı Məktəb': typeof d.lowestSchool === 'object' ? `${d.lowestSchool?.name || ''} (${d.lowestSchool?.score || 0}%)` : d.lowestSchool,
-    'İnkişaf Dinamikası': `${d.dynamics?.changePct > 0 ? '+' : ''}${d.dynamics?.changePct || 0}%`
+    'Lider Məktəb': typeof d.topSchool === 'object' ? `${d.topSchool?.name || ''} (${d.topSchool?.score || 0}%)` : d.topSchool
   }));
 
   const wsDistricts = XLSX.utils.json_to_sheet(districtsData);
-  wsDistricts['!cols'] = [
-    { wch: 14 },
-    { wch: 22 },
-    { wch: 14 },
-    { wch: 16 },
-    { wch: 16 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 18 },
-    { wch: 15 },
-    { wch: 15 },
-    { wch: 18 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 38 },
-    { wch: 38 },
-    { wch: 18 }
-  ];
-  XLSX.utils.book_append_sheet(wb, wsDistricts, 'Rayonlar və Fənlər');
+  XLSX.utils.book_append_sheet(wb, wsDistricts, 'Rayonlararası Reytinq');
+
+  // Vərəq 2: Məktəblərin Reytinq Cədvəli
+  const schoolsData = schools.map((s, idx) => ({
+    'NMR Sırası': s.nmrRank || idx + 1,
+    'Rayon Sırası': s.districtRank || '-',
+    'Rayon': s.district,
+    'Məktəb': s.name,
+    'UTİS Kodu': s.utisCode || '-',
+    'İştirakçı Şagird': s.studentsCount,
+    'Test Sayı': s.totalTestsTaken || 0,
+    'Orta Bal (%)': `${s.overallScore}%`,
+    'Müvəffəqiyyət Faizi (%)': `${s.successRate || 0}%`,
+    'IV sinif (%)': `${s.gradeScores?.['IV sinif'] || '-'}%`,
+    'VI sinif (%)': `${s.gradeScores?.['VI sinif'] || '-'}%`,
+    'IX sinif (%)': `${s.gradeScores?.['IX sinif'] || '-'}%`,
+    'XI sinif (%)': `${s.gradeScores?.['XI sinif'] || '-'}%`
+  }));
+
+  const wsSchools = XLSX.utils.json_to_sheet(schoolsData);
+  XLSX.utils.book_append_sheet(wb, wsSchools, 'Məktəblərin Reytinqi');
+
+  // Vərəq 3: Şagirdlərin Reytinq Cədvəli (Əgər varsa)
+  if (students && students.length > 0) {
+    const studentsData = students.map((st, idx) => ({
+      'NMR Sırası': st.nmrRank || idx + 1,
+      'Rayon Sırası': st.districtRank || '-',
+      'Məktəb Sırası': st.schoolRank || '-',
+      'Şagirdin Adı və Soyadı': st.fullName,
+      'Sinfi': st.grade,
+      'UTİS Kodu': st.utisCode || '-',
+      'Rayon': st.district,
+      'Məktəb': st.school,
+      'İştirak Test Sayı': st.testsCount,
+      'Toplanan Bal': st.totalScore,
+      'Orta Faiz (%)': `${st.avgPercentage}%`,
+      'Düzgün Cavab Faizi (%)': `${st.accuracyPercentage}%`
+    }));
+    const wsStudents = XLSX.utils.json_to_sheet(studentsData);
+    XLSX.utils.book_append_sheet(wb, wsStudents, 'Şagirdlərin Reytinqi');
+  }
 
   const fileName = `Naxcivan_MR_Regional_Statistika_${selectedPeriod.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
   XLSX.writeFile(wb, fileName);
