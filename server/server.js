@@ -985,7 +985,7 @@ app.post('/api/share/toggle', (req, res) => {
 
 // Student starts exam
 app.post('/api/exam/start', (req, res) => {
-  const { test_id, student_name, student_surname, class_name, student_class } = req.body;
+  const { test_id, student_name, student_surname, class_name, student_class, district, school, grade, monitoring_period } = req.body;
   if (!test_id || !student_name) {
     return res.status(400).json({ error: 'Ad və soyad daxil edilməlidir' });
   }
@@ -1008,11 +1008,23 @@ app.post('/api/exam/start', (req, res) => {
   db.prepare(`
     INSERT INTO TestSessions (
       id, test_id, student_name, student_surname, class_name,
+      district, school, grade, monitoring_period,
       started_at, status
-    ) VALUES (?, ?, ?, ?, ?, ?, 'in_progress')
-  `).run(sessionId, test_id, fName, lName, class_name || student_class || 'Qrup', now);
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'in_progress')
+  `).run(
+    sessionId,
+    test_id,
+    fName,
+    lName,
+    class_name || student_class || 'Qrup',
+    district || null,
+    school || null,
+    grade || null,
+    monitoring_period || 'I Monitorinq',
+    now
+  );
 
-  logAudit(null, `${fName} ${lName}`, 'İmtahan Başladı', `Test: ${test.title}`, req);
+  logAudit(null, `${fName} ${lName}`, 'İmtahan Başladı', `Test: ${test.title} (${district || 'Bölgə təyin edilməyib'})`, req);
   res.status(201).json({ session_id: sessionId, started_at: now });
 });
 
@@ -1369,6 +1381,36 @@ app.get('/api/admin/stats', (req, res) => {
 app.get('/api/admin/audit-logs', (req, res) => {
   const logs = db.prepare('SELECT * FROM AuditLogs ORDER BY created_at DESC LIMIT 50').all();
   res.json(logs);
+});
+
+// ==========================================
+// 9. REGIONAL STATS & MONITORING DATA (NAXÇIVAN MR)
+// ==========================================
+app.get('/api/regional-stats', (req, res) => {
+  try {
+    // Strictly monitoring grades: IV, VI, IX, XI
+    const completedSessions = db.prepare(`
+      SELECT ts.id, ts.student_name, ts.student_surname, ts.district, ts.school, ts.grade,
+             ts.percentage, ts.score, ts.monitoring_period, ts.completed_at,
+             t.subject, t.title as test_title
+      FROM TestSessions ts
+      JOIN Tests t ON ts.test_id = t.id
+      WHERE ts.status = 'completed'
+        AND (
+          ts.grade IN ('IV', 'VI', 'IX', 'XI', 'IV sinif', 'VI sinif', 'IX sinif', 'XI sinif', '4', '6', '9', '11')
+          OR t.grade_group IN ('IV', 'VI', 'IX', 'XI', 'IV sinif', 'VI sinif', 'IX sinif', 'XI sinif', '4', '6', '9', '11')
+        )
+      ORDER BY ts.completed_at DESC
+    `).all();
+
+    res.json({
+      success: true,
+      sessions: completedSessions,
+      count: completedSessions.length
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Regional statistika yüklənə bilmədi' });
+  }
 });
 
 // Serve frontend build in production

@@ -528,12 +528,30 @@ export const api = {
     return { message: `Paylaşım linki ${is_active ? 'aktivləşdirildi' : 'deaktiv edildi'}` };
   },
 
-  async startExam(test_id: string, student_name: string, student_surname: string, class_name?: string): Promise<{ session_id: string; started_at: string }> {
+  async startExam(
+    test_id: string,
+    student_name: string,
+    student_surname: string,
+    class_name?: string,
+    district?: string,
+    school?: string,
+    grade?: string,
+    monitoring_period?: string
+  ): Promise<{ session_id: string; started_at: string }> {
     try {
       const res = await fetch(`${API_BASE}/exam/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ test_id, student_name, student_surname, class_name }),
+        body: JSON.stringify({
+          test_id,
+          student_name,
+          student_surname,
+          class_name,
+          district,
+          school,
+          grade,
+          monitoring_period
+        }),
       });
       if (res.ok) return await res.json();
     } catch {}
@@ -541,6 +559,14 @@ export const api = {
     const sessionId = 'ses-' + Math.random().toString(36).substring(2, 9);
     const now = new Date().toISOString();
     return { session_id: sessionId, started_at: now };
+  },
+
+  async getRegionalStats(): Promise<{ success: boolean; sessions: any[]; count: number }> {
+    try {
+      const res = await fetch(`${API_BASE}/regional-stats`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return { success: true, sessions: [], count: 0 };
   },
 
   async saveExamAnswer(session_id: string, question_id: string, selected_answer: string): Promise<any> {

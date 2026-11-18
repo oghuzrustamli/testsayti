@@ -168,3 +168,93 @@ export function exportResultsToExcel(sessions: TestSession[], testTitle: string)
   }));
   exportMultiSubjectResultsToExcel(detailed, testTitle);
 }
+
+/**
+ * Naxçıvan MR Regional Statistika və Reytinq Hesabatının 2 Vərəqli Excel (.xlsx) İxracı (Tələb 14)
+ */
+export function exportRegionalStatsToExcel(
+  districts: any[],
+  schools: any[],
+  selectedPeriod: string = 'Bütün Monitorinqlər'
+) {
+  const wb = XLSX.utils.book_new();
+
+  // Vərəq 1: Məktəblərin Reytinq Cədvəli
+  const schoolsData = schools.map((s, idx) => ({
+    'NMR Sırası': s.nmrRank || idx + 1,
+    'Rayon': s.district,
+    'Məktəb': s.name,
+    'İştirakçı Sayı': s.studentsCount,
+    'Ümumi Nəticə (%)': `${s.overallScore}%`,
+    'IV sinif (%)': `${s.gradeScores?.['IV sinif'] || '-'}%`,
+    'VI sinif (%)': `${s.gradeScores?.['VI sinif'] || '-'}%`,
+    'IX sinif (%)': `${s.gradeScores?.['IX sinif'] || '-'}%`,
+    'XI sinif (%)': `${s.gradeScores?.['XI sinif'] || '-'}%`,
+    'Rayon Sırası': s.districtRank || '-',
+    'Dinamika (I -> III)': `${s.dynamics?.changePct > 0 ? '+' : ''}${s.dynamics?.changePct || 0}%`
+  }));
+
+  const wsSchools = XLSX.utils.json_to_sheet(schoolsData);
+  wsSchools['!cols'] = [
+    { wch: 12 },
+    { wch: 20 },
+    { wch: 42 },
+    { wch: 15 },
+    { wch: 16 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 18 }
+  ];
+  XLSX.utils.book_append_sheet(wb, wsSchools, 'Məktəblərin Reytinqi');
+
+  // Vərəq 2: Rayonlar üzrə Xülasə və Fənlər
+  const districtsData = districts.map((d, idx) => ({
+    'Reytinq Yeri': d.nmrRank || idx + 1,
+    'Rayon / Şəhər': d.name,
+    'Məktəb Sayı': d.schoolsCount,
+    'İştirakçı Şagird': d.studentsCount,
+    'Ümumi Orta (%)': `${d.overallScore}%`,
+    'IV sinif (%)': `${d.gradeScores?.['IV sinif'] || '-'}%`,
+    'VI sinif (%)': `${d.gradeScores?.['VI sinif'] || '-'}%`,
+    'IX sinif (%)': `${d.gradeScores?.['IX sinif'] || '-'}%`,
+    'XI sinif (%)': `${d.gradeScores?.['XI sinif'] || '-'}%`,
+    'Azərbaycan dili (%)': `${d.subjectScores?.['Azərbaycan dili'] || '-'}%`,
+    'Riyaziyyat (%)': `${d.subjectScores?.['Riyaziyyat'] || '-'}%`,
+    'Xarici dil (%)': `${d.subjectScores?.['Xarici dil'] || '-'}%`,
+    'Təbiət / Həyat (%)': `${d.subjectScores?.['Təbiət / Həyat bilgisi'] || '-'}%`,
+    'Tarix (%)': `${d.subjectScores?.['Tarix'] || '-'}%`,
+    'Fizika (%)': `${d.subjectScores?.['Fizika'] || '-'}%`,
+    'Ən Yüksək Məktəb': d.topSchool,
+    'Ən Aşağı Məktəb': d.lowestSchool,
+    'İnkişaf Dinamikası': `${d.dynamics?.changePct > 0 ? '+' : ''}${d.dynamics?.changePct || 0}%`
+  }));
+
+  const wsDistricts = XLSX.utils.json_to_sheet(districtsData);
+  wsDistricts['!cols'] = [
+    { wch: 14 },
+    { wch: 22 },
+    { wch: 14 },
+    { wch: 16 },
+    { wch: 16 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 18 },
+    { wch: 15 },
+    { wch: 15 },
+    { wch: 18 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 38 },
+    { wch: 38 },
+    { wch: 18 }
+  ];
+  XLSX.utils.book_append_sheet(wb, wsDistricts, 'Rayonlar və Fənlər');
+
+  const fileName = `Naxcivan_MR_Regional_Statistika_${selectedPeriod.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+}

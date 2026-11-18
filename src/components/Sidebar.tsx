@@ -24,7 +24,8 @@ import {
   ChevronDown,
   ChevronRight,
   Layers,
-  Sparkles
+  Sparkles,
+  Award
 } from 'lucide-react';
 
 export type TeacherTab =
@@ -40,6 +41,7 @@ export type TeacherTab =
   | 'classes'
   | 'results'
   | 'statistics'
+  | 'regional_stats'
   | 'archive'
   | 'settings';
 
@@ -49,6 +51,7 @@ export type AdminTab =
   | 'packages'
   | 'subscriptions'
   | 'stats'
+  | 'regional_stats'
   | 'settings'
   | 'audit';
 
@@ -57,6 +60,7 @@ export type StudentTab =
   | 'active_tests'
   | 'completed_tests'
   | 'results'
+  | 'regional_stats'
   | 'profile';
 
 interface SidebarProps {
@@ -110,6 +114,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'classes', label: 'Sinif və Şagirdlər', icon: Users2 },
     { id: 'results', label: 'Nəticələr', icon: BarChart3 },
     { id: 'statistics', label: 'Statistika', icon: TrendingUp },
+    { id: 'regional_stats', label: 'Regional statistika', icon: Award, badge: 'NMR' },
     { id: 'archive', label: 'Arxiv', icon: Archive },
     { id: 'settings', label: 'Parametrlər', icon: Settings },
   ];
@@ -120,6 +125,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'packages', label: 'Paketlər və Qiymətlər', icon: CreditCard },
     { id: 'subscriptions', label: 'Abunəliklər & Ödənişlər', icon: Shield },
     { id: 'stats', label: 'İstifadə statistikası', icon: TrendingUp },
+    { id: 'regional_stats', label: 'Regional statistika', icon: Award, badge: 'NMR' },
     { id: 'audit', label: 'Audit jurnalı', icon: History },
     { id: 'settings', label: 'Sistem parametrləri', icon: Settings },
   ];
@@ -129,6 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'active_tests', label: 'Aktiv testlər', icon: BookOpen },
     { id: 'completed_tests', label: 'Tamamlanmış testlər', icon: CheckCircle2 },
     { id: 'results', label: 'Nəticələrim', icon: BarChart3 },
+    { id: 'regional_stats', label: 'Regional statistika', icon: Award, badge: 'NMR' },
     { id: 'profile', label: 'Şəxsi məlumatlar', icon: UserCheck },
   ];
 

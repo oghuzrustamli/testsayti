@@ -212,6 +212,10 @@ export function initDatabase() {
   try { db.exec("ALTER TABLE Questions ADD COLUMN situation_synonyms_json TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE Questions ADD COLUMN situation_grading_mode TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE Questions ADD COLUMN situation_model_answer TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE TestSessions ADD COLUMN district TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE TestSessions ADD COLUMN school TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE TestSessions ADD COLUMN grade TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE TestSessions ADD COLUMN monitoring_period TEXT;"); } catch (e) {}
 
   seedInitialData();
   repairExistingTests();

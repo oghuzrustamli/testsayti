@@ -8,6 +8,7 @@ import { evaluateSituationAnswer } from '../lib/situationEvaluator';
 import { MathRenderer } from '../components/MathRenderer';
 import { MultiSubjectResultsTable } from '../components/MultiSubjectResultsTable';
 import { calculateMultiSubjectStats } from '../lib/multiSubjectAnalytics';
+import { NAKHCHIVAN_DISTRICTS, DISTRICT_SCHOOLS, MONITORING_GRADES } from '../lib/nakhchivanData';
 import confetti from 'canvas-confetti';
 import {
   Clock,
@@ -137,6 +138,9 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
   const [studentName, setStudentName] = useState<string>('');
   const [studentSurname, setStudentSurname] = useState<string>('');
   const [className, setClassName] = useState<string>('');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('Naxçıvan şəhəri');
+  const [selectedSchool, setSelectedSchool] = useState<string>('1 nömrəli tam orta məktəb');
+  const [selectedGrade, setSelectedGrade] = useState<string>('IX sinif');
   const [isExamStarted, setIsExamStarted] = useState<boolean>(false);
 
   // Active question navigation (interactive mode)
@@ -354,7 +358,11 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
         test?.id || testId || 'tst-buraxilis-demo',
         studentName.trim(),
         studentSurname.trim(),
-        className.trim() || 'Qrup'
+        className.trim() || selectedGrade,
+        selectedDistrict,
+        selectedSchool,
+        selectedGrade,
+        'I Monitorinq'
       );
       setSessionId(res.session_id);
       setIsExamStarted(true);
@@ -579,16 +587,70 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
               />
             </div>
 
+            <div className="grid grid-cols-2 gap-2.5">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Rayon / Şəhər:
+                </label>
+                <select
+                  value={selectedDistrict}
+                  onChange={(e) => {
+                    const newDist = e.target.value;
+                    setSelectedDistrict(newDist);
+                    const schools = DISTRICT_SCHOOLS[newDist];
+                    if (schools && schools.length > 0) {
+                      setSelectedSchool(schools[0]);
+                    }
+                  }}
+                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                >
+                  {NAKHCHIVAN_DISTRICTS.map((d) => (
+                    <option key={d.id} value={d.name}>{d.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Sinif:
+                </label>
+                <select
+                  value={selectedGrade}
+                  onChange={(e) => setSelectedGrade(e.target.value)}
+                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                >
+                  {MONITORING_GRADES.map((g) => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <div>
               <label className="text-xs font-bold text-slate-700 block mb-1">
-                Sinifiniz və ya Qrupunuz:
+                Məktəb:
+              </label>
+              <select
+                value={selectedSchool}
+                onChange={(e) => setSelectedSchool(e.target.value)}
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              >
+                {(DISTRICT_SCHOOLS[selectedDistrict] || []).map((sch) => (
+                  <option key={sch} value={sch}>{sch}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">
+                Sinif Şifrəsi / Qrup:
               </label>
               <input
                 type="text"
                 value={className}
                 onChange={(e) => setClassName(e.target.value)}
-                placeholder="Məsələn: 10-A və ya Blok I Qrup"
-                className="w-full px-4 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-800 focus:bg-white focus:outline-none"
+                placeholder="Məsələn: 9-A və ya Qrup 1"
+                className="w-full px-4 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-800 focus:bg-white focus:outline-none"
               />
             </div>
 

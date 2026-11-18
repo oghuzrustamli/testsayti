@@ -24,6 +24,7 @@ import { ProActivationModal } from './components/ProActivationModal';
 import { AdminAuthModal } from './components/AdminAuthModal';
 import { AuthModal } from './components/AuthModal';
 import { AiTestCreatorPage } from './pages/AiTestCreatorPage';
+import { RegionalStatsPage } from './pages/RegionalStatsPage';
 
 const DEFAULT_TEACHER: User = {
   id: 'usr-teacher-1',
@@ -178,8 +179,13 @@ export function App() {
             />
           ) : (
             <>
-              {/* TEACHER VIEWS */}
-              {currentUser.role === 'teacher' && (
+              {/* REGIONAL STATISTIKA VƏ AKADEMİK REYTİNQ (Bütün rollar üçün açıq) */}
+              {activeTab === 'regional_stats' ? (
+                <RegionalStatsPage user={currentUser} />
+              ) : (
+                <>
+                  {/* TEACHER VIEWS */}
+                  {currentUser.role === 'teacher' && (
                 <>
               {activeTab === 'dashboard' && (
                 <TeacherDashboard
@@ -350,8 +356,10 @@ export function App() {
           {currentUser.role === 'admin' && (
             <AdminPage currentUser={currentUser} />
           )}
-        </>
-      )}
+                </>
+              )}
+            </>
+          )}
     </main>
       </div>
 

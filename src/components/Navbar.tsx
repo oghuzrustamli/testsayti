@@ -201,11 +201,26 @@ export const Navbar: React.FC<NavbarProps> = ({
               onSelectCategory('all', 'all');
             }
           }}
-          className="px-3.5 py-2 rounded-xl text-[13px] font-black tracking-tight text-slate-900 hover:text-black hover:bg-indigo-50 hover:text-indigo-900 flex items-center gap-1.5 transition-all cursor-pointer border border-transparent hover:border-indigo-200"
+          className="px-3 py-2 rounded-xl text-[13px] font-black tracking-tight text-slate-900 hover:text-black hover:bg-indigo-50 hover:text-indigo-900 flex items-center gap-1.5 transition-all cursor-pointer border border-transparent hover:border-indigo-200"
           title="Fənlər və Siniflər üzrə Sınaq İmtahanları"
         >
           <BookOpen className="w-4 h-4 text-indigo-600" />
           <span>Sınaq İmtahanları</span>
+        </button>
+
+        {/* Regional Statistika Direct Button (Tələb 1) */}
+        <button
+          type="button"
+          onClick={() => {
+            if (onNavigateTab) {
+              onNavigateTab('regional_stats');
+            }
+          }}
+          className="px-3 py-2 rounded-xl text-[13px] font-black tracking-tight bg-emerald-50 hover:bg-emerald-100/90 text-emerald-900 border border-emerald-200 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+          title="Naxçıvan MR Regional Statistika və Reytinq Sistemi"
+        >
+          <Award className="w-4 h-4 text-emerald-600" />
+          <span>Regional statistika</span>
         </button>
 
         {MAIN_MENU_CATEGORIES.map((cat) => {
