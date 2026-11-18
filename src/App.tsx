@@ -25,6 +25,7 @@ import { AdminAuthModal } from './components/AdminAuthModal';
 import { AuthModal } from './components/AuthModal';
 import { AiTestCreatorPage } from './pages/AiTestCreatorPage';
 import { RegionalStatsPage } from './pages/RegionalStatsPage';
+import { AboutPage } from './pages/AboutPage';
 
 const DEFAULT_TEACHER: User = {
   id: 'usr-teacher-1',
@@ -179,8 +180,16 @@ export function App() {
             />
           ) : (
             <>
-              {/* REGIONAL STATISTIKA VƏ AKADEMİK REYTİNQ (Bütün rollar üçün açıq) */}
-              {activeTab === 'regional_stats' ? (
+              {/* HAQQINDA SƏHİFƏSİ VƏ AI TANITIM VİDEOSU (Bütün rollar üçün açıq) */}
+              {activeTab === 'about' ? (
+                <AboutPage
+                  user={currentUser}
+                  onNavigateTab={(tab) => {
+                    if (viewingAnsweredTestId) setViewingAnsweredTestId(null);
+                    setActiveTab(tab);
+                  }}
+                />
+              ) : activeTab === 'regional_stats' ? (
                 <RegionalStatsPage user={currentUser} />
               ) : (
                 <>

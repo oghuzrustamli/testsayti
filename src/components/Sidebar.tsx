@@ -25,7 +25,8 @@ import {
   ChevronRight,
   Layers,
   Sparkles,
-  Award
+  Award,
+  Cpu
 } from 'lucide-react';
 
 export type TeacherTab =
@@ -43,6 +44,7 @@ export type TeacherTab =
   | 'statistics'
   | 'regional_stats'
   | 'archive'
+  | 'about'
   | 'settings';
 
 export type AdminTab =
@@ -52,6 +54,7 @@ export type AdminTab =
   | 'subscriptions'
   | 'stats'
   | 'regional_stats'
+  | 'about'
   | 'settings'
   | 'audit';
 
@@ -61,6 +64,7 @@ export type StudentTab =
   | 'completed_tests'
   | 'results'
   | 'regional_stats'
+  | 'about'
   | 'profile';
 
 interface SidebarProps {
@@ -115,6 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'results', label: 'Nəticələr', icon: BarChart3 },
     { id: 'statistics', label: 'Statistika', icon: TrendingUp },
     { id: 'regional_stats', label: 'Regional statistika', icon: Award, badge: 'NMR' },
+    { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'EDUNEX', highlight: false },
     { id: 'archive', label: 'Arxiv', icon: Archive },
     { id: 'settings', label: 'Parametrlər', icon: Settings },
   ];
@@ -126,6 +131,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'subscriptions', label: 'Abunəliklər & Ödənişlər', icon: Shield },
     { id: 'stats', label: 'İstifadə statistikası', icon: TrendingUp },
     { id: 'regional_stats', label: 'Regional statistika', icon: Award, badge: 'NMR' },
+    { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'EDUNEX', highlight: false },
     { id: 'audit', label: 'Audit jurnalı', icon: History },
     { id: 'settings', label: 'Sistem parametrləri', icon: Settings },
   ];
@@ -136,6 +142,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'completed_tests', label: 'Tamamlanmış testlər', icon: CheckCircle2 },
     { id: 'results', label: 'Nəticələrim', icon: BarChart3 },
     { id: 'regional_stats', label: 'Regional statistika', icon: Award, badge: 'NMR' },
+    { id: 'about', label: 'Haqqında', icon: Cpu, badge: 'EDUNEX', highlight: false },
     { id: 'profile', label: 'Şəxsi məlumatlar', icon: UserCheck },
   ];
 
@@ -211,6 +218,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }
 
           const isActive = activeTab === item.id;
+          const isAbout = item.id === 'about';
 
           return (
             <button
@@ -221,17 +229,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   ? 'bg-slate-900 text-white shadow-xs'
                   : item.highlight
                   ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm shadow-indigo-100 font-extrabold'
+                  : isAbout
+                  ? 'bg-gradient-to-r from-sky-50/90 to-indigo-50/80 text-indigo-950 hover:bg-sky-100 border border-sky-200/70 shadow-2xs font-extrabold'
                   : 'text-slate-800 hover:bg-slate-100 hover:text-black'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-400' : item.highlight ? 'text-white' : 'text-slate-600'}`} />
+                <Icon className={`w-4 h-4 ${
+                  isActive
+                    ? 'text-indigo-400'
+                    : item.highlight
+                    ? 'text-white'
+                    : isAbout
+                    ? 'text-sky-600'
+                    : 'text-slate-600'
+                }`} />
                 <span>{item.label}</span>
               </div>
 
               {item.badge && (
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
-                  isActive ? 'bg-indigo-700 text-white' : 'bg-slate-100 text-slate-500'
+                  isActive
+                    ? 'bg-indigo-700 text-white'
+                    : isAbout
+                    ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-xs font-black'
+                    : 'bg-slate-100 text-slate-500'
                 }`}>
                   {item.badge}
                 </span>

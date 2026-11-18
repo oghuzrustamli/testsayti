@@ -16,7 +16,8 @@ import {
   Award,
   Compass,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  Cpu
 } from 'lucide-react';
 
 export interface MainMenuCategory {
@@ -221,6 +222,24 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <Award className="w-4 h-4 text-emerald-600" />
           <span>Regional statistika</span>
+        </button>
+
+        {/* Haqqında Direct Button */}
+        <button
+          type="button"
+          onClick={() => {
+            if (onNavigateTab) {
+              onNavigateTab('about');
+            }
+          }}
+          className="px-3 py-2 rounded-xl text-[13px] font-black tracking-tight bg-gradient-to-r from-sky-50 to-indigo-50 hover:from-sky-100 hover:to-indigo-100 text-indigo-950 border border-sky-300/80 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs group"
+          title="EDUNEX Haqqında, Müəllif və AI Tanıtım Videosu"
+        >
+          <Cpu className="w-4 h-4 text-sky-600 group-hover:rotate-12 transition-transform" />
+          <span>Haqqında</span>
+          <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-2xs">
+            EDUNEX
+          </span>
         </button>
 
         {MAIN_MENU_CATEGORIES.map((cat) => {
