@@ -30,6 +30,7 @@ import {
   UserCheck,
   ChevronRight,
   ArrowRight,
+  GraduationCap,
   X
 } from 'lucide-react';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
@@ -157,10 +158,18 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
       accentColor: 'amber',
       subItems: [
         {
+          id: 'student_database',
+          label: 'Şagird bazası',
+          description: 'Məktəbin vahid UTİS şagird bazası və Excel idxalı',
+          icon: Users2,
+          badge: 'UTİS',
+          badgeColor: 'bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 text-indigo-800 border border-indigo-200 dark:border-indigo-800',
+        },
+        {
           id: 'classes',
           label: t.classesTitle,
           description: t.classesDesc,
-          icon: Users2,
+          icon: GraduationCap,
         },
         {
           id: 'results',
@@ -317,6 +326,14 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
           label: t.usersTitle,
           description: t.usersDesc,
           icon: Users2,
+        },
+        {
+          id: 'student_database',
+          label: 'Şagird bazası',
+          description: 'Məktəbin vahid UTİS şagird bazası və Excel idxalı',
+          icon: Users2,
+          badge: 'UTİS',
+          badgeColor: 'bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 text-indigo-800 border border-indigo-200 dark:border-indigo-800',
         },
         {
           id: 'audit',

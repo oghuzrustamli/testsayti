@@ -1367,6 +1367,340 @@ app.post('/api/students', (req, res) => {
 });
 
 // ==========================================
+// 7.1. ŞAGİRD BAZASI & UTİS İNTEQRASİYASI (I - XI SİNİFLƏR)
+// ==========================================
+app.get('/api/student-database', (req, res) => {
+  const { search, grade, is_archived, sort_by = 'created_at', sort_order = 'DESC', page = 1, limit = 25 } = req.query;
+  const archivedVal = is_archived === '1' ? 1 : 0;
+
+  let query = 'SELECT * FROM Students WHERE COALESCE(is_archived, 0) = ?';
+  const params = [archivedVal];
+
+  if (grade && grade !== 'all') {
+    query += ' AND grade_class = ?';
+    params.push(grade);
+  }
+
+  if (search && search.trim()) {
+    const s = `%${search.trim().toLowerCase()}%`;
+    query += ` AND (
+      LOWER(COALESCE(full_name, '')) LIKE ? OR
+      LOWER(COALESCE(first_name, '')) LIKE ? OR
+      LOWER(COALESCE(last_name, '')) LIKE ? OR
+      LOWER(COALESCE(father_name, '')) LIKE ? OR
+      COALESCE(utis_code, '') LIKE ? OR
+      LOWER(COALESCE(fin_code, '')) LIKE ? OR
+      LOWER(COALESCE(school_name, '')) LIKE ?
+    )`;
+    params.push(s, s, s, s, s, s, s);
+  }
+
+  // Count total matching
+  const countRow = db.prepare(`SELECT COUNT(*) as total FROM (${query})`).get(...params);
+  const total = countRow ? countRow.total : 0;
+
+  // Sorting
+  const allowedSorts = ['first_name', 'last_name', 'grade_class', 'utis_code', 'fin_code', 'created_at', 'school_name'];
+  const finalSort = allowedSorts.includes(sort_by) ? sort_by : 'created_at';
+  const finalOrder = sort_order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+  query += ` ORDER BY ${finalSort} ${finalOrder}`;
+
+  // Pagination
+  const pageNum = Math.max(1, parseInt(page) || 1);
+  const limitNum = Math.max(5, Math.min(200, parseInt(limit) || 25));
+  const offset = (pageNum - 1) * limitNum;
+  query += ' LIMIT ? OFFSET ?';
+  params.push(limitNum, offset);
+
+  const students = db.prepare(query).all(...params);
+
+  // Attach exam count and avg score from TestSessions
+  const enriched = students.map(st => {
+    const sessions = db.prepare(`
+      SELECT COUNT(*) as exam_count, AVG(score) as avg_score
+      FROM TestSessions
+      WHERE (utis_code IS NOT NULL AND utis_code = ?)
+         OR student_id = ?
+         OR (LOWER(student_name) = LOWER(?) AND LOWER(student_surname) = LOWER(?))
+    `).get(st.utis_code || '', st.id, st.first_name || '', st.last_name || '');
+
+    return {
+      ...st,
+      first_name: st.first_name || (st.full_name ? st.full_name.split(' ')[0] : ''),
+      last_name: st.last_name || (st.full_name ? st.full_name.split(' ').slice(1).join(' ') : ''),
+      father_name: st.father_name || '',
+      utis_code: st.utis_code || '',
+      fin_code: st.fin_code || '',
+      grade_class: st.grade_class || 'IX sinif',
+      school_name: st.school_name || '1 nömrəli tam orta məktəb',
+      is_archived: st.is_archived || 0,
+      exam_count: sessions ? sessions.exam_count : 0,
+      avg_score: sessions && sessions.avg_score ? Math.round(sessions.avg_score * 10) / 10 : 0
+    };
+  });
+
+  // Overall stats
+  const totalActive = db.prepare('SELECT COUNT(*) as cnt FROM Students WHERE COALESCE(is_archived, 0) = 0').get().cnt;
+  const totalArchived = db.prepare('SELECT COUNT(*) as cnt FROM Students WHERE is_archived = 1').get().cnt;
+
+  res.json({
+    students: enriched,
+    total,
+    page: pageNum,
+    limit: limitNum,
+    stats: {
+      totalActive,
+      totalArchived
+    }
+  });
+});
+
+app.get('/api/student-database/import-history', (req, res) => {
+  try {
+    const list = db.prepare('SELECT * FROM ImportHistory ORDER BY created_at DESC LIMIT 50').all();
+    res.json(list);
+  } catch (e) {
+    res.json([]);
+  }
+});
+
+app.post('/api/student-database/import', (req, res) => {
+  const { students, file_name = 'utis_sagird_bazasi.xlsx' } = req.body;
+  if (!Array.isArray(students) || students.length === 0) {
+    return res.status(400).json({ error: 'İdxal üçün şagird məlumatları tapılmadı' });
+  }
+
+  const now = new Date().toISOString();
+  let importedCount = 0;
+  let updatedCount = 0;
+  let skippedCount = 0;
+
+  for (const s of students) {
+    const fName = (s.first_name || '').trim();
+    const lName = (s.last_name || '').trim();
+    const fatName = (s.father_name || '').trim();
+    const utis = (s.utis_code || '').toString().trim();
+    const fin = (s.fin_code || '').toString().trim().toUpperCase();
+    const grade = (s.grade_class || '').toString().trim() || 'IX sinif';
+    const school = (s.school_name || '').toString().trim() || '1 nömrəli tam orta məktəb';
+
+    if (!fName || !lName) {
+      skippedCount++;
+      continue;
+    }
+
+    const fullName = `${fName} ${lName}`;
+
+    // Check if exists by UTIS or FIN
+    let existing = null;
+    if (utis) {
+      existing = db.prepare('SELECT id FROM Students WHERE utis_code = ?').get(utis);
+    }
+    if (!existing && fin) {
+      existing = db.prepare('SELECT id FROM Students WHERE fin_code = ?').get(fin);
+    }
+
+    if (existing) {
+      db.prepare(`
+        UPDATE Students SET
+          full_name = ?, first_name = ?, last_name = ?, father_name = ?,
+          utis_code = COALESCE(?, utis_code),
+          fin_code = COALESCE(?, fin_code),
+          grade_class = ?, school_name = ?, updated_at = ?, is_archived = 0
+        WHERE id = ?
+      `).run(fullName, fName, lName, fatName, utis || null, fin || null, grade, school, now, existing.id);
+      updatedCount++;
+    } else {
+      const newId = 'std-' + Math.random().toString(36).substring(2, 9);
+      db.prepare(`
+        INSERT INTO Students (
+          id, teacher_id, full_name, first_name, last_name, father_name,
+          utis_code, fin_code, grade_class, school_name, is_archived, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+      `).run(newId, 'usr-teacher-1', fullName, fName, lName, fatName, utis || null, fin || null, grade, school, now, now);
+      importedCount++;
+    }
+  }
+
+  // Record in ImportHistory
+  const histId = 'imp-' + Math.random().toString(36).substring(2, 9);
+  try {
+    db.prepare(`
+      INSERT INTO ImportHistory (
+        id, file_name, total_rows, imported_count, updated_count, skipped_count, imported_by, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(histId, file_name, students.length, importedCount, updatedCount, skippedCount, 'Müəllim', now);
+  } catch (e) {}
+
+  res.json({
+    message: 'İdxal uğurla tamamlandı',
+    total_rows: students.length,
+    imported_count: importedCount,
+    updated_count: updatedCount,
+    skipped_count: skippedCount
+  });
+});
+
+app.get('/api/student-database/:id', (req, res) => {
+  const { id } = req.params;
+  const st = db.prepare('SELECT * FROM Students WHERE id = ?').get(id);
+  if (!st) return res.status(404).json({ error: 'Şagird tapılmadı' });
+
+  // Get all exam history for this student
+  const fName = st.first_name || (st.full_name ? st.full_name.split(' ')[0] : '');
+  const lName = st.last_name || (st.full_name ? st.full_name.split(' ').slice(1).join(' ') : '');
+
+  const sessions = db.prepare(`
+    SELECT ts.*, t.title as test_title, t.subject, t.exam_model, t.total_points as test_max_points
+    FROM TestSessions ts
+    LEFT JOIN Tests t ON ts.test_id = t.id
+    WHERE (ts.utis_code IS NOT NULL AND ts.utis_code = ?)
+       OR ts.student_id = ?
+       OR (LOWER(ts.student_name) = LOWER(?) AND LOWER(ts.student_surname) = LOWER(?))
+    ORDER BY ts.started_at DESC
+  `).all(st.utis_code || '', st.id, fName, lName);
+
+  res.json({
+    student: {
+      ...st,
+      first_name: fName,
+      last_name: lName,
+      father_name: st.father_name || '',
+      utis_code: st.utis_code || '',
+      fin_code: st.fin_code || '',
+      grade_class: st.grade_class || 'IX sinif',
+      school_name: st.school_name || '1 nömrəli tam orta məktəb',
+      is_archived: st.is_archived || 0
+    },
+    exam_history: sessions.map(s => ({
+      session_id: s.id,
+      test_id: s.test_id,
+      test_title: s.test_title || 'Sınaq İmtahanı',
+      subject: s.subject || 'Ümumi',
+      exam_model: s.exam_model || 'Buraxılış imtahanı',
+      score: s.score || 0,
+      total_points: s.test_max_points || 100,
+      percentage: s.percentage || 0,
+      correct_count: s.correct_count || 0,
+      incorrect_count: s.incorrect_count || 0,
+      blank_count: s.blank_count || 0,
+      duration_seconds: s.duration_seconds || 0,
+      status: s.status || 'completed',
+      started_at: s.started_at,
+      completed_at: s.completed_at
+    }))
+  });
+});
+
+app.post('/api/student-database', (req, res) => {
+  const { first_name, last_name, father_name, utis_code, fin_code, grade_class, school_name, phone } = req.body;
+  if (!first_name || !last_name) {
+    return res.status(400).json({ error: 'Şagirdin adı və soyadı daxil edilməlidir' });
+  }
+
+  const cleanUtis = (utis_code || '').trim();
+  if (cleanUtis && !/^\d{7}$/.test(cleanUtis)) {
+    return res.status(400).json({ error: 'UTİS kodu 7 rəqəmdən ibarət olmalıdır' });
+  }
+
+  if (cleanUtis) {
+    const existing = db.prepare('SELECT id FROM Students WHERE utis_code = ? AND COALESCE(is_archived, 0) = 0').get(cleanUtis);
+    if (existing) {
+      return res.status(400).json({ error: 'Bu UTİS kodu ilə başqa aktiv şagird artıq mövcuddur' });
+    }
+  }
+
+  const id = 'std-' + Math.random().toString(36).substring(2, 9);
+  const now = new Date().toISOString();
+  const fullName = `${first_name.trim()} ${last_name.trim()}`;
+
+  db.prepare(`
+    INSERT INTO Students (
+      id, teacher_id, full_name, first_name, last_name, father_name,
+      utis_code, fin_code, grade_class, school_name, phone, is_archived, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+  `).run(
+    id,
+    'usr-teacher-1',
+    fullName,
+    first_name.trim(),
+    last_name.trim(),
+    (father_name || '').trim(),
+    cleanUtis || null,
+    (fin_code || '').trim().toUpperCase() || null,
+    grade_class || 'IX sinif',
+    school_name || '1 nömrəli tam orta məktəb',
+    phone || null,
+    now,
+    now
+  );
+
+  res.status(201).json({ id, message: 'Şagird uğurla əlavə edildi' });
+});
+
+app.put('/api/student-database/:id', (req, res) => {
+  const { id } = req.params;
+  const { first_name, last_name, father_name, utis_code, fin_code, grade_class, school_name, phone } = req.body;
+  if (!first_name || !last_name) {
+    return res.status(400).json({ error: 'Şagirdin adı və soyadı daxil edilməlidir' });
+  }
+
+  const cleanUtis = (utis_code || '').trim();
+  if (cleanUtis && !/^\d{7}$/.test(cleanUtis)) {
+    return res.status(400).json({ error: 'UTİS kodu 7 rəqəmdən ibarət olmalıdır' });
+  }
+
+  if (cleanUtis) {
+    const existing = db.prepare('SELECT id FROM Students WHERE utis_code = ? AND id != ? AND COALESCE(is_archived, 0) = 0').get(cleanUtis, id);
+    if (existing) {
+      return res.status(400).json({ error: 'Bu UTİS kodu ilə başqa aktiv şagird artıq mövcuddur' });
+    }
+  }
+
+  const now = new Date().toISOString();
+  const fullName = `${first_name.trim()} ${last_name.trim()}`;
+
+  db.prepare(`
+    UPDATE Students SET
+      full_name = ?, first_name = ?, last_name = ?, father_name = ?,
+      utis_code = ?, fin_code = ?, grade_class = ?, school_name = ?,
+      phone = ?, updated_at = ?
+    WHERE id = ?
+  `).run(
+    fullName,
+    first_name.trim(),
+    last_name.trim(),
+    (father_name || '').trim(),
+    cleanUtis || null,
+    (fin_code || '').trim().toUpperCase() || null,
+    grade_class || 'IX sinif',
+    school_name || '1 nömrəli tam orta məktəb',
+    phone || null,
+    now,
+    id
+  );
+
+  res.json({ message: 'Şagird məlumatları yeniləndi' });
+});
+
+app.patch('/api/student-database/:id/archive', (req, res) => {
+  const { id } = req.params;
+  const { is_archived } = req.body;
+  const targetArchived = is_archived === 1 || is_archived === true ? 1 : 0;
+  const now = new Date().toISOString();
+
+  db.prepare(`
+    UPDATE Students SET
+      is_archived = ?,
+      archived_at = ?,
+      updated_at = ?
+    WHERE id = ?
+  `).run(targetArchived, targetArchived === 1 ? now : null, now, id);
+
+  res.json({ message: targetArchived === 1 ? 'Şagird arxivə göndərildi' : 'Şagird aktiv bazaya bərpa edildi' });
+});
+
+// ==========================================
 // 8. ADMIN STATS & AUDIT LOGS
 // ==========================================
 app.get('/api/admin/stats', (req, res) => {

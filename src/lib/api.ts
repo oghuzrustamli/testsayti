@@ -1,9 +1,38 @@
 // src/lib/api.ts
-import { User, Test, Question, TestSession, ActivationCode, AuditLog, ClassItem, StudentItem } from '../types';
+import {
+  User,
+  Test,
+  Question,
+  TestSession,
+  ActivationCode,
+  AuditLog,
+  ClassItem,
+  StudentItem,
+  StudentDatabaseItem,
+  StudentExamHistoryItem,
+  StudentImportItem,
+  ImportHistoryItem
+} from '../types';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
 const LS_TESTS_KEY = 'edunex_tests_store';
 const LS_RESULTS_KEY = 'edunex_results_store';
+const LS_STUDENT_DB_KEY = 'atroq_student_database';
+const LS_IMPORT_HISTORY_KEY = 'atroq_import_history';
+
+const DEFAULT_STUDENT_DATABASE: StudentDatabaseItem[] = [
+  { id: 'stdb-1', first_name: 'Murad', last_name: 'Əliyev', father_name: 'Rəşad', full_name: 'Murad Əliyev', utis_code: '1048291', fin_code: '7A8B9C1', grade_class: 'I sinif', school_name: '1 nömrəli tam orta məktəb', is_archived: 0, created_at: new Date().toISOString() },
+  { id: 'stdb-2', first_name: 'Ayan', last_name: 'Məmmədova', father_name: 'İlham', full_name: 'Ayan Məmmədova', utis_code: '1048292', fin_code: '6B4C5D2', grade_class: 'II sinif', school_name: '1 nömrəli tam orta məktəb', is_archived: 0, created_at: new Date().toISOString() },
+  { id: 'stdb-3', first_name: 'Fərid', last_name: 'Həsənov', father_name: 'Tural', full_name: 'Fərid Həsənov', utis_code: '1048293', fin_code: '5C3D4E3', grade_class: 'III sinif', school_name: '1 nömrəli tam orta məktəb', is_archived: 0, created_at: new Date().toISOString() },
+  { id: 'stdb-4', first_name: 'Nəzrin', last_name: 'Quliyeva', father_name: 'Zaur', full_name: 'Nəzrin Quliyeva', utis_code: '1048294', fin_code: '4D2E3F4', grade_class: 'IV sinif', school_name: '1 nömrəli tam orta məktəb', is_archived: 0, created_at: new Date().toISOString() },
+  { id: 'stdb-5', first_name: 'Elmir', last_name: 'Rzayev', father_name: 'Vüqar', full_name: 'Elmir Rzayev', utis_code: '1048295', fin_code: '3E1F2G5', grade_class: 'V sinif', school_name: '1 nömrəli tam orta məktəb', is_archived: 0, created_at: new Date().toISOString() },
+  { id: 'stdb-6', first_name: 'Dəniz', last_name: 'İsmayılova', father_name: 'Elnur', full_name: 'Dəniz İsmayılova', utis_code: '1048296', fin_code: '2F0G1H6', grade_class: 'VI sinif', school_name: '1 nömrəli tam orta məktəb', is_archived: 0, created_at: new Date().toISOString() },
+  { id: 'stdb-7', first_name: 'Kamran', last_name: 'Bağırov', father_name: 'Samir', full_name: 'Kamran Bağırov', utis_code: '1048297', fin_code: '1G9H0J7', grade_class: 'VII sinif', school_name: '1 nömrəli tam orta məktəb', is_archived: 0, created_at: new Date().toISOString() },
+  { id: 'stdb-8', first_name: 'Ləman', last_name: 'Süleymanova', father_name: 'Kamal', full_name: 'Ləman Süleymanova', utis_code: '1048298', fin_code: '0H8J9K8', grade_class: 'VIII sinif', school_name: '1 nömrəli tam orta məktəb', is_archived: 0, created_at: new Date().toISOString() },
+  { id: 'stdb-9', first_name: 'Əli', last_name: 'Həsənov', father_name: 'Namiq', full_name: 'Əli Həsənov', utis_code: '1234567', fin_code: '9J7K8L9', grade_class: 'IX sinif', school_name: '1 nömrəli tam orta məktəb', is_archived: 0, created_at: new Date().toISOString() },
+  { id: 'stdb-10', first_name: 'Aysel', last_name: 'Cəfərova', father_name: 'Rauf', full_name: 'Aysel Cəfərova', utis_code: '1048300', fin_code: '8K6L7M0', grade_class: 'X sinif', school_name: '1 nömrəli tam orta məktəb', is_archived: 0, created_at: new Date().toISOString() },
+  { id: 'stdb-11', first_name: 'Orxan', last_name: 'Tağıyev', father_name: 'Seymur', full_name: 'Orxan Tağıyev', utis_code: '1048301', fin_code: '7L5M6N1', grade_class: 'XI sinif', school_name: '1 nömrəli tam orta məktəb', is_archived: 0, created_at: new Date().toISOString() },
+];
 
 const DEFAULT_SAMPLE_TESTS: Test[] = [
   {
@@ -803,5 +832,324 @@ export const api = {
       if (res.ok) return await res.json();
     } catch {}
     return [];
+  },
+
+  // ==========================================
+  // Şagird Bazası (UTİS & I-XI Siniflər)
+  // ==========================================
+  async getStudentDatabase(params: {
+    search?: string;
+    grade?: string;
+    is_archived?: number;
+    sort_by?: string;
+    sort_order?: 'ASC' | 'DESC';
+    page?: number;
+    limit?: number;
+  } = {}): Promise<{ students: StudentDatabaseItem[]; total: number; page: number; limit: number; stats: { totalActive: number; totalArchived: number } }> {
+    const q = new URLSearchParams();
+    if (params.search) q.append('search', params.search);
+    if (params.grade) q.append('grade', params.grade);
+    if (params.is_archived !== undefined) q.append('is_archived', params.is_archived.toString());
+    if (params.sort_by) q.append('sort_by', params.sort_by);
+    if (params.sort_order) q.append('sort_order', params.sort_order);
+    if (params.page) q.append('page', params.page.toString());
+    if (params.limit) q.append('limit', params.limit.toString());
+
+    try {
+      const res = await fetch(`${API_BASE}/student-database?${q.toString()}`);
+      if (res.ok) return await res.json();
+    } catch {}
+
+    // Fallback to localStorage
+    let stored: StudentDatabaseItem[] = [];
+    try {
+      const saved = localStorage.getItem(LS_STUDENT_DB_KEY);
+      stored = saved ? JSON.parse(saved) : [...DEFAULT_STUDENT_DATABASE];
+    } catch {
+      stored = [...DEFAULT_STUDENT_DATABASE];
+    }
+
+    const archivedVal = params.is_archived === 1 ? 1 : 0;
+    let list = stored.filter(s => (s.is_archived || 0) === archivedVal);
+
+    if (params.grade && params.grade !== 'all') {
+      list = list.filter(s => s.grade_class === params.grade);
+    }
+
+    if (params.search && params.search.trim()) {
+      const s = params.search.trim().toLowerCase();
+      list = list.filter(item =>
+        (item.full_name && item.full_name.toLowerCase().includes(s)) ||
+        (item.first_name && item.first_name.toLowerCase().includes(s)) ||
+        (item.last_name && item.last_name.toLowerCase().includes(s)) ||
+        (item.father_name && item.father_name.toLowerCase().includes(s)) ||
+        (item.utis_code && item.utis_code.includes(s)) ||
+        (item.fin_code && item.fin_code.toLowerCase().includes(s)) ||
+        (item.school_name && item.school_name.toLowerCase().includes(s))
+      );
+    }
+
+    const total = list.length;
+    const pageNum = Math.max(1, params.page || 1);
+    const limitNum = Math.max(5, params.limit || 25);
+    const start = (pageNum - 1) * limitNum;
+    const paginated = list.slice(start, start + limitNum);
+
+    const totalActive = stored.filter(s => (s.is_archived || 0) === 0).length;
+    const totalArchived = stored.filter(s => s.is_archived === 1).length;
+
+    return {
+      students: paginated,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      stats: { totalActive, totalArchived }
+    };
+  },
+
+  async getStudentDatabaseById(id: string): Promise<{ student: StudentDatabaseItem; exam_history: StudentExamHistoryItem[] }> {
+    try {
+      const res = await fetch(`${API_BASE}/student-database/${id}`);
+      if (res.ok) return await res.json();
+    } catch {}
+
+    // Fallback
+    let stored: StudentDatabaseItem[] = [];
+    try {
+      const saved = localStorage.getItem(LS_STUDENT_DB_KEY);
+      stored = saved ? JSON.parse(saved) : [...DEFAULT_STUDENT_DATABASE];
+    } catch {
+      stored = [...DEFAULT_STUDENT_DATABASE];
+    }
+
+    const student = stored.find(s => s.id === id) || stored[0];
+
+    // Read sessions from LS_RESULTS_KEY if any
+    let history: StudentExamHistoryItem[] = [];
+    try {
+      const resSaved = localStorage.getItem(LS_RESULTS_KEY);
+      if (resSaved) {
+        const allSessions: TestSession[] = JSON.parse(resSaved);
+        history = allSessions
+          .filter(sess =>
+            (student.utis_code && (sess as any).utis_code === student.utis_code) ||
+            (sess.student_name === student.first_name && sess.student_surname === student.last_name)
+          )
+          .map(sess => ({
+            session_id: sess.id,
+            test_id: sess.test_id,
+            test_title: sess.test_title || 'Sınaq İmtahanı',
+            subject: sess.subject || 'Riyaziyyat',
+            exam_model: sess.exam_model || 'Buraxılış imtahanı',
+            score: sess.score,
+            total_points: sess.total_points || 100,
+            percentage: sess.percentage,
+            correct_count: sess.correct_count,
+            incorrect_count: sess.incorrect_count,
+            blank_count: sess.blank_count,
+            duration_seconds: sess.duration_seconds,
+            status: sess.status,
+            started_at: sess.started_at,
+            completed_at: sess.completed_at
+          }));
+      }
+    } catch {}
+
+    return { student, exam_history: history };
+  },
+
+  async createStudentDatabaseItem(data: Partial<StudentDatabaseItem>): Promise<any> {
+    try {
+      const res = await fetch(`${API_BASE}/student-database`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) return await res.json();
+      const err = await res.json().catch(() => ({}));
+      if (err.error) throw new Error(err.error);
+    } catch (err: any) {
+      if (err.message && !err.message.includes('fetch')) throw err;
+    }
+
+    // Local fallback
+    const id = 'stdb-' + Math.random().toString(36).substring(2, 9);
+    const newStudent: StudentDatabaseItem = {
+      id,
+      first_name: data.first_name || '',
+      last_name: data.last_name || '',
+      father_name: data.father_name || '',
+      full_name: `${data.first_name || ''} ${data.last_name || ''}`.trim(),
+      utis_code: data.utis_code || '',
+      fin_code: (data.fin_code || '').toUpperCase(),
+      grade_class: data.grade_class || 'IX sinif',
+      school_name: data.school_name || '1 nömrəli tam orta məktəb',
+      phone: data.phone || '',
+      is_archived: 0,
+      created_at: new Date().toISOString()
+    };
+
+    try {
+      const saved = localStorage.getItem(LS_STUDENT_DB_KEY);
+      const list: StudentDatabaseItem[] = saved ? JSON.parse(saved) : [...DEFAULT_STUDENT_DATABASE];
+      list.unshift(newStudent);
+      localStorage.setItem(LS_STUDENT_DB_KEY, JSON.stringify(list));
+    } catch {}
+
+    return { id, message: 'Şagird əlavə edildi' };
+  },
+
+  async updateStudentDatabaseItem(id: string, data: Partial<StudentDatabaseItem>): Promise<any> {
+    try {
+      const res = await fetch(`${API_BASE}/student-database/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) return await res.json();
+      const err = await res.json().catch(() => ({}));
+      if (err.error) throw new Error(err.error);
+    } catch (err: any) {
+      if (err.message && !err.message.includes('fetch')) throw err;
+    }
+
+    try {
+      const saved = localStorage.getItem(LS_STUDENT_DB_KEY);
+      if (saved) {
+        const list: StudentDatabaseItem[] = JSON.parse(saved);
+        const updated = list.map(s => s.id === id ? { ...s, ...data, full_name: `${data.first_name || s.first_name} ${data.last_name || s.last_name}`.trim(), updated_at: new Date().toISOString() } : s);
+        localStorage.setItem(LS_STUDENT_DB_KEY, JSON.stringify(updated));
+      }
+    } catch {}
+
+    return { message: 'Şagird məlumatları yeniləndi' };
+  },
+
+  async archiveStudentDatabaseItem(id: string, is_archived: number): Promise<any> {
+    try {
+      const res = await fetch(`${API_BASE}/student-database/${id}/archive`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_archived }),
+      });
+      if (res.ok) return await res.json();
+    } catch {}
+
+    try {
+      const saved = localStorage.getItem(LS_STUDENT_DB_KEY);
+      if (saved) {
+        const list: StudentDatabaseItem[] = JSON.parse(saved);
+        const updated = list.map(s => s.id === id ? { ...s, is_archived, archived_at: is_archived === 1 ? new Date().toISOString() : undefined } : s);
+        localStorage.setItem(LS_STUDENT_DB_KEY, JSON.stringify(updated));
+      }
+    } catch {}
+
+    return { message: is_archived === 1 ? 'Şagird arxivə göndərildi' : 'Şagird aktiv bazaya bərpa edildi' };
+  },
+
+  async importStudentsFromExcel(students: StudentImportItem[], file_name: string): Promise<any> {
+    try {
+      const res = await fetch(`${API_BASE}/student-database/import`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ students, file_name }),
+      });
+      if (res.ok) return await res.json();
+    } catch {}
+
+    // Fallback to localStorage
+    let stored: StudentDatabaseItem[] = [];
+    try {
+      const saved = localStorage.getItem(LS_STUDENT_DB_KEY);
+      stored = saved ? JSON.parse(saved) : [...DEFAULT_STUDENT_DATABASE];
+    } catch {
+      stored = [...DEFAULT_STUDENT_DATABASE];
+    }
+
+    let imported = 0;
+    let updated = 0;
+
+    for (const s of students) {
+      const existingIdx = stored.findIndex(it => (s.utis_code && it.utis_code === s.utis_code) || (s.fin_code && it.fin_code === s.fin_code));
+      if (existingIdx !== -1) {
+        stored[existingIdx] = {
+          ...stored[existingIdx],
+          first_name: s.first_name,
+          last_name: s.last_name,
+          father_name: s.father_name,
+          full_name: `${s.first_name} ${s.last_name}`,
+          grade_class: s.grade_class || stored[existingIdx].grade_class,
+          school_name: s.school_name || stored[existingIdx].school_name,
+          updated_at: new Date().toISOString()
+        };
+        updated++;
+      } else {
+        stored.push({
+          id: 'stdb-' + Math.random().toString(36).substring(2, 9),
+          first_name: s.first_name,
+          last_name: s.last_name,
+          father_name: s.father_name,
+          full_name: `${s.first_name} ${s.last_name}`,
+          utis_code: s.utis_code,
+          fin_code: s.fin_code,
+          grade_class: s.grade_class || 'IX sinif',
+          school_name: s.school_name || '1 nömrəli tam orta məktəb',
+          is_archived: 0,
+          created_at: new Date().toISOString()
+        });
+        imported++;
+      }
+    }
+
+    try {
+      localStorage.setItem(LS_STUDENT_DB_KEY, JSON.stringify(stored));
+      // Save history
+      const savedHist = localStorage.getItem(LS_IMPORT_HISTORY_KEY);
+      const histList: ImportHistoryItem[] = savedHist ? JSON.parse(savedHist) : [];
+      histList.unshift({
+        id: 'imp-' + Math.random().toString(36).substring(2, 9),
+        file_name,
+        total_rows: students.length,
+        imported_count: imported,
+        updated_count: updated,
+        skipped_count: Math.max(0, students.length - (imported + updated)),
+        imported_by: 'Müəllim',
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem(LS_IMPORT_HISTORY_KEY, JSON.stringify(histList));
+    } catch {}
+
+    return {
+      message: 'İdxal uğurla tamamlandı',
+      total_rows: students.length,
+      imported_count: imported,
+      updated_count: updated,
+      skipped_count: Math.max(0, students.length - (imported + updated))
+    };
+  },
+
+  async getImportHistory(): Promise<ImportHistoryItem[]> {
+    try {
+      const res = await fetch(`${API_BASE}/student-database/import-history`);
+      if (res.ok) return await res.json();
+    } catch {}
+
+    try {
+      const saved = localStorage.getItem(LS_IMPORT_HISTORY_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+
+    return [
+      {
+        id: 'imp-demo-1',
+        file_name: 'UTIS_Mekteb_Sagirdler_2026.xlsx',
+        total_rows: 120,
+        imported_count: 115,
+        updated_count: 5,
+        skipped_count: 0,
+        imported_by: 'Nərmin Məmmədova',
+        created_at: new Date(Date.now() - 86400000 * 2).toISOString()
+      }
+    ];
   }
 };

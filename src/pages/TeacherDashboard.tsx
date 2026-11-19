@@ -25,7 +25,8 @@ import {
   ChevronRight,
   CheckCircle2,
   Calendar,
-  School
+  School,
+  GraduationCap
 } from 'lucide-react';
 import { formatDuration } from '../lib/export-utils';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
@@ -283,14 +284,41 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             </div>
           </div>
 
-          {/* Card 3: Sinif və Şagird İdarəetməsi */}
+          {/* Card 3: Şagird Bazası (UTİS) */}
+          <div
+            onClick={() => onNavigate('student_database')}
+            className="p-5 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between text-slate-900 dark:text-white"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Users className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
+                  UTİS
+                </span>
+              </div>
+              <h3 className="font-black text-sm text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                Şagird Bazası (UTİS)
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                Məktəbin vahid şagird bazası, Excel (.xlsx) idxalı, FİN və UTİS kodları, imtahan nəticələri tarixçəsi.
+              </p>
+            </div>
+            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-indigo-600 dark:text-indigo-400">
+              <span>Şagird bazasına keç</span>
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+
+          {/* Card 3b: Sinif və Şagird İdarəetməsi */}
           <div
             onClick={() => onNavigate('classes')}
             className="p-5 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between text-slate-900 dark:text-white"
           >
             <div>
               <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-                <Users className="w-5 h-5" />
+                <GraduationCap className="w-5 h-5" />
               </div>
               <h3 className="font-black text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                 {t.hubClassesTitle}

@@ -1061,8 +1061,8 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
       {/* Top Header Bar */}
       <header className="h-14 sm:h-16 shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 px-3 sm:px-6 flex items-center justify-between shadow-2xs">
         <div className="flex items-center gap-2 sm:gap-3 truncate">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-black text-xs shrink-0">
-            EDX
+          <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-black text-xs tracking-tight shrink-0 shadow-sm" title="ATROQ Education">
+            ATQ
           </div>
           <div className="truncate">
             <div className="flex items-center gap-1.5">

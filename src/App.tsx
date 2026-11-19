@@ -26,10 +26,11 @@ import { AuthModal } from './components/AuthModal';
 import { AiTestCreatorPage } from './pages/AiTestCreatorPage';
 import { RegionalStatsPage } from './pages/RegionalStatsPage';
 import { AboutPage } from './pages/AboutPage';
+import { StudentDatabasePage } from './pages/StudentDatabasePage';
 
 const DEFAULT_TEACHER: User = {
   id: 'usr-teacher-1',
-  email: 'muellim@edunex.az',
+  email: 'muellim@atroq.edu.az',
   full_name: 'Nərmin Məmmədova',
   phone: '+994 50 345 67 89',
   role: 'teacher',
@@ -41,7 +42,7 @@ const DEFAULT_TEACHER: User = {
 
 const DEFAULT_STUDENT: User = {
   id: 'usr-student-1',
-  email: 'sagird@edunex.az',
+  email: 'sagird@atroq.edu.az',
   full_name: 'Əli Həsənov',
   phone: '+994 55 987 65 43',
   role: 'student',
@@ -201,6 +202,8 @@ export function App() {
                 />
               ) : activeTab === 'regional_stats' ? (
                 <RegionalStatsPage user={currentUser} />
+              ) : activeTab === 'student_database' ? (
+                <StudentDatabasePage user={currentUser} />
               ) : (
                 <>
                   {/* TEACHER VIEWS */}

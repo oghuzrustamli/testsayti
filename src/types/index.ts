@@ -215,6 +215,68 @@ export interface StudentItem {
   grade?: number;
 }
 
+// ATROQ Education - UTİS Şagird Bazası İnterfeysləri (I - XI Siniflər)
+export interface StudentDatabaseItem {
+  id: string;
+  teacher_id?: string;
+  first_name: string;
+  last_name: string;
+  father_name: string;
+  full_name: string;
+  utis_code: string;
+  fin_code: string;
+  grade_class: string;
+  school_name: string;
+  phone?: string;
+  is_archived: number;
+  archived_at?: string;
+  created_at: string;
+  updated_at?: string;
+  exam_count?: number;
+  avg_score?: number;
+}
+
+export interface StudentExamHistoryItem {
+  session_id: string;
+  test_id: string;
+  test_title: string;
+  subject: string;
+  exam_model?: string;
+  score: number;
+  total_points: number;
+  percentage: number;
+  correct_count: number;
+  incorrect_count: number;
+  blank_count: number;
+  duration_seconds: number;
+  status: string;
+  started_at: string;
+  completed_at?: string;
+}
+
+export interface StudentImportItem {
+  first_name: string;
+  last_name: string;
+  father_name: string;
+  utis_code: string;
+  fin_code: string;
+  grade_class: string;
+  school_name: string;
+  status: 'new' | 'existing_match' | 'needs_update' | 'duplicate_in_file' | 'invalid';
+  validation_errors: string[];
+}
+
+export interface ImportHistoryItem {
+  id: string;
+  file_name: string;
+  total_rows: number;
+  imported_count: number;
+  updated_count: number;
+  skipped_count: number;
+  imported_by?: string;
+  created_at: string;
+}
+
 export interface PdfQuestionItem {
   id: string;
   orderNumber: number;

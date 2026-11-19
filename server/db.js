@@ -240,6 +240,36 @@ export function initDatabase() {
     db.exec("ALTER TABLE Tests ADD COLUMN test_type TEXT DEFAULT 'standard';");
   } catch (e) {}
 
+  // UTIS Şagird Bazası Cədvəlləri və Sütun Miqrasiyaları
+  try {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS ImportHistory (
+        id TEXT PRIMARY KEY,
+        file_name TEXT NOT NULL,
+        total_rows INTEGER NOT NULL DEFAULT 0,
+        imported_count INTEGER NOT NULL DEFAULT 0,
+        updated_count INTEGER NOT NULL DEFAULT 0,
+        skipped_count INTEGER NOT NULL DEFAULT 0,
+        imported_by TEXT,
+        created_at TEXT NOT NULL
+      );
+    `);
+  } catch (e) {}
+
+  try {
+    const studentCols = db.prepare("PRAGMA table_info(Students)").all().map(c => c.name);
+    if (!studentCols.includes('first_name')) db.exec("ALTER TABLE Students ADD COLUMN first_name TEXT;");
+    if (!studentCols.includes('last_name')) db.exec("ALTER TABLE Students ADD COLUMN last_name TEXT;");
+    if (!studentCols.includes('father_name')) db.exec("ALTER TABLE Students ADD COLUMN father_name TEXT;");
+    if (!studentCols.includes('utis_code')) db.exec("ALTER TABLE Students ADD COLUMN utis_code TEXT;");
+    if (!studentCols.includes('fin_code')) db.exec("ALTER TABLE Students ADD COLUMN fin_code TEXT;");
+    if (!studentCols.includes('grade_class')) db.exec("ALTER TABLE Students ADD COLUMN grade_class TEXT;");
+    if (!studentCols.includes('school_name')) db.exec("ALTER TABLE Students ADD COLUMN school_name TEXT;");
+    if (!studentCols.includes('is_archived')) db.exec("ALTER TABLE Students ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0;");
+    if (!studentCols.includes('archived_at')) db.exec("ALTER TABLE Students ADD COLUMN archived_at TEXT;");
+    if (!studentCols.includes('updated_at')) db.exec("ALTER TABLE Students ADD COLUMN updated_at TEXT;");
+  } catch (e) {}
+
   seedInitialData();
   repairExistingTests();
 }
@@ -431,10 +461,10 @@ function seedInitialData() {
     'usr-admin-1',
     'admin@edunex.az',
     'admin123',
-    'EDUNEX Baş Administrator',
+    'ATROQ Education Baş Administrator',
     '+994 50 111 22 33',
     'admin',
-    'EDUNEX Head Office',
+    'ATROQ Education Mərkəzi Qərargah',
     'active',
     1,
     nextYear,
@@ -717,5 +747,5 @@ function seedInitialData() {
   db.prepare(`
     INSERT INTO AuditLogs (id, user_id, user_name, action, details, ip_address, created_at)
     VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run('log-1', 'usr-admin-1', 'EDUNEX Administrator', 'Sistem başlanğıcı', 'İlkin verilənlər bazası və sınaq məlumatları yükləndi', '127.0.0.1', now);
+  `).run('log-1', 'usr-admin-1', 'ATROQ Education Administrator', 'Sistem başlanğıcı', 'İlkin verilənlər bazası və sınaq məlumatları yükləndi', '127.0.0.1', now);
 }

@@ -42,6 +42,7 @@ export type TeacherTab =
   | 'exams_grades'
   | 'my_tests'
   | 'question_bank'
+  | 'student_database'
   | 'classes'
   | 'results'
   | 'statistics'
@@ -52,6 +53,7 @@ export type TeacherTab =
 
 export type AdminTab =
   | 'users'
+  | 'student_database'
   | 'activation_codes'
   | 'packages'
   | 'subscriptions'
@@ -151,7 +153,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       groupTitle: 'Tədris və Nəzarət',
       items: [
-        { id: 'classes', label: 'Sinif və Şagirdlər', icon: Users2 },
+        { id: 'student_database', label: 'Şagird bazası', icon: Users2, badge: 'UTİS', highlight: true },
+        { id: 'classes', label: 'Sinif və Şagirdlər', icon: GraduationCap },
         { id: 'results', label: 'Nəticələr və Jurnal', icon: BarChart3 },
         { id: 'statistics', label: 'Akademik Statistika', icon: TrendingUp },
       ]
@@ -178,6 +181,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       groupTitle: 'İdarəetmə',
       items: [
         { id: 'users', label: 'İstifadəçilər', icon: Users2 },
+        { id: 'student_database', label: 'Şagird bazası', icon: Users2, badge: 'UTİS', highlight: true },
         { id: 'activation_codes', label: 'Aktivasiya Kodları', icon: Key, badge: 'PRO' },
         { id: 'packages', label: 'Paketlər və Qiymətlər', icon: CreditCard },
         { id: 'subscriptions', label: 'Abunəliklər & Ödənişlər', icon: Shield },
