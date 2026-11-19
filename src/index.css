@@ -192,8 +192,8 @@
 
 .dark .omr-column-card {
   background-color: #0f172a;
-  border: 1px solid #475569 !important; /* Dark rejimdə incə və tünd çərçivə */
-  box-shadow: none !important;
+  border: 1.5px solid #38bdf8 !important; /* Dark rejimdə aydın seçilən parlaq mavi çərçivə */
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2) !important;
 }
 
 .dark .omr-bubble-btn {
@@ -235,8 +235,8 @@
 
 .dark .omr-numeric-grid {
   background-color: #0f172a;
-  border: 1px solid #475569 !important;
-  box-shadow: none !important;
+  border: 1.5px solid #38bdf8 !important; /* Dark rejimdə aydın seçilən parlaq mavi çərçivə */
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2) !important;
 }
 
 .omr-numeric-col {

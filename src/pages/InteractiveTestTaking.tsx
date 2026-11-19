@@ -1351,20 +1351,20 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
 
                   return (
                     <div className="flex flex-col gap-3">
-                      {/* 1. QAPALI OMR SUALLARI (DƏQİQ 3 SÜTUN, ÇOX İNCƏ VƏ TÜND ÇƏRÇİVƏ) */}
+                      {/* 1. QAPALI OMR SUALLARI (DƏQİQ 3 SÜTUN, DARK REJİMDƏ AYDIN SEÇİLƏN ÇƏRÇİVƏ) */}
                       {closedQuestions.length > 0 && (
-                        <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-700/80 dark:border-slate-700 shadow-2xs">
+                        <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/80 border border-slate-700/80 dark:border-sky-400/80 shadow-2xs dark:shadow-[0_0_12px_rgba(56,189,248,0.18)]">
                           <div className="flex items-center justify-between px-1 mb-1">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-800 dark:text-sky-300">
                               Qapalı Suallar (1 - {closedQuestions.length})
                             </span>
-                            <span className="text-[9px] text-slate-600 dark:text-slate-400 font-bold">
+                            <span className="text-[9px] text-slate-600 dark:text-sky-400 font-bold">
                               3 Sütunlu Standart A-E
                             </span>
                           </div>
                           <div className="grid grid-cols-3 gap-2 items-stretch">
                             {columnSlices.map((colQuestions, colIdx) => (
-                              <div key={colIdx} className="omr-column-card bg-white dark:bg-slate-900 border border-slate-700/80 dark:border-slate-700 shadow-2xs">
+                              <div key={colIdx} className="omr-column-card bg-white dark:bg-slate-900 border border-slate-700/80 dark:border-sky-400/80 shadow-2xs">
                                 <div className="flex flex-col gap-0.5">
                                   {colQuestions.map((q, idxInCol) => {
                                     const originalIndex = questions.findIndex(orig => orig.id === q.id);
@@ -1413,14 +1413,14 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                         </div>
                       )}
 
-                      {/* 2. AÇIQ SUALLAR (RƏQƏMLİ) - ÇOX İNCƏ VƏ TÜND ÇƏRÇİVƏ */}
+                      {/* 2. AÇIQ SUALLAR (RƏQƏMLİ) - DARK REJİMDƏ AYDIN SEÇİLƏN ÇƏRÇİVƏ */}
                       {openQuestions.length > 0 && (
-                        <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-700/80 dark:border-slate-700 shadow-2xs">
+                        <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/80 border border-slate-700/80 dark:border-sky-400/80 shadow-2xs dark:shadow-[0_0_12px_rgba(56,189,248,0.18)]">
                           <div className="flex items-center justify-between px-1 mb-1">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-800 dark:text-sky-300">
                               Açıq Cavablı Suallar ({openQuestions.length})
                             </span>
-                            <span className="text-[9px] text-slate-600 dark:text-slate-400 font-bold">
+                            <span className="text-[9px] text-slate-600 dark:text-sky-400 font-bold">
                               6-Sütunlu Standart Rəqəm Matrisi
                             </span>
                           </div>
@@ -1434,7 +1434,7 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                               return (
                                 <div
                                   key={q.id || qNum}
-                                  className="w-full bg-white dark:bg-slate-900 border border-slate-700/80 dark:border-slate-700 shadow-2xs rounded-xl p-2.5 flex flex-col gap-1.5"
+                                  className="w-full bg-white dark:bg-slate-900 border border-slate-700/80 dark:border-sky-400/80 shadow-2xs rounded-xl p-2.5 flex flex-col gap-1.5"
                                 >
                                   <div className="flex items-center justify-between pb-1 border-b border-slate-200 dark:border-slate-800 text-[10px]">
                                     <div className="flex items-center gap-1.5">
