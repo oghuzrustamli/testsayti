@@ -736,16 +736,16 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                         key={sub.name}
                         type="button"
                         onClick={() => setSelectedSubject(sub.name)}
-                        className={`w-full p-2.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
+                        className={`w-full p-2.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer bg-white dark:bg-slate-900/90 ${
                           isSelected
-                            ? 'bg-indigo-50/90 dark:bg-indigo-950 border-indigo-500 dark:border-indigo-400 shadow-xs ring-1 ring-indigo-300 dark:ring-indigo-500/60'
-                            : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/70'
+                            ? 'border-blue-700 dark:border-blue-600 shadow-xs'
+                            : 'border-slate-200/90 dark:border-slate-800 hover:border-blue-700 dark:hover:border-blue-600'
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 transition-transform group-hover:scale-105 ${
                             isSelected
-                              ? 'bg-indigo-600 text-white shadow-2xs'
+                              ? 'bg-blue-700 text-white shadow-2xs'
                               : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                           }`}>
                             {sub.name.charAt(0)}
@@ -754,7 +754,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                             <div className="text-xs font-black text-slate-900 dark:text-white truncate flex items-center gap-1.5">
                               <span>{sub.name}</span>
                               {isSelected && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400 shrink-0" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 shrink-0" />
                               )}
                             </div>
                             <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate flex items-center gap-1.5 mt-0.5">
@@ -768,7 +768,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                         </div>
 
                         <ChevronRight className={`w-4 h-4 shrink-0 transition-transform ${
-                          isSelected ? 'text-indigo-600 dark:text-indigo-400 translate-x-0.5' : 'text-slate-300 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-300'
+                          isSelected ? 'text-blue-600 dark:text-blue-400 translate-x-0.5' : 'text-slate-300 dark:text-slate-600 group-hover:text-blue-600 dark:group-hover:text-blue-400'
                         }`} />
                       </button>
                     );
@@ -898,14 +898,14 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                         <div
                           key={topic}
                           onClick={() => handleToggleTopic(topic)}
-                          className={`p-2 rounded-lg border text-xs font-semibold flex items-center gap-2.5 cursor-pointer transition-all select-none ${
+                          className={`p-2 rounded-lg border text-xs font-semibold flex items-center gap-2.5 cursor-pointer transition-all select-none bg-white dark:bg-slate-900/60 ${
                             isChecked
-                              ? 'bg-indigo-50/80 dark:bg-indigo-950/70 border-indigo-300 dark:border-indigo-600 text-slate-900 dark:text-white shadow-2xs'
-                              : 'bg-transparent border-transparent text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:border-slate-200 dark:hover:border-slate-700'
+                              ? 'border-blue-700 dark:border-blue-600 text-slate-900 dark:text-white shadow-2xs'
+                              : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-blue-700 dark:hover:border-blue-600'
                           }`}
                         >
                           <div className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
-                            isChecked ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800'
+                            isChecked ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800'
                           }`}>
                             {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
                           </div>

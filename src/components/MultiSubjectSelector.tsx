@@ -273,10 +273,10 @@ export const MultiSubjectSelector: React.FC<MultiSubjectSelectorProps> = ({
           return (
             <div
               key={sub.name}
-              className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-2 select-none ${
+              className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-2 select-none bg-white dark:bg-slate-900/80 ${
                 selected
-                  ? 'bg-gradient-to-r from-indigo-50/90 to-white dark:from-indigo-950/80 dark:to-slate-800/95 border-indigo-400 dark:border-indigo-500 shadow-2xs ring-1 ring-indigo-300 dark:ring-indigo-700'
-                  : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                  ? 'border-blue-700 dark:border-blue-600 shadow-2xs'
+                  : 'border-slate-200 dark:border-slate-800 hover:border-blue-700 dark:hover:border-blue-600'
               }`}
             >
               {/* Checkbox and Subject Name */}
