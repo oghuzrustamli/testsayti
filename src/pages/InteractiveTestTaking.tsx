@@ -211,6 +211,21 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
 
   const timerRef = useRef<any>(null);
 
+  // Disable any window/body level scrolling during test taking so PDF and OMR scroll 100% independently
+  useEffect(() => {
+    if (isExamStarted) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [isExamStarted]);
+
   // Load test details by share code or testId
   useEffect(() => {
     async function fetchTest() {
@@ -945,16 +960,6 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
       </div>
     );
   }
-
-  // Disable any window/body level scrolling during test taking so PDF and OMR scroll 100% independently
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    };
-  }, []);
 
   // 3. Exam In-Progress Screen
   const answeredCount = Object.keys(answers).filter(k => answers[k] && answers[k].trim() !== '').length;

@@ -359,9 +359,13 @@ export function App() {
               onEnterTestCode={(code) => setExamShareCode(code)}
               onTakeTest={(testId) => {
                 api.getTestById(testId).then(t => {
-                  if (t.share_code) {
-                    setExamShareCode(t.share_code);
+                  if (t) {
+                    setExamShareCode(t.share_code || t.id);
+                  } else {
+                    setExamShareCode(testId);
                   }
+                }).catch(() => {
+                  setExamShareCode(testId);
                 });
               }}
             />
