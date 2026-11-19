@@ -1,10 +1,9 @@
 // src/pages/AboutPage.tsx
 // ATROQ Education – “Haqqında” Səhifəsi
-// Proqramın müəllifi: Rəşad Kirmanoğlu, yaradılma məqsədi, imkanları və AI Tanıtım Videosu
+// Proqramın müəllifi: Rəşad Kirmanoğlu, yaradılma məqsədi, imkanları və Rəsmi Loqo
 // Dizayn düzəlişi: Bütün çərçivələr, kartlar, mətnlər və boşluqlar mütənasib şəkildə kiçildilib, yığcamlaşdırılıb
-import React, { useState } from 'react';
+import React from 'react';
 import { User } from '../types';
-import { AboutVideoShowcase } from '../components/AboutVideoShowcase';
 import {
   Sparkles,
   Cpu,
@@ -137,8 +136,6 @@ const ATROQ_CAPABILITIES: CapabilityItem[] = [
 ];
 
 export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => {
-  const [showVideoModal, setShowVideoModal] = useState<boolean>(false);
-
   return (
     <div className="min-h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
       {/* Background Decorative Tech Grids */}
@@ -259,41 +256,35 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
         </section>
 
         {/* =========================================================================
-            3. ATROQ EDUCATION-I TANI — MONTAJ EDİLMİŞ AI TANITIM VİDEOSU (16:9 Kompakt Sahə)
+            3. ATROQ EDUCATION RƏSMİ LOQO VƏ BREND VİTRİNİ (BÖYÜK QUTU FORMATI)
            ========================================================================= */}
         <section className="flex flex-col gap-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-indigo-600 dark:text-sky-400 text-[10px] font-black uppercase tracking-wider mb-0.5">
-                <Sparkles className="w-3 h-3" />
-                <span>MULTİMEDİA TƏQDİMATI</span>
-              </div>
-              <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                <span>ATROQ Education-ı tanı</span>
-                <span className="text-[9px] px-2 py-0.5 rounded bg-sky-50 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 font-mono font-bold border border-sky-200 dark:border-sky-500/30">
-                  48 SANİYƏ • VİRTUAL APARICI
-                </span>
-              </h2>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                Virtual qadın aparıcının təqdimatında ATROQ Education-ın real proqram görüntüləri, canlı lip-sync və səs müşayiəti.
+          <div className="w-full rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-6 sm:p-10 shadow-sm dark:shadow-2xl relative overflow-hidden flex flex-col items-center justify-center text-center">
+            {/* Arxa fon parıltısı və dekorativ qradient */}
+            <div className="absolute inset-0 bg-radial from-indigo-50/70 via-transparent to-transparent dark:from-indigo-600/10 pointer-events-none" />
+
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-sky-300 text-xs font-mono uppercase tracking-widest mb-6 shadow-2xs relative z-10">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-sky-400" />
+              <span>RƏSMİ BREND VƏ MİLLİ EKOSİSTEM LOQOSU</span>
+            </div>
+
+            {/* Böyük Loqo Qutusu (Böyük, Relyefli, Ağ Kontrastlı və Aydın) */}
+            <div className="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-12 shadow-lg border border-slate-200/90 dark:border-slate-300 flex items-center justify-center relative z-10 group transition-all duration-300 hover:shadow-xl">
+              <img
+                src="/assets/atroq-logo.png"
+                alt="ATROQ Education Rəsmi Loqosu"
+                className="w-full max-w-lg sm:max-w-xl h-auto max-h-72 sm:max-h-96 object-contain filter drop-shadow-md group-hover:scale-102 transition-transform duration-300"
+              />
+            </div>
+
+            <div className="mt-6 max-w-xl relative z-10">
+              <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                ATROQ Education
+              </h3>
+              <p className="mt-1.5 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
+                Təhsilin rəqəmsallaşdırılması, müasir qiymətləndirmə texnologiyaları və süni intellekt əsaslı milli imtahan platformasının rəsmi brend kimliyi.
               </p>
             </div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={() => setShowVideoModal(true)}
-                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-[11px] font-black flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
-              >
-                <Play className="w-3.5 h-3.5 fill-current" />
-                <span>Pəncərədə Aç</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Embedded Video Showcase Player - Kompakt 16:9 çərçivə */}
-          <div className="max-w-2xl mx-auto w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-1 sm:p-1.5 shadow-sm dark:shadow-xl">
-            <AboutVideoShowcase />
           </div>
         </section>
 
@@ -495,13 +486,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
 
       </div>
 
-      {/* Fullscreen Video Modal */}
-      {showVideoModal && (
-        <AboutVideoShowcase
-          isModal={true}
-          onClose={() => setShowVideoModal(false)}
-        />
-      )}
     </div>
   );
 };

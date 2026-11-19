@@ -95,25 +95,22 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       <div className="flex items-center gap-1 overflow-x-auto p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-bold text-slate-600">
         <button
           onClick={() => setActiveTab('enter_test')}
-          className={`px-4 py-2 rounded-lg transition-all ${
-            activeTab === 'enter_test' ? 'bg-white text-indigo-700 shadow-xs' : 'hover:text-slate-900'
-          }`}
+          className={`px-4 py-2 rounded-lg transition-all ${activeTab === 'enter_test' ? 'bg-white text-indigo-700 shadow-xs' : 'hover:text-slate-900'
+            }`}
         >
           Testə Daxil Ol
         </button>
         <button
           onClick={() => setActiveTab('active_tests')}
-          className={`px-4 py-2 rounded-lg transition-all ${
-            activeTab === 'active_tests' ? 'bg-white text-indigo-700 shadow-xs' : 'hover:text-slate-900'
-          }`}
+          className={`px-4 py-2 rounded-lg transition-all ${activeTab === 'active_tests' ? 'bg-white text-indigo-700 shadow-xs' : 'hover:text-slate-900'
+            }`}
         >
           Aktiv Testlər ({availableTests.length})
         </button>
         <button
           onClick={() => setActiveTab('results')}
-          className={`px-4 py-2 rounded-lg transition-all ${
-            activeTab === 'results' ? 'bg-white text-indigo-700 shadow-xs' : 'hover:text-slate-900'
-          }`}
+          className={`px-4 py-2 rounded-lg transition-all ${activeTab === 'results' ? 'bg-white text-indigo-700 shadow-xs' : 'hover:text-slate-900'
+            }`}
         >
           Nəticələrim ({myResults.length})
         </button>
