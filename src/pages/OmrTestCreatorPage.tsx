@@ -1404,20 +1404,20 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
 
               return (
                 <div className="flex flex-col gap-3.5">
-                  {/* 1. QAPALI SUALLAR - DƏQİQ VƏ BƏRABƏR 3 SÜTUNLU OPTİK QABARCIQLAR (DARK REJİMDƏ AYDIN SEÇİLƏN ÇƏRÇİVƏ) */}
+                  {/* 1. QAPALI SUALLAR - DƏQİQ VƏ BƏRABƏR 3 SÜTUNLU OPTİK QABARCIQLAR (İNCƏ TÜND GÖY ÇƏRÇİVƏ) */}
                   {closedRows.length > 0 && (
-                    <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/80 border border-slate-700/80 dark:border-sky-400/80 shadow-2xs dark:shadow-[0_0_12px_rgba(56,189,248,0.18)]">
+                    <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/80 border border-blue-900/80 dark:border-sky-400/80 shadow-2xs dark:shadow-[0_0_12px_rgba(56,189,248,0.18)]">
                       <div className="flex items-center justify-between px-1 mb-1">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-800 dark:text-sky-300">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-blue-950 dark:text-sky-300">
                           Qapalı Suallar (1 - {closedRows.length})
                         </span>
-                        <span className="text-[9px] text-slate-600 dark:text-sky-400 font-bold">
+                        <span className="text-[9px] text-blue-900 dark:text-sky-400 font-bold">
                           3 Sütunlu Standart A-E
                         </span>
                       </div>
                       <div className="grid grid-cols-3 gap-2 items-stretch">
                         {columnSlices.map((colRows, colIdx) => (
-                          <div key={colIdx} className="omr-column-card h-full min-h-full bg-white dark:bg-slate-900 border border-slate-700/80 dark:border-sky-400/80 shadow-2xs">
+                          <div key={colIdx} className="omr-column-card h-full min-h-full bg-white dark:bg-slate-900 border border-blue-900/80 dark:border-sky-400/80 shadow-2xs">
                             <div className="flex flex-col gap-0.5">
                               {colRows.map((row) => {
                                 const currentChoice = activeOmrTab === 'teacher_key'
@@ -1473,15 +1473,15 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                     </div>
                   )}
 
-                  {/* 2. AÇIQ SUALLAR (RƏQƏMLİ 6-SÜTUNLU GRİD) - DARK REJİMDƏ AYDIN SEÇİLƏN ÇƏRÇİVƏ */}
+                  {/* 2. AÇIQ SUALLAR (RƏQƏMLİ 6-SÜTUNLU GRİD) - İNCƏ TÜND GÖY ÇƏRÇİVƏ */}
                   {openRows.length > 0 && (
-                    <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/80 border border-slate-700/80 dark:border-sky-400/80 shadow-2xs dark:shadow-[0_0_12px_rgba(56,189,248,0.18)]">
+                    <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/80 border border-blue-900/80 dark:border-sky-400/80 shadow-2xs dark:shadow-[0_0_12px_rgba(56,189,248,0.18)]">
                       <div className="flex items-center justify-between px-1 mb-1">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-800 dark:text-sky-300 flex items-center gap-1">
-                          <Plus className="w-3 h-3 text-slate-700 dark:text-sky-400" />
+                        <span className="text-[10px] font-black uppercase tracking-wider text-blue-950 dark:text-sky-300 flex items-center gap-1">
+                          <Plus className="w-3 h-3 text-blue-900 dark:text-sky-400" />
                           Açıq Cavablı Suallar ({openRows.length})
                         </span>
-                        <span className="text-[9px] text-slate-600 dark:text-sky-400 font-bold">
+                        <span className="text-[9px] text-blue-900 dark:text-sky-400 font-bold">
                           6-Sütunlu Standart Rəqəm Matrisi
                         </span>
                       </div>
@@ -1499,7 +1499,7 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                           return (
                             <div
                               key={row.number}
-                              className="w-full bg-white dark:bg-slate-900 border border-slate-700/80 dark:border-sky-400/80 shadow-2xs rounded-xl p-2.5 flex flex-col gap-1.5"
+                              className="w-full bg-white dark:bg-slate-900 border border-blue-900/80 dark:border-sky-400/80 shadow-2xs rounded-xl p-2.5 flex flex-col gap-1.5"
                             >
                               {/* Header */}
                               <div className="flex items-center justify-between pb-1 border-b border-sky-100 dark:border-slate-800 text-[10px]">
@@ -1773,12 +1773,12 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
 
                   return (
                     <div className="flex flex-col gap-3 flex-1 overflow-y-auto scrollbar-thin p-1">
-                      {/* 1. QAPALI SUALLAR - DƏQİQ 3 SÜTUN VƏ BƏRABƏR BOŞLUQ (DARK REJİMDƏ AYDIN SEÇİLƏN ÇƏRÇİVƏ) */}
+                      {/* 1. QAPALI SUALLAR - DƏQİQ 3 SÜTUN VƏ BƏRABƏR BOŞLUQ (İNCƏ TÜND GÖY ÇƏRÇİVƏ) */}
                       {closedRows.length > 0 && (
-                        <div className="flex flex-col gap-1.5 p-2 rounded-2xl bg-slate-50/70 dark:bg-slate-900/80 border border-slate-700/80 dark:border-sky-400/80 shadow-2xs dark:shadow-[0_0_12px_rgba(56,189,248,0.18)]">
+                        <div className="flex flex-col gap-1.5 p-2 rounded-2xl bg-slate-50/70 dark:bg-slate-900/80 border border-blue-900/80 dark:border-sky-400/80 shadow-2xs dark:shadow-[0_0_12px_rgba(56,189,248,0.18)]">
                           <div className="grid grid-cols-3 gap-1.5 items-stretch">
                             {columnSlices.map((colRows, colIdx) => (
-                              <div key={colIdx} className="omr-column-card bg-white dark:bg-slate-900 border border-slate-700/80 dark:border-sky-400/80 shadow-2xs">
+                              <div key={colIdx} className="omr-column-card bg-white dark:bg-slate-900 border border-blue-900/80 dark:border-sky-400/80 shadow-2xs">
                                 <div className="flex flex-col gap-0.5">
                                   {colRows.map((r) => {
                                     const ans = previewAnswers[r.number];
@@ -1819,14 +1819,14 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                         </div>
                       )}
 
-                      {/* 2. AÇIQ SUALLAR (RƏQƏMLİ) - DARK REJİMDƏ AYDIN SEÇİLƏN ÇƏRÇİVƏ */}
+                      {/* 2. AÇIQ SUALLAR (RƏQƏMLİ) - İNCƏ TÜND GÖY ÇƏRÇİVƏ */}
                       {openRows.length > 0 && (
-                        <div className="flex flex-col gap-1.5 p-2 rounded-2xl bg-slate-50/70 dark:bg-slate-900/80 border border-slate-700/80 dark:border-sky-400/80 shadow-2xs dark:shadow-[0_0_12px_rgba(56,189,248,0.18)]">
+                        <div className="flex flex-col gap-1.5 p-2 rounded-2xl bg-slate-50/70 dark:bg-slate-900/80 border border-blue-900/80 dark:border-sky-400/80 shadow-2xs dark:shadow-[0_0_12px_rgba(56,189,248,0.18)]">
                           <div className="flex items-center justify-between px-1 mb-1">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-800 dark:text-sky-300">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-blue-950 dark:text-sky-300">
                               Açıq Cavablı Suallar ({openRows.length})
                             </span>
-                            <span className="text-[9px] text-slate-600 dark:text-sky-400 font-bold">
+                            <span className="text-[9px] text-blue-900 dark:text-sky-400 font-bold">
                               6-Sütunlu Standart Rəqəm Matrisi
                             </span>
                           </div>
@@ -1834,7 +1834,7 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                             {openRows.map((r) => {
                               const studentCols = parseStringToColumns(previewAnswers[r.number] || '');
                               return (
-                                <div key={r.number} className="w-full bg-white dark:bg-slate-900 border border-slate-700/80 dark:border-sky-400/80 shadow-2xs rounded-xl p-2.5 flex flex-col gap-1.5">
+                                <div key={r.number} className="w-full bg-white dark:bg-slate-900 border border-blue-900/80 dark:border-sky-400/80 shadow-2xs rounded-xl p-2.5 flex flex-col gap-1.5">
                                   <div className="flex items-center justify-between text-[11px] pb-1 border-b border-sky-100 dark:border-slate-800">
                                     <div className="flex items-center gap-1.5">
                                       <span className="w-6 min-w-[24px] font-mono font-black text-[12px] text-slate-900 dark:text-slate-100 shrink-0 select-none">
