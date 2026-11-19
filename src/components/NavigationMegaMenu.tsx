@@ -59,6 +59,7 @@ interface NavigationMegaMenuProps {
   currentUser: User;
   activeTab: string;
   onNavigateTab: (tab: string) => void;
+  triggerRef?: React.RefObject<HTMLElement | null>;
 }
 
 export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
@@ -67,6 +68,7 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
   currentUser,
   activeTab,
   onNavigateTab,
+  triggerRef,
 }) => {
   const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -420,9 +422,14 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
   // Click outside listener
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        onClose();
+      const target = e.target as Node;
+      if (menuRef.current && menuRef.current.contains(target)) {
+        return;
       }
+      if (triggerRef?.current && triggerRef.current.contains(target)) {
+        return;
+      }
+      onClose();
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -440,7 +447,7 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
       document.removeEventListener('mousedown', handleOutsideClick);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, triggerRef]);
 
   if (!isOpen) return null;
 
@@ -453,17 +460,17 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden pointer-events-auto">
-      {/* Yumşaq fon qaraldılması (Backdrop) */}
+    <>
+      {/* Yumşaq fon qaraldılması (Backdrop) - Header-in altından başlayır, düyməyə mane olmur */}
       <div
-        className="fixed inset-0 bg-slate-900/30 backdrop-blur-xs transition-opacity duration-200"
+        className="fixed top-16 inset-x-0 bottom-0 bg-slate-900/30 backdrop-blur-2xs z-40 transition-opacity duration-200"
         onClick={onClose}
       />
 
       {/* Yuxarıdan açılan Əsas və Alt Menyu Qutusu */}
       <div
         ref={menuRef}
-        className="absolute top-16 left-3 sm:left-6 max-w-[calc(100vw-24px)] sm:max-w-none bg-white rounded-2xl sm:rounded-3xl shadow-2xl shadow-slate-900/20 border border-slate-200/90 overflow-hidden flex flex-col md:flex-row animate-in fade-in slide-in-from-top-3 duration-200 z-50"
+        className="fixed top-16 sm:top-[66px] left-3 sm:left-6 max-w-[calc(100vw-24px)] md:max-w-none bg-white rounded-2xl sm:rounded-3xl shadow-2xl shadow-slate-900/25 border border-slate-200/90 overflow-hidden flex flex-col md:flex-row animate-in fade-in slide-in-from-top-2 duration-200 z-50"
         style={{ maxHeight: 'calc(100vh - 84px)' }}
       >
         {/* ================================================================= */}
@@ -648,6 +655,6 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
