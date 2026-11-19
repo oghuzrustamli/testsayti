@@ -7,8 +7,12 @@
     <title>ATROQ Education</title>
     <script>
       try {
-        localStorage.setItem('atroq_theme', 'light');
-        document.documentElement.classList.remove('dark');
+        var savedTheme = localStorage.getItem('atroq_theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
       } catch (e) {}
     </script>
     <!-- Fonts -->

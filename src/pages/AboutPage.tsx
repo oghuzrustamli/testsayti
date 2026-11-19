@@ -373,7 +373,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
             <div className="w-full md:w-80 flex flex-col items-center justify-center gap-3.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/90 border border-slate-200 dark:border-slate-800/90 shadow-sm dark:shadow-xl shrink-0">
 
               {/* Rəsmi ATROQ Loqosu - Ağ Fonlu Zərif Kart */}
-              <div className="w-full bg-white rounded-xl p-3 sm:p-4 border border-slate-200/90 dark:border-slate-300 shadow-xs flex items-center justify-center group hover:shadow-md transition-all">
+              <div data-keep-white="true" className="w-full bg-white rounded-xl p-3 sm:p-4 border border-slate-200/90 dark:border-slate-300 shadow-xs flex items-center justify-center group hover:shadow-md transition-all">
                 <img
                   src="/assets/atroq-logo.png"
                   alt="ATROQ Education Rəsmi Loqosu"

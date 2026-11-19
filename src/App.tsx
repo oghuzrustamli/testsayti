@@ -123,7 +123,7 @@ export function App() {
   }
 
   return (
-    <div className="h-screen w-full flex flex-col overflow-hidden bg-[#eef6fc] font-sans">
+    <div className="h-screen w-full flex flex-col overflow-hidden bg-[#eef6fc] dark:bg-[#090e17] font-sans">
       {/* Top Navigation - Immovably Fixed at the top across all pages */}
       <Navbar
         currentUser={currentUser}
@@ -176,7 +176,7 @@ export function App() {
         )}
 
         {/* Main Content Area - Split-view for OMR & AI test creators, scrollable for dashboard, exams hub & other pages */}
-        <main className={`flex-1 min-w-0 min-h-0 bg-[#eef6fc] ${activeTab === 'omr_test' || activeTab === 'ai_test' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto overflow-x-hidden'}`}>
+        <main className={`flex-1 min-w-0 min-h-0 bg-[#eef6fc] dark:bg-[#090e17] ${activeTab === 'omr_test' || activeTab === 'ai_test' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto overflow-x-hidden'}`}>
           {viewingAnsweredTestId ? (
             <AnsweredTestPage
               testId={viewingAnsweredTestId}

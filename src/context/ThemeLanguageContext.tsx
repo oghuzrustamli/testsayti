@@ -30,10 +30,13 @@ export const ThemeLanguageProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const t = TRANSLATIONS[language] || TRANSLATIONS.az;
 
-  // 2. Theme state (İşıqlı rejim tələbinə əsasən susmaya görə 'light')
+  // 2. Theme state (Qaranlıq / İşıqlı rejim: localStorage oxunur və saxlanılır)
   const [theme, setThemeState] = useState<Theme>(() => {
     try {
-      localStorage.setItem(THEME_STORAGE_KEY, 'light');
+      const saved = localStorage.getItem(THEME_STORAGE_KEY);
+      if (saved === 'dark' || saved === 'light') {
+        return saved;
+      }
     } catch (e) {
       // ignore
     }
@@ -58,8 +61,10 @@ export const ThemeLanguageProvider: React.FC<{ children: React.ReactNode }> = ({
     const root = document.documentElement;
     if (theme === 'dark') {
       root.classList.add('dark');
+      root.classList.remove('light');
     } else {
       root.classList.remove('dark');
+      root.classList.add('light');
     }
   }, [theme]);
 

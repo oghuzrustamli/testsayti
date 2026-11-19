@@ -469,25 +469,25 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
         onClick={onClose}
       />
 
-      {/* Yuxarıdan açılan Əsas və Alt Menyu Qutusu (İşıqlı rejim, normal ağ qutular, qara yazılar) */}
+      {/* Yuxarıdan açılan Əsas və Alt Menyu Qutusu */}
       <div
         ref={menuRef}
-        className="fixed top-16 sm:top-[66px] left-3 sm:left-6 max-w-[calc(100vw-24px)] md:max-w-none bg-white rounded-2xl sm:rounded-3xl shadow-2xl shadow-sky-950/20 border border-sky-100 overflow-hidden flex flex-col md:flex-row animate-in fade-in slide-in-from-top-2 duration-200 z-50 text-slate-900"
+        className="fixed top-16 sm:top-[66px] left-3 sm:left-6 max-w-[calc(100vw-24px)] md:max-w-none bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl shadow-sky-950/20 dark:shadow-black/60 border border-sky-100 dark:border-slate-800 overflow-hidden flex flex-col md:flex-row animate-in fade-in slide-in-from-top-2 duration-200 z-50 text-slate-900 dark:text-white"
         style={{ maxHeight: 'calc(100vh - 84px)' }}
       >
         {/* ================================================================= */}
-        {/* SOL SÜTUN: ƏSAS MENYULAR SİYAHISI (Okean mavisi zərif fon)       */}
+        {/* SOL SÜTUN: ƏSAS MENYULAR SİYAHISI                                 */}
         {/* ================================================================= */}
-        <div className="w-full md:w-72 bg-[#f4f9fd] border-b md:border-b-0 md:border-r border-sky-100 p-3 sm:p-3.5 flex flex-col overflow-y-auto shrink-0 select-none">
-          <div className="px-2.5 py-1.5 mb-2 flex items-center justify-between border-b border-sky-100">
-            <div className="bg-white px-2.5 py-1 rounded-xl border border-sky-200/80 shadow-2xs inline-flex items-center justify-center">
+        <div className="w-full md:w-72 bg-[#f4f9fd] dark:bg-slate-950 border-b md:border-b-0 md:border-r border-sky-100 dark:border-slate-800 p-3 sm:p-3.5 flex flex-col overflow-y-auto shrink-0 select-none">
+          <div className="px-2.5 py-1.5 mb-2 flex items-center justify-between border-b border-sky-100 dark:border-slate-800">
+            <div data-keep-white="true" className="bg-white dark:bg-slate-900 px-2.5 py-1 rounded-xl border border-sky-200/80 dark:border-slate-700 shadow-2xs inline-flex items-center justify-center">
               <img
                 src="/assets/atroq-logo.png"
                 alt="ATROQ Education"
                 className="h-6 sm:h-7 w-auto object-contain"
               />
             </div>
-            <span className="text-[10px] font-bold text-slate-500">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
               {currentMenu.length} {t.sectionsCount}
             </span>
           </div>
@@ -511,8 +511,8 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
                   }}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-left transition-all cursor-pointer group ${
                     isSelected
-                      ? 'bg-white text-indigo-950 font-black shadow-xs border border-sky-200/90 ring-1 ring-sky-500/10'
-                      : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 border border-transparent font-bold'
+                      ? 'bg-white dark:bg-slate-900 text-indigo-950 dark:text-white font-black shadow-xs border border-sky-200/90 dark:border-slate-700 ring-1 ring-sky-500/10'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-900/60 border border-transparent font-bold'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -521,26 +521,26 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
                         isSelected
                           ? 'bg-indigo-600 text-white shadow-xs'
                           : hasActiveChild
-                          ? 'bg-sky-100 text-indigo-800'
-                          : 'bg-slate-200/80 text-slate-700'
+                          ? 'bg-sky-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300'
+                          : 'bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="truncate">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-black truncate text-slate-900">{cat.label}</span>
+                        <span className="text-xs font-black truncate text-slate-900 dark:text-white">{cat.label}</span>
                         {cat.badge && (
                           <span
                             className={`text-[9px] font-black px-1.5 py-0.2 rounded-full ${
-                              cat.badgeColor || 'bg-indigo-100 text-indigo-800'
+                              cat.badgeColor || 'bg-indigo-100 dark:bg-indigo-900/80 text-indigo-800 dark:text-indigo-200'
                             }`}
                           >
                             {cat.badge}
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
                         {cat.subtitle}
                       </p>
                     </div>
@@ -549,8 +549,8 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
                   <ChevronRight
                     className={`w-4 h-4 shrink-0 transition-transform ${
                       isSelected
-                        ? 'text-indigo-600 translate-x-0.5'
-                        : 'text-slate-400 group-hover:text-slate-600'
+                        ? 'text-indigo-600 dark:text-indigo-400 translate-x-0.5'
+                        : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600'
                     }`}
                   />
                 </button>
@@ -560,32 +560,32 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
         </div>
 
         {/* ================================================================= */}
-        {/* SAĞ SÜTUN: SEÇİLMİŞ ƏSAS MENYUYA AİD ALT MENYULAR (Ağ Kartlar)    */}
+        {/* SAĞ SÜTUN: SEÇİLMİŞ ƏSAS MENYUYA AİD ALT MENYULAR                 */}
         {/* ================================================================= */}
-        <div className="w-full md:w-[440px] lg:w-[480px] bg-white p-4 sm:p-5 flex flex-col justify-between overflow-y-auto select-none">
+        <div className="w-full md:w-[440px] lg:w-[480px] bg-white dark:bg-slate-900 p-4 sm:p-5 flex flex-col justify-between overflow-y-auto select-none">
           <div>
             {/* Alt Menyu Başlığı */}
-            <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                   {React.createElement(activeCategory.icon, { className: 'w-4 h-4' })}
                 </div>
                 <div>
-                  <h3 className="text-xs sm:text-sm font-black text-slate-900 leading-tight">
+                  <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white leading-tight">
                     {activeCategory.label}
                   </h3>
-                  <p className="text-[10.5px] text-slate-500 font-medium">
+                  <p className="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium">
                     {activeCategory.subtitle} — {t.functionsCount}
                   </p>
                 </div>
               </div>
 
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                 {activeCategory.subItems.length} {t.functionsCount}
               </span>
             </div>
 
-            {/* Alt Menyu Bəndləri (Normal Ağ Qutular, Qara Yazılar) */}
+            {/* Alt Menyu Bəndləri */}
             <div className="flex flex-col gap-2">
               {activeCategory.subItems.map((sub) => {
                 const SubIcon = sub.icon;
@@ -597,8 +597,8 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
                     onClick={() => handleItemClick(sub.id)}
                     className={`group p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
                       isItemActive
-                        ? 'bg-sky-50/90 border-sky-300 text-slate-950 shadow-xs'
-                        : 'bg-white hover:bg-sky-50/50 border-slate-200/90 hover:border-sky-300 hover:shadow-xs text-slate-900'
+                        ? 'bg-sky-50/90 dark:bg-indigo-950/60 border-sky-300 dark:border-indigo-700 text-slate-950 dark:text-white shadow-xs'
+                        : 'bg-white dark:bg-slate-950/80 hover:bg-sky-50/50 dark:hover:bg-slate-800/80 border-slate-200/90 dark:border-slate-800 hover:border-sky-300 dark:hover:border-indigo-700 hover:shadow-xs text-slate-900 dark:text-white'
                     }`}
                   >
                     <div className="flex items-start gap-3 min-w-0">
@@ -606,38 +606,38 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
                         className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 mt-0.5 ${
                           isItemActive
                             ? 'bg-indigo-600 text-white shadow-xs'
-                            : 'bg-slate-100 group-hover:bg-indigo-100 text-slate-700 group-hover:text-indigo-700'
+                            : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-950 text-slate-700 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-300'
                         }`}
                       >
                         <SubIcon className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-xs sm:text-[13px] font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
+                          <span className="text-xs sm:text-[13px] font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                             {sub.label}
                           </span>
                           {sub.badge && (
                             <span
                               className={`text-[9px] font-black px-1.5 py-0.2 rounded-full ${
-                                sub.badgeColor || 'bg-slate-200 text-slate-700'
+                                sub.badgeColor || 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                               }`}
                             >
                               {sub.badge}
                             </span>
                           )}
                           {isItemActive && (
-                            <span className="text-[9px] font-bold text-indigo-700 bg-indigo-100 px-1.5 py-0.2 rounded-full">
+                            <span className="text-[9px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-950 px-1.5 py-0.2 rounded-full">
                               {t.currentSection}
                             </span>
                           )}
                         </div>
-                        <p className="text-[10.5px] text-slate-600 line-clamp-2 mt-0.5 leading-relaxed font-medium">
+                        <p className="text-[10.5px] text-slate-600 dark:text-slate-400 line-clamp-2 mt-0.5 leading-relaxed font-medium">
                           {sub.description}
                         </p>
                       </div>
                     </div>
 
-                    <div className="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-indigo-600 group-hover:text-white text-slate-500 flex items-center justify-center shrink-0 transition-all">
+                    <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-600 group-hover:text-white text-slate-500 dark:text-slate-400 flex items-center justify-center shrink-0 transition-all">
                       <ArrowRight className="w-3.5 h-3.5" />
                     </div>
                   </div>
@@ -647,12 +647,12 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
           </div>
 
           {/* Menyu Alt Məlumat Zolağı */}
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
             <span className="font-semibold">ATROQ Education • v2.5</span>
             <button
               type="button"
               onClick={onClose}
-              className="text-slate-500 hover:text-slate-800 font-bold flex items-center gap-1 cursor-pointer transition-colors"
+              className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 font-bold flex items-center gap-1 cursor-pointer transition-colors"
             >
               <X className="w-3.5 h-3.5" />
               <span>{t.closeEsc}</span>
