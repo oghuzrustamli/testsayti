@@ -88,8 +88,9 @@
 }
 
 /* ==============================================================
-   OMR BUBBLE BUTTONS SPECIFICATION (3-Sütun, 10px Font, 18-20px Dairə)
+   OMR BUBBLE BUTTONS SPECIFICATION (3-Sütun, 10px Font, 19px Dairə)
    A, B, C, D, E circular options with flexbox centering & border-radius 50%
+   SABİT ÖLÇÜ: Seçilmiş və seçilməmiş vəziyyətdə ölçü tam eyni qalır (transform: none)
    ============================================================== */
 .omr-bubble-row {
   display: inline-flex;
@@ -98,40 +99,55 @@
 }
 
 .omr-bubble-btn {
-  width: 19px !important; /* Dairələrin diametri təxminən 18-20px (19px) */
+  width: 19px !important;
   height: 19px !important;
   min-width: 19px !important;
   min-height: 19px !important;
+  max-width: 19px !important;
+  max-height: 19px !important;
   border-radius: 50% !important; /* Perfect circle */
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   font-weight: 800;
-  font-size: 10px !important; /* Dəqiq 10px şrift ölçüsü */
+  font-size: 10px !important;
   line-height: 1;
   text-align: center;
   cursor: pointer;
   user-select: none;
-  transition: all 0.12s ease-in-out;
-  border: 1px solid #cbd5e1; /* slate-300 */
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  border: 1px solid #cbd5e1;
   background-color: #ffffff;
-  color: #334155; /* slate-700 */
-  padding: 0;
-  box-sizing: border-box;
+  color: #334155;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  transform: none !important;
 }
 
 .omr-bubble-btn:hover:not(:disabled) {
-  border-color: #64748b;
-  background-color: #f1f5f9;
+  border-color: #059669;
+  background-color: #f0fdf4;
+  transform: none !important;
 }
 
-/* Green selected state: teacher correct answer OR student selected answer */
+.omr-bubble-btn:active {
+  transform: none !important;
+}
+
+/* Green selected state: SABİT 19px ÖLÇÜ, transform: none, yalnız rəng və kontur fərqlənir */
 .omr-bubble-btn.omr-selected {
+  width: 19px !important;
+  height: 19px !important;
+  min-width: 19px !important;
+  min-height: 19px !important;
+  max-width: 19px !important;
+  max-height: 19px !important;
   background-color: #059669 !important; /* emerald-600 */
-  border-color: #047857 !important; /* emerald-700 */
+  border: 1.5px solid #047857 !important; /* emerald-700 */
   color: #ffffff !important; /* White high-contrast letter */
-  box-shadow: 0 0 0 1.5px #a7f3d0;
-  transform: scale(1.08);
+  box-shadow: none !important;
+  transform: none !important;
+  padding: 0 !important;
 }
 
 .omr-bubble-btn:focus-visible {
@@ -145,10 +161,35 @@
   flex-direction: column;
   gap: 2px;
   background-color: #ffffff;
-  border: 1px solid #e2e8f0; /* slate-200 */
+  border: 1px solid #e0f2fe; /* sky-100 */
   border-radius: 0.5rem;
   padding: 0.3rem 0.25rem;
   min-width: 145px;
+}
+
+.dark .omr-column-card {
+  background-color: #0f172a;
+  border-color: #1e293b;
+}
+
+.dark .omr-bubble-btn {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+.dark .omr-bubble-btn:hover:not(:disabled) {
+  background-color: #064e3b;
+  border-color: #059669;
+  color: #ffffff;
+  transform: none !important;
+}
+
+.dark .omr-bubble-btn.omr-selected {
+  background-color: #059669 !important;
+  border-color: #34d399 !important;
+  color: #ffffff !important;
+  transform: none !important;
 }
 
 /* 6-Column Numeric Grid (Açıq Sual - Üstdəki A-E variantları ilə eyni yığcam ölçüdə) */
@@ -200,6 +241,8 @@
   height: 19px !important;
   min-width: 19px !important;
   min-height: 19px !important;
+  max-width: 19px !important;
+  max-height: 19px !important;
   border-radius: 50% !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -213,22 +256,55 @@
   border: 1px solid #cbd5e1;
   background-color: #ffffff;
   color: #334155;
-  padding: 0;
-  transition: all 0.1s ease-in-out;
-  box-sizing: border-box;
+  padding: 0 !important;
+  transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+  box-sizing: border-box !important;
+  transform: none !important;
 }
 
 .omr-numeric-bubble:hover {
-  background-color: #f1f5f9;
-  border-color: #64748b;
+  background-color: #f0fdf4;
+  border-color: #059669;
+  transform: none !important;
+}
+
+.omr-numeric-bubble:active {
+  transform: none !important;
 }
 
 .omr-numeric-bubble.omr-selected {
+  width: 19px !important;
+  height: 19px !important;
+  min-width: 19px !important;
+  min-height: 19px !important;
+  max-width: 19px !important;
+  max-height: 19px !important;
   background-color: #059669 !important;
-  border-color: #047857 !important;
+  border: 1.5px solid #047857 !important;
   color: #ffffff !important;
-  box-shadow: 0 0 0 1.5px #a7f3d0;
-  transform: scale(1.08);
+  box-shadow: none !important;
+  transform: none !important;
+  padding: 0 !important;
+}
+
+.dark .omr-numeric-bubble {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+.dark .omr-numeric-bubble:hover {
+  background-color: #064e3b;
+  border-color: #059669;
+  color: #ffffff;
+  transform: none !important;
+}
+
+.dark .omr-numeric-bubble.omr-selected {
+  background-color: #059669 !important;
+  border-color: #34d399 !important;
+  color: #ffffff !important;
+  transform: none !important;
 }
 
 /* ==============================================================

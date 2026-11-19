@@ -1404,20 +1404,20 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
 
               return (
                 <div className="flex flex-col gap-3.5">
-                  {/* 1. QAPALI SUALLAR - DƏQİQ VƏ BƏRABƏR 3 SÜTUNLU OPTİK QABARCIQLAR */}
+                  {/* 1. QAPALI SUALLAR - DƏQİQ VƏ BƏRABƏR 3 SÜTUNLU OPTİK QABARCIQLAR (OKEAN MAVİSİ FON) */}
                   {closedRows.length > 0 && (
-                    <div className="flex flex-col gap-1.5">
-                      <div className="flex items-center justify-between px-1">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-700">
+                    <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-[#eef6fc] dark:bg-[#0c1a2e] border border-sky-200/90 dark:border-sky-900/50 shadow-2xs">
+                      <div className="flex items-center justify-between px-1 mb-1">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-sky-950 dark:text-sky-200">
                           Qapalı Suallar (1 - {closedRows.length})
                         </span>
-                        <span className="text-[9px] text-slate-400 font-semibold">
+                        <span className="text-[9px] text-sky-700 dark:text-sky-400 font-bold">
                           3 Sütunlu Standart A-E
                         </span>
                       </div>
                       <div className="grid grid-cols-3 gap-2 items-stretch">
                         {columnSlices.map((colRows, colIdx) => (
-                          <div key={colIdx} className="omr-column-card h-full min-h-full">
+                          <div key={colIdx} className="omr-column-card h-full min-h-full bg-white dark:bg-slate-900 border border-sky-100 dark:border-slate-800 shadow-2xs">
                             <div className="flex flex-col gap-0.5">
                               {colRows.map((row) => {
                                 const currentChoice = activeOmrTab === 'teacher_key'
@@ -1427,25 +1427,20 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                                 return (
                                   <div
                                     key={row.number}
-                                    className={`px-2 py-0.5 rounded-md border flex items-center justify-center gap-2 transition-colors ${currentChoice
-                                      ? 'bg-emerald-50/60 border-emerald-300'
-                                      : 'bg-white border-slate-200 hover:border-slate-300'
+                                    className={`px-1.5 sm:px-2 py-0.5 rounded-md border flex items-center justify-between gap-1.5 transition-colors relative ${currentChoice
+                                      ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/40 dark:border-emerald-700'
+                                      : 'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 hover:border-sky-300 dark:hover:border-sky-700'
                                       }`}
                                   >
-                                    {/* Sual nömrəsi */}
-                                    <div className="flex items-center gap-0.5 shrink-0 min-w-[20px] text-right justify-end">
-                                      <span className="font-mono font-bold text-[10px] text-slate-800">
+                                    {/* Sual nömrəsi: Həmişə sabit mövqedə, z-index 10, variant seçildikdə heç vaxt itmir */}
+                                    <div className="flex items-center shrink-0 w-6 min-w-[24px] text-left select-none relative z-10">
+                                      <span className="font-mono font-bold text-[10.5px] text-slate-900 dark:text-slate-100">
                                         {row.number < 10 ? `0${row.number}` : row.number}.
                                       </span>
-                                      {currentChoice && (
-                                        <span className="text-[8.5px] font-black text-emerald-700 bg-emerald-100 px-0.5 rounded leading-none">
-                                          {currentChoice}
-                                        </span>
-                                      )}
                                     </div>
 
-                                    {/* A, B, C, D, E Circular Buttons */}
-                                    <div className="omr-bubble-row shrink-0" role="radiogroup">
+                                    {/* A, B, C, D, E Circular Buttons: Sabit 19px dairə, transform: none */}
+                                    <div className="omr-bubble-row shrink-0 flex items-center gap-[2.5px] relative z-10" role="radiogroup">
                                       {['A', 'B', 'C', 'D', 'E'].map((letter) => {
                                         const isSelected = currentChoice === letter;
                                         return (
@@ -1504,15 +1499,15 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                           return (
                             <div
                               key={row.number}
-                              className="w-full bg-slate-50 border-2 border-indigo-200 rounded-xl p-2 flex flex-col gap-1.5 shadow-2xs"
+                              className="w-full bg-[#f4f9fd] dark:bg-slate-900 border border-sky-200/90 dark:border-sky-900/60 rounded-xl p-2 flex flex-col gap-1.5 shadow-2xs"
                             >
                               {/* Header */}
-                              <div className="flex items-center justify-between pb-1 border-b border-indigo-100 text-[10px]">
+                              <div className="flex items-center justify-between pb-1 border-b border-sky-100 dark:border-slate-800 text-[10px]">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="font-mono font-bold text-slate-800">
+                                  <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
                                     {row.number < 10 ? `0${row.number}` : row.number}.
                                   </span>
-                                  <span className="bg-indigo-100 text-indigo-800 font-extrabold px-1.5 py-0.2 rounded text-[8.5px]">
+                                  <span className="bg-sky-100 dark:bg-sky-950 text-sky-900 dark:text-sky-300 font-extrabold px-1.5 py-0.2 rounded text-[8.5px]">
                                     Açıq Sual
                                   </span>
                                 </div>
@@ -1778,50 +1773,49 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
 
                   return (
                     <div className="flex flex-col gap-3 flex-1 overflow-y-auto scrollbar-thin p-1">
-                      {/* 1. QAPALI SUALLAR - DƏQİQ 3 SÜTUN VƏ BƏRABƏR BOŞLUQ */}
+                      {/* 1. QAPALI SUALLAR - DƏQİQ 3 SÜTUN VƏ BƏRABƏR BOŞLUQ (OKEAN MAVİSİ FON) */}
                       {closedRows.length > 0 && (
-                        <div className="grid grid-cols-3 gap-1.5 items-stretch">
-                          {columnSlices.map((colRows, colIdx) => (
-                            <div key={colIdx} className="omr-column-card">
-                              <div className="flex flex-col gap-0.5">
-                                {colRows.map((r) => {
-                                  const ans = previewAnswers[r.number];
-                                  return (
-                                    <div
-                                      key={r.number}
-                                      className={`px-1.5 py-0.5 rounded-md border flex items-center justify-between transition-colors ${ans ? 'bg-emerald-50/60 border-emerald-400' : 'bg-white border-slate-200 hover:border-slate-300'
-                                        }`}
-                                    >
-                                      <div className="flex items-center gap-0.5 shrink-0 min-w-[22px] text-right justify-end">
-                                        <span className="font-mono font-bold text-[10px] text-slate-800">
-                                          {r.number < 10 ? `0${r.number}` : r.number}.
-                                        </span>
-                                        {ans && (
-                                          <span className="text-[8px] font-black text-emerald-700 bg-emerald-100 px-0.5 rounded leading-none">
-                                            {ans}
+                        <div className="flex flex-col gap-1.5 p-2 rounded-2xl bg-[#eef6fc] dark:bg-[#0c1a2e] border border-sky-200/90 dark:border-sky-900/50 shadow-2xs">
+                          <div className="grid grid-cols-3 gap-1.5 items-stretch">
+                            {columnSlices.map((colRows, colIdx) => (
+                              <div key={colIdx} className="omr-column-card bg-white dark:bg-slate-900 border border-sky-100 dark:border-slate-800 shadow-2xs">
+                                <div className="flex flex-col gap-0.5">
+                                  {colRows.map((r) => {
+                                    const ans = previewAnswers[r.number];
+                                    return (
+                                      <div
+                                        key={r.number}
+                                        className={`px-1.5 py-0.5 rounded-md border flex items-center justify-between gap-1.5 transition-colors relative ${ans
+                                          ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/40 dark:border-emerald-700'
+                                          : 'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 hover:border-sky-300 dark:hover:border-sky-700'
+                                          }`}
+                                      >
+                                        <div className="flex items-center shrink-0 w-6 min-w-[24px] text-left select-none relative z-10">
+                                          <span className="font-mono font-bold text-[10.5px] text-slate-900 dark:text-slate-100">
+                                            {r.number < 10 ? `0${r.number}` : r.number}.
                                           </span>
-                                        )}
-                                      </div>
+                                        </div>
 
-                                      <div className="omr-bubble-row shrink-0 flex items-center gap-[2.5px]">
-                                        {['A', 'B', 'C', 'D', 'E'].map((l) => (
-                                          <button
-                                            key={l}
-                                            type="button"
-                                            onClick={() => setPreviewAnswers(prev => ({ ...prev, [r.number]: prev[r.number] === l ? '' : l }))}
-                                            className={`omr-bubble-btn ${ans === l ? 'omr-selected' : ''}`}
-                                            title={`Sual ${r.number}: Variant ${l}`}
-                                          >
-                                            {l}
-                                          </button>
-                                        ))}
+                                        <div className="omr-bubble-row shrink-0 flex items-center gap-[2.5px] relative z-10">
+                                          {['A', 'B', 'C', 'D', 'E'].map((l) => (
+                                            <button
+                                              key={l}
+                                              type="button"
+                                              onClick={() => setPreviewAnswers(prev => ({ ...prev, [r.number]: prev[r.number] === l ? '' : l }))}
+                                              className={`omr-bubble-btn ${ans === l ? 'omr-selected' : ''}`}
+                                              title={`Sual ${r.number}: Variant ${l}`}
+                                            >
+                                              {l}
+                                            </button>
+                                          ))}
+                                        </div>
                                       </div>
-                                    </div>
-                                  );
-                                })}
+                                    );
+                                  })}
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
                       )}
 
