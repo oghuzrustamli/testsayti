@@ -80,11 +80,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </p>
           </div>
           <div className="shrink-0 hidden sm:block">
-            <img
-              src="/assets/atroq-logo.png"
-              alt="ATROQ Education"
-              className="h-11 sm:h-12 w-auto object-contain dark:brightness-125 dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.35)]"
-            />
+            <div className="bg-white px-3 py-1.5 rounded-xl border border-indigo-100 dark:border-slate-800 shadow-xs flex items-center justify-center">
+              <img
+                src="/assets/atroq-logo.png"
+                alt="ATROQ Education"
+                className="h-10 sm:h-11 w-auto object-contain"
+              />
+            </div>
           </div>
         </div>
       </div>

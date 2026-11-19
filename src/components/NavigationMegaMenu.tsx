@@ -480,11 +480,13 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
         {/* ================================================================= */}
         <div className="w-full md:w-72 bg-slate-50/90 dark:bg-slate-950 border-b md:border-b-0 md:border-r border-slate-200/80 dark:border-slate-800 p-3 sm:p-3.5 flex flex-col overflow-y-auto shrink-0 select-none">
           <div className="px-2.5 py-1.5 mb-2 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800">
-            <img
-              src="/assets/atroq-logo.png"
-              alt="ATROQ Education"
-              className="h-7 w-auto object-contain dark:brightness-125 dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
-            />
+            <div className="bg-white px-2.5 py-1 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs inline-flex items-center justify-center">
+              <img
+                src="/assets/atroq-logo.png"
+                alt="ATROQ Education"
+                className="h-6 sm:h-7 w-auto object-contain"
+              />
+            </div>
             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
               {currentMenu.length} {t.sectionsCount}
             </span>

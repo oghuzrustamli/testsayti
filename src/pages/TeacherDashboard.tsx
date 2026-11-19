@@ -108,11 +108,13 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
 
             {/* Xoş gəlmisiniz panelinin yuxarı sağında rəsmi ATROQ Education Loqosu */}
             <div className="flex items-center gap-2">
-              <img
-                src="/assets/atroq-logo.png"
-                alt="ATROQ Education"
-                className="h-9 sm:h-10 w-auto object-contain dark:brightness-125 dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.35)]"
-              />
+              <div className="bg-white px-3 py-1.5 rounded-xl border border-indigo-100 dark:border-slate-800 shadow-xs flex items-center justify-center">
+                <img
+                  src="/assets/atroq-logo.png"
+                  alt="ATROQ Education"
+                  className="h-8 sm:h-9 w-auto object-contain"
+                />
+              </div>
             </div>
           </div>
 

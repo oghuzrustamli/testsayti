@@ -62,12 +62,14 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ onSuccess, onClo
         </div>
 
         {/* Official ATROQ Logo */}
-        <div className="flex justify-center mb-2.5">
-          <img
-            src="/assets/atroq-logo.png"
-            alt="ATROQ Education Logo"
-            className="h-14 sm:h-16 w-auto object-contain dark:brightness-125 dark:drop-shadow-[0_0_12px_rgba(255,255,255,0.35)]"
-          />
+        <div className="flex justify-center mb-3">
+          <div className="bg-white px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm inline-flex items-center justify-center">
+            <img
+              src="/assets/atroq-logo.png"
+              alt="ATROQ Education Logo"
+              className="h-12 sm:h-14 w-auto object-contain"
+            />
+          </div>
         </div>
 
         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/80 border border-amber-200 dark:border-amber-500/40 text-[9.5px] font-mono tracking-widest text-amber-800 dark:text-amber-300 uppercase shadow-xs mb-2">

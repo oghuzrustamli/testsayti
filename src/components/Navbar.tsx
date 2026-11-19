@@ -79,11 +79,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="flex items-center gap-2 cursor-pointer group shrink-0"
           title="ATROQ Education"
         >
-          <div className="h-10 sm:h-11 flex items-center justify-center group-hover:scale-105 transition-transform">
+          {/* Loqonun arxa fonu: Həm Dark, həm Light rejimdə loqonun və yazının 100% aydın seçilməsi üçün ağ premium kapsul */}
+          <div className="bg-white px-2.5 sm:px-3 py-1 rounded-xl border border-slate-200/90 dark:border-slate-700/80 shadow-xs flex items-center justify-center group-hover:shadow-md group-hover:border-indigo-300 transition-all">
             <img
               src="/assets/atroq-logo.png"
               alt="ATROQ Education"
-              className="h-8 sm:h-9 w-auto object-contain dark:brightness-125 dark:contrast-125 dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]"
+              className="h-7 sm:h-8 w-auto object-contain"
             />
           </div>
         </div>

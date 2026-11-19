@@ -165,12 +165,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Brand & Logo Header */}
         <div className="text-center mb-5 relative flex flex-col items-center">
-          <div className="flex justify-center mb-2.5">
-            <img
-              src="/assets/atroq-logo.png"
-              alt="ATROQ Education Logo"
-              className="h-14 sm:h-16 w-auto object-contain dark:brightness-125 dark:drop-shadow-[0_0_12px_rgba(255,255,255,0.35)]"
-            />
+          <div className="flex justify-center mb-3">
+            <div className="bg-white px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm inline-flex items-center justify-center">
+              <img
+                src="/assets/atroq-logo.png"
+                alt="ATROQ Education Logo"
+                className="h-12 sm:h-14 w-auto object-contain"
+              />
+            </div>
           </div>
 
           <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/80 border border-cyan-200 dark:border-cyan-500/40 text-[10px] font-mono tracking-widest text-cyan-800 dark:text-cyan-300 uppercase shadow-xs mb-2">
