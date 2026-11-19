@@ -185,7 +185,7 @@ const ContinuousOmrPdfPage: React.FC<{
 
   return (
     <div className="flex flex-col items-center my-3 relative group w-full">
-      <div className="w-full max-w-fit self-center flex items-center justify-between px-3 py-1 mb-1.5 rounded-full bg-white/90 border border-slate-300 text-[10.5px] font-bold text-slate-700 shadow-2xs backdrop-blur-xs select-none">
+      <div className="w-full max-w-fit self-center flex items-center justify-between px-3 py-1 mb-1.5 rounded-full bg-white/90 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 text-[10.5px] font-bold text-slate-700 dark:text-slate-200 shadow-2xs backdrop-blur-xs select-none">
         <span>Səhifə {pageNum}</span>
       </div>
       <canvas
@@ -1455,7 +1455,6 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                                               }
                                             }}
                                             className={`omr-bubble-btn ${isSelected ? 'omr-selected' : ''}`}
-                                            title={`Sual ${row.number}: ${letter}`}
                                             aria-label={`Sual ${row.number} Variant ${letter}`}
                                           >
                                             {letter}
@@ -1578,7 +1577,6 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                                               type="button"
                                               onClick={() => handleNumericBubbleClick(row.number, cIdx, ch, activeOmrTab === 'teacher_key')}
                                               className={`omr-numeric-bubble ${isSelected ? 'omr-selected' : ''}`}
-                                              title={`Sütun ${cIdx + 1}: ${ch}`}
                                             >
                                               {ch}
                                             </button>
@@ -1808,7 +1806,6 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                                               type="button"
                                               onClick={() => setPreviewAnswers(prev => ({ ...prev, [r.number]: prev[r.number] === l ? '' : l }))}
                                               className={`omr-bubble-btn ${ans === l ? 'omr-selected' : ''}`}
-                                              title={`Sual ${r.number}: Variant ${l}`}
                                             >
                                               {l}
                                             </button>

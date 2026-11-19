@@ -940,6 +940,27 @@ const LOGIC_TEMPLATES: RawQuestionTemplate[] = [
 ];
 
 // -------------------------------------------------------------
+// TOPIC & QUESTION TEXT SANITIZER (Sinif adı və mövzu nömrəsi suala düşmür)
+// -------------------------------------------------------------
+function cleanTopicName(topic: string, subject: string): string {
+  let clean = (topic || '').trim();
+  // Remove (X-ci sinif), (X sinif), etc.
+  clean = clean.replace(/\s*\(\s*\d+-?[a-zç]*\s*sinif\s*\)\s*:?/gi, '');
+  // Remove Subject name if at start (e.g. "Təsviri incəsənət:")
+  if (subject) {
+    const escSub = subject.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    clean = clean.replace(new RegExp(`^${escSub}[:\\s–\\-]*`, 'i'), '');
+  }
+  // Remove "Bölmə X -", "Fəsil X -", "Mövzu X -", "Dərs X -"
+  clean = clean.replace(/^(Bölmə|Fəsil|Mövzu|Dərs)\s*\d+\s*[–:\-]\s*/i, '');
+  // Remove leading numbers like "1. ", "01. "
+  clean = clean.replace(/^\d+[\.\)]\s*/, '');
+  // Clean double spaces and surrounding quotes
+  clean = clean.replace(/^«+|»+$/g, '').replace(/^"+|"+$/g, '').trim();
+  return clean || subject;
+}
+
+// -------------------------------------------------------------
 // UNIVERSAL SMART GENERATOR FOR ALL TOPICS
 // -------------------------------------------------------------
 function generateSmartCurriculumQuestion(
@@ -949,33 +970,35 @@ function generateSmartCurriculumQuestion(
   index: number,
   difficulty: 'easy' | 'medium' | 'hard'
 ): RawQuestionTemplate {
+  const clean = cleanTopicName(topic, subject);
+
   const archetypes = [
     {
-      q: `«${topic}» mövzusu üzrə əsas elmi qanunauyğunluq və fundamental anlayışla bağlı hansı müddəa tamamilə doğrudur?`,
-      c: `Mövzunun əsas prinsipləri dərslik proqramına və elmi meyarlara tam uyğundur`,
+      q: `«${clean}» ilə bağlı verilmiş əsas elmi qanunauyğunluq və anlayışlardan hansı tamamilə doğrudur?`,
+      c: `Əsas anlayışlar və prinsiplər dərslik proqramına və elmi meyarlara tam uyğundur`,
       w: [
-        `Qanunauyğunluqlar yalnız xüsusi laboratoriya şəraitində qüvvədədir`,
+        `Qanunauyğunluqlar yalnız xüsusi şəraitdə qüvvədədir`,
         `Əsas anlayışlar müasir elmi nəticələrlə ziddiyyət təşkil edir`,
         `Hadisələr arasındakı asılılıq tam təsadüfi xarakter daşıyır`,
-        `Qaydalar yalnız ibtidai səviyyə üçün qəbul edilmişdir`
+        `Qaydalar yalnız ilkin anlayış səviyyəsi üçün qəbul edilmişdir`
       ],
-      exp: `Dövlət təhsil standartına əsasən ${topic} mövzusunun fundamental elmi əsaslarına söykənir.`,
+      exp: `Dövlət təhsil standartına əsasən «${clean}» fundamental elmi əsaslara söykənir.`,
       skill: 'knowledge' as SkillType
     },
     {
-      q: `«${topic}» anlayışını digər əlaqəli mövzulardan fərqləndirən əsas xüsusiyyət hansıdır?`,
+      q: `«${clean}» anlayışını digər əlaqəli sahələrdən fərqləndirən əsas cəhət hansıdır?`,
       c: `Özünəməxsus qanunauyğunluqlara və spesifik tətbiq sahəsinə malik olması`,
       w: [
         `Heç bir fərqləndirici əlamətinin mövcud olmaması`,
-        `Yalnız digər fənlərin nəzəriyyəsini təkrar etməsi`,
+        `Yalnız digər fənlərin nəzəriyyəsini eynilə təkrar etməsi`,
         `Real həyatda heç vaxt müşahidə olunmaması`,
         `Bütün digər elmi qanunlarla tam əks olması`
       ],
-      exp: `${topic} anlayışı özünəməxsus nəzəri meyarlara və praktik tətbiq sahələrinə malikdir.`,
+      exp: `«${clean}» anlayışı özünəməxsus nəzəri meyarlara və praktik tətbiq sahələrinə malikdir.`,
       skill: 'analysis' as SkillType
     },
     {
-      q: `«${topic}» mövzusunda öyrənilən hadisə və ya prosesin baş verməsinin əsas səbəb-nəticə əlaqəsi hansı bənddə düzgün göstərilmişdir?`,
+      q: `«${clean}» çərçivəsində öyrənilən hadisə və ya prosesin baş verməsinin əsas səbəb-nəticə əlaqəsi hansı bənddə düzgün göstərilmişdir?`,
       c: `İlkin amillərin qanunauyğun qarşılıqlı təsiri nəticəsində təbii və elmi nəticənin formalaşması`,
       w: [
         `Prosesin heç bir səbəb olmadan tam kortəbii baş verməsi`,
@@ -983,11 +1006,11 @@ function generateSmartCurriculumQuestion(
         `Nəticənin əvvəlcədən təyin edilməsinin qeyri-mümkünlüyü`,
         `Əlaqələrin yalnız nəzəri fərziyyə olub sübut olunmaması`
       ],
-      exp: `Səbəb-nəticə əlaqəsi dərslik kurikulumunun tələblərinə uyğun elmi arqumentlərlə sübut olunmuşdur.`,
+      exp: `Səbəb-nəticə əlaqəsi kurikulumun tələblərinə uyğun elmi arqumentlərlə əsaslandırılır.`,
       skill: 'cause_effect' as SkillType
     },
     {
-      q: `«${topic}» üzrə biliklərin praktik fəaliyyətdə və ya situasiya məsələsində tətbiqi ilə bağlı hansı fikir doğrudur?`,
+      q: `«${clean}» üzrə biliklərin praktik fəaliyyətdə və ya situasiya məsələsində tətbiqi ilə bağlı hansı fikir doğrudur?`,
       c: `Nəzəri qaydaların düzgün tətbiqi məsələnin səmərəli və xətasız həllini təmin edir`,
       w: [
         `Praktik fəaliyyətdə nəzəri biliklərdən istifadə tam yararsızdır`,
@@ -999,19 +1022,19 @@ function generateSmartCurriculumQuestion(
       skill: 'practical' as SkillType
     },
     {
-      q: `«${topic}» mövzusuna aid verilmiş fikirlərdən hansı YANLIŞDIR?`,
-      c: `Bu anlayış yalnız təcrid olunmuş şəkildə mövcuddur və digər mövzularla heç bir əlaqəsi yoxdur`,
+      q: `«${clean}» anlayışına aid verilmiş fikirlərdən hansı YANLIŞDIR?`,
+      c: `Bu anlayış yalnız təcrid olunmuş şəkildə mövcuddur və digər sahələrlə heç bir əlaqəsi yoxdur`,
       w: [
         `Mövzu fənnin ümumi məzmun xətti ilə sıx bağlıdır`,
         `Qanunauyğunluqlar elmi təcrübə və faktlarla təsdiqlənir`,
         `Tədris proqramında əsas standartlar sırasına daxildir`,
         `Öyrənilən biliklər məntiqi təhlil bacarıqlarını inkişaf etdirir`
       ],
-      exp: `Mövzu heç vaxt təcrid olunmur, əksinə fənlərarası və fəndaxili inteqrasiya prinsiplərinə əsaslanır.`,
+      exp: `Anlayış heç vaxt təcrid olunmur, əksinə fənlərarası və fəndaxili inteqrasiya prinsiplərinə əsaslanır.`,
       skill: 'logic' as SkillType
     },
     {
-      q: `«${topic}» mövzusunun əsas xarakterik əlamətlərini ümumiləşdirən düzgün fikir hansıdır?`,
+      q: `«${clean}» sahəsinin əsas xarakterik əlamətlərini ümumiləşdirən düzgün fikir hansıdır?`,
       c: `Məntiqi ardıcıllıq, elmi dəqiqlik və zəngin dərslik faktologiyası`,
       w: [
         `Qeyri-dəqiqlik və faktiki ziddiyyətlər`,
@@ -1032,7 +1055,7 @@ function generateSmartCurriculumQuestion(
     explanation: picked.exp,
     difficulty,
     skill: picked.skill,
-    subtopic: topic
+    subtopic: clean
   };
 }
 
@@ -1211,13 +1234,14 @@ function generateOpenQuestionData(
     };
   }
 
+  const clean = cleanTopicName(topic, subject);
   return {
-    topic,
-    question_text: `${qNum}. «${topic}» mövzusu üzrə əsas qanunauyğunluğu elmi terminlərlə ətraflı şərh edin və onun tədris proqramına uyğun ən azı iki konkret faktiki nümunəsini göstərin.`,
+    topic: clean,
+    question_text: `${qNum}. «${clean}» ilə bağlı əsas elmi anlayış və qanunauyğunluqları ətraflı şərh edin və mövzuya uyğun ən azı iki konkret nümunə göstərin.`,
     correct_answer: 'Mövzunun tam nəzəri şərhi və ən azı 2 düzgün faktiki nümunə.',
     explanation: 'Dərslik tələblərinə uyğun elmi terminologiyadan istifadə olunmalı və həyatla əlaqələndirilməlidir.',
     criteria: 'Mövzu dəqiq izah olunub və 2 düzgün nümunə var: 6 bal.\nYalnız 1 nümunə və ya natamam izah: 3 bal.\nCavab verilməyib: 0 bal.',
-    keywords: [topic, 'nümunə', 'tətbiq', 'qanunauyğunluq']
+    keywords: [clean, 'nümunə', 'tətbiq', 'qanunauyğunluq']
   };
 }
 

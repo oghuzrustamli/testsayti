@@ -507,9 +507,9 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
           )}
         </div>
 
-        {/* Embedded Image Preview if present */}
+        {/* Embedded Image Preview if present (Sətrin başında / Sola düzlənmiş) */}
         {currentQ.image_url && (
-          <div className="relative border border-slate-200 bg-slate-50 rounded-xl p-3 flex flex-col items-center">
+          <div className="relative border border-slate-200 bg-slate-50 rounded-xl p-3 flex flex-col items-start text-left">
             <div className="flex items-center justify-between w-full mb-2">
               <span className="text-xs font-bold text-slate-800 flex items-center gap-1">
                 <ImageIcon className="w-3.5 h-3.5 text-indigo-600" /> Sual Şəkli
@@ -517,7 +517,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
               <button
                 type="button"
                 onClick={() => onUpdateQuestion(activeQuestionIndex, { ...currentQ, image_url: '' })}
-                className="text-rose-600 hover:text-rose-700 text-xs font-semibold flex items-center gap-1"
+                className="text-rose-600 hover:text-rose-700 text-xs font-semibold flex items-center gap-1 cursor-pointer"
               >
                 <Trash2 className="w-3 h-3" /> Şəkli sil
               </button>
@@ -532,7 +532,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
 
         {/* Embedded Graph Preview if present */}
         {currentQ.graph_data?.imageDataUrl && (
-          <div className="relative border border-indigo-100 bg-indigo-50/20 rounded-xl p-3 flex flex-col items-center">
+          <div className="relative border border-indigo-100 bg-indigo-50/20 rounded-xl p-3 flex flex-col items-start text-left">
             <div className="flex items-center justify-between w-full mb-2">
               <span className="text-xs font-bold text-indigo-800 flex items-center gap-1">
                 <Compass className="w-3.5 h-3.5" /> Suala daxil edilmiş funksiya qrafiki

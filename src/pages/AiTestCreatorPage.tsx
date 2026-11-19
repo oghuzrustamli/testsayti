@@ -667,9 +667,9 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
             {/* ==============================================================
                 SOL PANEL: FƏNN SEÇİMİ (Fənn Kataloqu & Axtarış)
                 ============================================================== */}
-            <div className="lg:col-span-4 xl:col-span-3.5 bg-white border-r border-slate-200 flex flex-col h-full overflow-hidden">
+            <div className="lg:col-span-4 xl:col-span-3.5 bg-white dark:bg-[#0c1424] border-r border-slate-200 dark:border-slate-800 flex flex-col h-full overflow-hidden">
               {/* Fənn Axtarış Sahəsi */}
-              <div className="p-3 border-b border-slate-100 shrink-0 flex flex-col gap-2">
+              <div className="p-3 border-b border-slate-100 dark:border-slate-800 shrink-0 flex flex-col gap-2">
                 <div className="relative">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -677,13 +677,13 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                     value={subjectSearch}
                     onChange={(e) => setSubjectSearch(e.target.value)}
                     placeholder="Fənn axtar (məs: Fizika, Tarix)..."
-                    className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:border-indigo-600 transition-colors"
+                    className="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-indigo-600 transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                   {subjectSearch && (
                     <button
                       type="button"
                       onClick={() => setSubjectSearch('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -706,7 +706,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                       className={`px-2.5 py-1 rounded-lg shrink-0 transition-all cursor-pointer ${
                         selectedCategory === cat.id
                           ? 'bg-indigo-600 text-white shadow-2xs'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                       }`}
                     >
                       {cat.label}
@@ -736,27 +736,27 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                         onClick={() => setSelectedSubject(sub.name)}
                         className={`w-full p-2.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
                           isSelected
-                            ? 'bg-gradient-to-r from-indigo-50 to-violet-50/50 border-indigo-400 shadow-xs ring-1 ring-indigo-300'
-                            : 'bg-white border-slate-200/90 hover:border-slate-300 hover:bg-slate-50/70'
+                            ? 'bg-indigo-50/90 dark:bg-indigo-950 border-indigo-500 dark:border-indigo-400 shadow-xs ring-1 ring-indigo-300 dark:ring-indigo-500/60'
+                            : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/70'
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 transition-transform group-hover:scale-105 ${
                             isSelected
                               ? 'bg-indigo-600 text-white shadow-2xs'
-                              : 'bg-slate-100 text-slate-700'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                           }`}>
                             {sub.name.charAt(0)}
                           </div>
                           <div className="min-w-0">
-                            <div className="text-xs font-black text-slate-900 truncate flex items-center gap-1.5">
+                            <div className="text-xs font-black text-slate-900 dark:text-white truncate flex items-center gap-1.5">
                               <span>{sub.name}</span>
                               {isSelected && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 shrink-0" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400 shrink-0" />
                               )}
                             </div>
-                            <div className="text-[10px] text-slate-500 font-medium truncate flex items-center gap-1.5 mt-0.5">
-                              <span className="px-1.5 py-0.2 rounded bg-slate-100 font-bold text-slate-600 text-[9px]">
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate flex items-center gap-1.5 mt-0.5">
+                              <span className="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 font-bold text-slate-600 dark:text-slate-400 text-[9px]">
                                 {gradeRangeText}
                               </span>
                               <span className="text-slate-400">•</span>
@@ -766,7 +766,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                         </div>
 
                         <ChevronRight className={`w-4 h-4 shrink-0 transition-transform ${
-                          isSelected ? 'text-indigo-600 translate-x-0.5' : 'text-slate-300 group-hover:text-slate-500'
+                          isSelected ? 'text-indigo-600 dark:text-indigo-400 translate-x-0.5' : 'text-slate-300 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-300'
                         }`} />
                       </button>
                     );
@@ -780,40 +780,40 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                 ============================================================== */}
             <div className="lg:col-span-8 xl:col-span-8.5 bg-[#eef6fc] dark:bg-[#090e17] flex flex-col h-full overflow-y-auto p-3 sm:p-5 gap-4 scrollbar-thin">
               {/* Kontekst Menyu Başlığı - Seçilmiş Fənn Kartı */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-violet-700 text-white flex items-center justify-center font-black text-lg shadow-md shadow-indigo-100">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-violet-700 text-white flex items-center justify-center font-black text-lg shadow-md shadow-indigo-100 dark:shadow-none">
                     {selectedSubject.charAt(0)}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                      <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
                         {selectedSubject}
                       </h2>
-                      <span className="px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 font-black text-[10px]">
+                      <span className="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-black text-[10px]">
                         {currentSubjectMeta.category === 'exact' ? 'Dəqiq Elmlər' : currentSubjectMeta.category === 'humanitarian' ? 'Humanitar Fənn' : currentSubjectMeta.category === 'social' ? 'İctimai Elmlər' : 'Tətbiqi Fənn'}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       {currentSubjectMeta.description}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-                  <span>Proqram: <strong className="text-slate-800">AR Elm və Təhsil Nazirliyi</strong></span>
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+                  <span>Proqram: <strong className="text-slate-800 dark:text-slate-200">AR Elm və Təhsil Nazirliyi</strong></span>
                 </div>
               </div>
 
               {/* 1. SİNFİ SEÇ (Yalnız bu fənn üçün keçərli olan siniflər) */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col gap-2">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                    <GraduationCap className="w-4 h-4 text-indigo-600" />
+                  <label className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <GraduationCap className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                     1. Sinfi Seç ({validGradesForSubject.length} Sinif Üzrə Dərslik)
                   </label>
-                  <span className="text-[11px] text-slate-500 font-semibold">
-                    Cari seçim: <strong className="text-indigo-600">{selectedGrade}</strong>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
+                    Cari seçim: <strong className="text-indigo-600 dark:text-indigo-400">{selectedGrade}</strong>
                   </span>
                 </div>
 
@@ -827,8 +827,8 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                         onClick={() => setSelectedGrade(grade)}
                         className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
                           isGradeSelected
-                            ? 'bg-slate-900 text-white shadow-xs ring-2 ring-slate-800 scale-[1.02]'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900'
+                            ? 'bg-indigo-600 text-white shadow-xs ring-2 ring-indigo-500/50 scale-[1.02]'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         {grade}
@@ -839,14 +839,14 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
               </div>
 
               {/* 2. MÖVZU BAZASI (Rəsmi Dərslik Fəsilləri və Mövzular) */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col gap-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-indigo-600" />
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                    <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
                       2. Mövzu Bazası ({selectedGrade} Dərsliyi)
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px]">
+                    <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px]">
                       Seçilib: {selectedTopics.length} / {availableTopics.length}
                     </span>
                   </div>
@@ -855,7 +855,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                     <button
                       type="button"
                       onClick={handleSelectAllTopics}
-                      className="px-2.5 py-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                      className="px-2.5 py-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 rounded-lg transition-colors cursor-pointer"
                     >
                       {selectedTopics.length === availableTopics.length ? 'Seçimi təmizlə' : 'Hamısını seç'}
                     </button>
@@ -870,13 +870,13 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                     value={topicSearch}
                     onChange={(e) => setTopicSearch(e.target.value)}
                     placeholder="Mövzularda axtar..."
-                    className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:border-indigo-600"
+                    className="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-indigo-600 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                   {topicSearch && (
                     <button
                       type="button"
                       onClick={() => setTopicSearch('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -884,7 +884,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                 </div>
 
                 {/* Mövzuların İki Sütunlu Çekboks Siyahısı */}
-                <div className="max-h-60 overflow-y-auto border border-slate-200 rounded-xl p-2 bg-slate-50/50 flex flex-col gap-1 scrollbar-thin">
+                <div className="max-h-60 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-xl p-2 bg-slate-50/50 dark:bg-slate-950/50 flex flex-col gap-1 scrollbar-thin">
                   {filteredTopics.length === 0 ? (
                     <div className="p-4 text-center text-xs text-slate-400">
                       Mövzu tapılmadı
@@ -898,12 +898,12 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                           onClick={() => handleToggleTopic(topic)}
                           className={`p-2 rounded-lg border text-xs font-semibold flex items-center gap-2.5 cursor-pointer transition-all select-none ${
                             isChecked
-                              ? 'bg-white border-indigo-300 text-slate-900 shadow-2xs'
-                              : 'bg-transparent border-transparent text-slate-600 hover:bg-white hover:border-slate-200'
+                              ? 'bg-indigo-50/80 dark:bg-indigo-950/70 border-indigo-300 dark:border-indigo-600 text-slate-900 dark:text-white shadow-2xs'
+                              : 'bg-transparent border-transparent text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:border-slate-200 dark:hover:border-slate-700'
                           }`}
                         >
                           <div className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
-                            isChecked ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 bg-white'
+                            isChecked ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800'
                           }`}>
                             {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
                           </div>
@@ -916,48 +916,48 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
               </div>
 
               {/* 3. TEST PARAMETRLƏRİ (Sual Sayı və Çətinlik Dərəcəsi) */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col gap-3">
-                <label className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-indigo-600" />
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col gap-3">
+                <label className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   3. Test Parametrləri
                 </label>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {/* Qapalı Suallar */}
-                  <div className="p-3 bg-indigo-50/60 border border-indigo-100 rounded-xl flex flex-col gap-1">
-                    <span className="text-xs font-bold text-indigo-900">Qapalı Suallar (A-E):</span>
+                  <div className="p-3 bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 rounded-xl flex flex-col gap-1">
+                    <span className="text-xs font-bold text-indigo-900 dark:text-indigo-300">Qapalı Suallar (A-E):</span>
                     <input
                       type="number"
                       min={1}
                       max={60}
                       value={closedCount}
                       onChange={(e) => setClosedCount(Math.max(1, parseInt(e.target.value) || 0))}
-                      className="w-full px-3 py-1.5 bg-white border border-indigo-200 rounded-lg text-sm font-black text-indigo-900 text-center focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full px-3 py-1.5 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700 rounded-lg text-sm font-black text-indigo-900 dark:text-indigo-200 text-center focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     />
-                    <span className="text-[10px] text-indigo-700">5 variantlı (A, B, C, D, E)</span>
+                    <span className="text-[10px] text-indigo-700 dark:text-indigo-400">5 variantlı (A, B, C, D, E)</span>
                   </div>
 
                   {/* Açıq Suallar */}
-                  <div className="p-3 bg-amber-50/60 border border-amber-100 rounded-xl flex flex-col gap-1">
-                    <span className="text-xs font-bold text-amber-900">Açıq Suallar:</span>
+                  <div className="p-3 bg-amber-50/60 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900/60 rounded-xl flex flex-col gap-1">
+                    <span className="text-xs font-bold text-amber-900 dark:text-amber-300">Açıq Suallar:</span>
                     <input
                       type="number"
                       min={0}
                       max={30}
                       value={openCount}
                       onChange={(e) => setOpenCount(Math.max(0, parseInt(e.target.value) || 0))}
-                      className="w-full px-3 py-1.5 bg-white border border-amber-200 rounded-lg text-sm font-black text-amber-900 text-center focus:outline-none focus:ring-1 focus:ring-amber-500"
+                      className="w-full px-3 py-1.5 bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-700 rounded-lg text-sm font-black text-amber-900 dark:text-amber-200 text-center focus:outline-none focus:ring-1 focus:ring-amber-500"
                     />
-                    <span className="text-[10px] text-amber-700">Həll yolu və meyarlı (0 ola bilər)</span>
+                    <span className="text-[10px] text-amber-700 dark:text-amber-400">Həll yolu və meyarlı (0 ola bilər)</span>
                   </div>
 
                   {/* Çətinlik */}
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-1">
-                    <span className="text-xs font-bold text-slate-800">Çətinlik Səviyyəsi:</span>
+                  <div className="p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl flex flex-col gap-1">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Çətinlik Səviyyəsi:</span>
                     <select
                       value={difficulty}
                       onChange={(e) => setDifficulty(e.target.value as any)}
-                      className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:border-indigo-600 cursor-pointer"
+                      className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-600 cursor-pointer"
                     >
                       <option value="mixed">Qarışıq (Standart DİM balansı)</option>
                       <option value="easy">Asan (Baza biliklər)</option>
@@ -1024,13 +1024,13 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
       {currentStep === 3 && generatedResult && (
         <div className="h-full w-full flex flex-col overflow-hidden animate-in fade-in">
           {/* Yuxarı Fəaliyyət Zolağı (Sərbəst Sabit) */}
-          <div className="shrink-0 bg-white border-b border-slate-200 px-4 py-3 shadow-xs flex flex-wrap items-center justify-between gap-3 z-10">
+          <div className="shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 shadow-xs flex flex-wrap items-center justify-between gap-3 z-10">
             <div className="flex-1 min-w-[260px] max-w-xl">
               <input
                 type="text"
                 value={testTitle}
                 onChange={(e) => setTestTitle(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl font-black text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-600"
+                className="w-full px-3 py-1.5 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl font-black text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-indigo-600"
                 placeholder="Testin adı..."
                 title="Testin adı (Redaktə edə bilərsiniz)"
               />
@@ -1040,7 +1040,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
               <button
                 type="button"
                 onClick={() => setCurrentStep(1)}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-colors cursor-pointer"
+                className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
               >
                 ← Parametrlər
               </button>
@@ -1048,10 +1048,10 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
               <button
                 type="button"
                 onClick={handleDownloadQuestionBookletPdf}
-                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl border border-slate-300 flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl border border-slate-300 dark:border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
                 title="A4 formatında Sual Kitabçasını PDF olaraq yüklə"
               >
-                <Printer className="w-3.5 h-3.5 text-slate-600" />
+                <Printer className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                 <span>Sual Kitabçası (PDF)</span>
               </button>
 
@@ -1068,39 +1068,39 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
           </div>
 
           {/* Məlumat Paneli */}
-          <div className="shrink-0 bg-slate-100/90 border-b border-slate-200/80 px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-700">
+          <div className="shrink-0 bg-slate-100/90 dark:bg-slate-800/90 border-b border-slate-200/80 dark:border-slate-800 px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-700 dark:text-slate-300">
             <div className="flex flex-wrap items-center gap-3">
               <span><strong>Fənn:</strong> {creationMode === 'multi' ? multiSubjects.map(s => s.subject).join(', ') : `${selectedSubject} (${selectedGrade})`}</span>
-              <span className="text-slate-300">•</span>
+              <span className="text-slate-300 dark:text-slate-600">•</span>
               <span><strong>Cəmi Suallar:</strong> {editableQuestions.length} sual</span>
               {creationMode === 'single' ? (
                 <>
-                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-300 dark:text-slate-600">•</span>
                   <span><strong>Mövzular:</strong> {selectedTopics.length} mövzu əhatə olundu</span>
                 </>
               ) : (
                 <>
-                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-300 dark:text-slate-600">•</span>
                   <span><strong>Çoxfənli Bölgü:</strong> {multiSubjects.map(s => `${s.subject}: ${s.questionCount}`).join(' • ')}</span>
                 </>
               )}
             </div>
             {saveSuccessMsg && (
-              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md animate-fade-in">
+              <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-md animate-fade-in">
                 ✓ {saveSuccessMsg}
               </span>
             )}
           </div>
 
           {/* TƏK VƏ TAM GENİŞLİKDƏ SƏRBƏST SÜRÜŞƏN SUALLAR SAHƏSİ (Heç bir OMR xanası yoxdur) */}
-          <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 scrollbar-thin">
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 scrollbar-thin bg-slate-50 dark:bg-slate-950">
             <div className="max-w-4xl mx-auto flex flex-col gap-4">
-              <div className="flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-3 shadow-2xs">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                  <BookOpen className="w-4 h-4 text-indigo-600" />
+              <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 shadow-2xs">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   Sual Kitabçası ({editableQuestions.length} Sual)
                 </h3>
-                <span className="text-[11px] text-slate-400 font-semibold">
+                <span className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold">
                   Mətn və variantları birbaşa redaktə edə bilərsiniz
                 </span>
               </div>
@@ -1112,25 +1112,25 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                 return (
                   <div
                     key={q.id}
-                    className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs hover:border-indigo-300 transition-all flex flex-col gap-3"
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-all flex flex-col gap-3"
                   >
                     {/* Başlıq: Sual № və Mövzu Nişanı */}
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
                       <div className="flex items-center gap-2">
                         <span className={`w-7 h-7 rounded-xl font-black text-xs flex items-center justify-center ${
-                          isClosed ? 'bg-indigo-50 text-indigo-700' : 'bg-amber-50 text-amber-800 border border-amber-200'
+                          isClosed ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300' : 'bg-amber-50 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                         }`}>
                           #{idx + 1}
                         </span>
                         {q.subject && (
-                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800">
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-800 dark:text-indigo-300">
                             {q.subject}
                           </span>
                         )}
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                           {q.topic}
                         </span>
-                        <span className="text-[10px] font-black text-slate-400">
+                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500">
                           {isClosed ? 'Qapalı (A-E)' : 'Açıq Sual'}
                         </span>
                       </div>
@@ -1139,7 +1139,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                         <button
                           type="button"
                           onClick={() => setEditingQId(isEditing ? null : q.id)}
-                          className="px-2.5 py-1 text-slate-600 hover:text-indigo-600 hover:bg-slate-100 text-xs font-bold rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                          className="px-2.5 py-1 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                           <span>{isEditing ? 'Tamamla' : 'Redaktə'}</span>
@@ -1156,10 +1156,10 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                           const val = e.target.value;
                           setEditableQuestions(prev => prev.map(item => item.id === q.id ? { ...item, question_text: val } : item));
                         }}
-                        className="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-indigo-600"
+                        className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-indigo-600"
                       />
                     ) : (
-                      <div className="text-sm font-bold text-slate-900 leading-relaxed">
+                      <div className="text-sm font-bold text-slate-900 dark:text-white leading-relaxed">
                         <MathRenderer content={q.question_text} />
                       </div>
                     )}
@@ -1174,12 +1174,12 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                               key={opt.id}
                               className={`p-2.5 rounded-xl border text-xs flex items-center gap-2.5 transition-all ${
                                 isCorrect
-                                  ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950 font-bold ring-1 ring-emerald-200'
-                                  : 'bg-slate-50/70 border-slate-200 text-slate-800'
+                                  ? 'bg-emerald-50/80 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-600 text-emerald-950 dark:text-emerald-200 font-bold ring-1 ring-emerald-200 dark:ring-emerald-700'
+                                  : 'bg-slate-50/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
                               }`}
                             >
                               <span className={`w-5 h-5 rounded-md flex items-center justify-center font-black text-[11px] shrink-0 ${
-                                isCorrect ? 'bg-emerald-600 text-white' : 'bg-white border border-slate-300 text-slate-600'
+                                isCorrect ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-200'
                               }`}>
                                 {opt.id}
                               </span>
@@ -1187,7 +1187,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                                 <MathRenderer content={opt.text} />
                               </div>
                               {isCorrect && (
-                                <span className="text-[10px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded shrink-0">
+                                <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/80 px-1.5 py-0.2 rounded shrink-0">
                                   ✓ Düzgün cavab
                                 </span>
                               )}
@@ -1199,12 +1199,12 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
 
                     {/* Açıq Sual Model Cavabı və Meyarı */}
                     {!isClosed && (
-                      <div className="p-3 bg-amber-50/60 border border-amber-200 rounded-xl flex flex-col gap-1 text-xs">
-                        <div className="font-bold text-amber-900 flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-600" />
+                      <div className="p-3 bg-amber-50/60 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl flex flex-col gap-1 text-xs">
+                        <div className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                           <span>Qiymətləndirmə Meyarı və Düzgün Həll Yolu:</span>
                         </div>
-                        <div className="text-slate-800 pl-5 leading-relaxed font-mono text-[11px]">
+                        <div className="text-slate-800 dark:text-slate-200 pl-5 leading-relaxed font-mono text-[11px]">
                           {q.correct_answer || 'Həll yolu daxil edilib'}
                         </div>
                       </div>
@@ -1212,8 +1212,8 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
 
                     {/* İzah Bölməsi */}
                     {q.explanation && (
-                      <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-[11px] text-slate-600 flex items-start gap-1.5">
-                        <span className="font-bold text-indigo-700 shrink-0">İzah:</span>
+                      <div className="p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-100 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-300 flex items-start gap-1.5">
+                        <span className="font-bold text-indigo-700 dark:text-indigo-400 shrink-0">İzah:</span>
                         <span>{q.explanation}</span>
                       </div>
                     )}

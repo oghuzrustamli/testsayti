@@ -114,7 +114,7 @@ const ContinuousPdfPageItem: React.FC<ContinuousPdfPageItemProps> = ({
 
   return (
     <div className="flex flex-col items-center my-3 relative group w-full">
-      <div className="w-full max-w-fit self-center flex items-center justify-between px-3 py-1 mb-1.5 rounded-full bg-white/90 border border-slate-300 text-[10.5px] font-bold text-slate-700 shadow-2xs backdrop-blur-xs select-none">
+      <div className="w-full max-w-fit self-center flex items-center justify-between px-3 py-1 mb-1.5 rounded-full bg-white/90 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 text-[10.5px] font-bold text-slate-700 dark:text-slate-200 shadow-2xs backdrop-blur-xs select-none">
         <span>Səhifə {pageNum}</span>
       </div>
       <canvas
@@ -1387,7 +1387,6 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                                                 type="button"
                                                 onClick={() => handleSelectAnswer(q.id, isSelected ? '' : letter)}
                                                 className={`omr-bubble-btn ${isSelected ? 'omr-selected' : ''}`}
-                                                title={`Sual ${qNum}: ${letter}`}
                                               >
                                                 {letter}
                                               </button>
@@ -1476,7 +1475,6 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                                                     handleSelectAnswer(q.id, newCols.join(''));
                                                   }}
                                                   className={`omr-numeric-bubble ${isSelected ? 'omr-selected' : ''}`}
-                                                  title={`Sütun ${cIdx + 1}: ${ch}`}
                                                 >
                                                   {ch}
                                                 </button>
@@ -1669,9 +1667,9 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                       <MathRenderer content={currentQ.question_text || `Sual №${currentIndex + 1}`} />
                     </div>
 
-                    {/* Attached Image if present */}
+                    {/* Attached Image if present (Sətrin başında / Sola düzlənmiş) */}
                     {currentQ.image_url && (
-                      <div className="my-2 flex justify-center p-3 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <div className="my-2 flex justify-start p-2.5 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
                         <img
                           src={currentQ.image_url}
                           alt="Sual Şəkli"
@@ -1682,7 +1680,7 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
 
                     {/* Embedded Graph if present */}
                     {currentQ.graph_data?.imageDataUrl && (
-                      <div className="my-2 flex justify-center p-3 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <div className="my-2 flex justify-start p-2.5 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
                         <img
                           src={currentQ.graph_data.imageDataUrl}
                           alt="Sual Qrafiki"
@@ -1737,13 +1735,13 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                               key={opt.id}
                               type="button"
                               onClick={() => handleSelectAnswer(currentQ.id, opt.id)}
-                              className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-xl border text-left transition-all cursor-pointer ${
+                              className={`w-full flex items-start gap-3.5 px-4 py-3 rounded-xl border text-left transition-all cursor-pointer ${
                                 isSelected
                                   ? 'bg-indigo-50/90 dark:bg-indigo-950/80 border-indigo-600 dark:border-indigo-500 ring-1 ring-indigo-600 dark:ring-indigo-500 text-indigo-950 dark:text-white font-bold shadow-xs'
                                   : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50/70 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 font-medium'
                               }`}
                             >
-                              <span className={`w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 transition-colors ${
+                              <span className={`w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 transition-colors mt-0.5 ${
                                 isSelected
                                   ? 'bg-indigo-600 text-white shadow-xs'
                                   : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
@@ -1751,7 +1749,7 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                                 {opt.id}
                               </span>
 
-                              <span className="flex-1 text-xs sm:text-sm leading-snug">
+                              <span className="flex-1 text-xs sm:text-sm leading-snug text-left">
                                 <MathRenderer content={opt.text} />
                               </span>
 

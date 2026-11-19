@@ -715,9 +715,9 @@ export const AnsweredTestPage: React.FC<AnsweredTestPageProps> = ({
                         </div>
                       </div>
 
-                      {/* Question Content Display */}
+                      {/* Question Content Display (Sətrin başında / Sola düzlənmiş) */}
                       {q.type === 'crop' && q.imageDataUrl ? (
-                        <div className="my-1 border border-slate-200 rounded-xl overflow-hidden bg-slate-50 p-2 flex justify-center">
+                        <div className="my-1 border border-slate-200 rounded-xl overflow-hidden bg-slate-50 p-2 flex justify-start">
                           <img
                             src={q.imageDataUrl}
                             alt={`Sual ${q.orderNumber}`}
@@ -759,7 +759,6 @@ export const AnsweredTestPage: React.FC<AnsweredTestPageProps> = ({
                                 type="button"
                                 onClick={() => handleSelectAnswer(q.id, letter)}
                                 className={`omr-bubble-btn ${isSelected ? 'omr-selected' : ''}`}
-                                title={`Sual ${q.orderNumber}: Düzgün cavab ${letter}`}
                                 aria-label={`Variant ${letter}`}
                                 aria-checked={isSelected}
                                 role="radio"
@@ -873,7 +872,6 @@ export const AnsweredTestPage: React.FC<AnsweredTestPageProps> = ({
                                 type="button"
                                 onClick={() => handleSelectStudentAnswer(q.id, letter)}
                                 className={`omr-bubble-btn ${isStudentSelected ? 'omr-selected' : ''}`}
-                                title={`Sual ${q.orderNumber}: ${letter} variantını seç`}
                                 aria-label={`Sual ${q.orderNumber} Variant ${letter}`}
                                 aria-checked={isStudentSelected}
                                 role="radio"

@@ -124,7 +124,7 @@ export const PrintableView: React.FC<PrintableViewProps> = ({ test, onBack }) =>
 
               {/* Embedded Graph if present */}
               {q.graph_data?.imageDataUrl && (
-                <div className="my-3 flex justify-center">
+                <div className="my-3 flex justify-start">
                   <img
                     src={q.graph_data.imageDataUrl}
                     alt="Qrafik"

@@ -1164,16 +1164,25 @@ export const CURRICULUM_DATA: Record<string, Record<string, string[]>> = {
 
   'Musiqi': {
     '5-ci sinif': ['Azərbaycan xalq musiqisi və muğam sənəti', 'Musiqi alətlərimiz (Tar, kamança, qaval)', 'Klassik bəstəkarlarımız (Üzeyir Hacıbəyli, Qara Qarayev)', 'Musiqi janrları: Mahnı, romans, simfoniya'],
-    '7-ci sinif': ['Milli operalar və baletlər («Leyli və Məcnun», «Yeddi gözəl»)', 'Dünya musiqi klassikləri (Bax, Motsart, Bethoven)', 'Xor və orkestr növləri', 'Müasir musiqi cərəyanları və caz']
+    '6-cı sinif': ['Xalq mahnıları və aşıq yaradıcılığı', 'Simfonik muğamlar (Fikrət Əmirov)', 'Xor sənəti və çoxsəslilik', 'Dünya bəstəkarlarının məşhur əsərləri'],
+    '7-ci sinif': ['Milli operalar və baletlər («Leyli və Məcnun», «Yeddi gözəl»)', 'Dünya musiqi klassikləri (Bax, Motsart, Bethoven)', 'Xor və orkestr növləri', 'Müasir musiqi cərəyanları və caz'],
+    '8-ci sinif': ['Müasir estrada və caz musiqisi', 'Azərbaycan bəstəkarlarının kino musiqiləri', 'Musiqi formaları və polifoniya', 'Milli musiqi ənənələrimizin qorunması'],
+    '9-cu sinif': ['Azərbaycan musiqi mədəniyyətinin inkişaf yolu', 'Dahi musiqi xadimlərinin irsi', 'Dünya musiqi teatrları və festivalları', 'Musiqidə milli üslub və müasirlik']
   },
 
   'Təsviri incəsənət': {
     '5-ci sinif': ['Rəngkarlıq və rəng dairəsi', 'Qrafika və xətti rəsm', 'Naturadan rəsm: Natürmort', 'Azərbaycan xalçaçılıq məktəbləri'],
-    '7-ci sinif': ['Portret janrı və insan anatomiyası rəsmdə', 'Mənzərə janrı və fəza perspektivası', 'Dekorativ-tətbiqi sənət və memarlıq abidələri', 'Tarixi və bədii kompozisiyalar']
+    '6-cı sinif': ['Heykəltəraşlıq növləri və plastika', 'Bəzək sənəti və ornamentlər', 'İllüstrasiya və nağıl qəhrəmanlarının təsviri', 'Perspektiva və fəza anlayışı'],
+    '7-ci sinif': ['Portret janrı və insan anatomiyası rəsmdə', 'Mənzərə janrı və fəza perspektivası', 'Dekorativ-tətbiqi sənət və memarlıq abidələri', 'Tarixi və bədii kompozisiyalar'],
+    '8-ci sinif': ['Dəzgah və kitab qrafikası sənəti', 'Rəngkarlıq janrları və kompozisiya qanunları', 'Azərbaycanın tarixi memarlıq inciləri', 'Heykəltəraşlıq və monumental sənət', 'Dizayn və müasir bədii tərtibat'],
+    '9-cu sinif': ['Müasir təsviri sənət cərəyanları', 'Dizayn növləri və qrafik tərtibat', 'Görkəmli Azərbaycan rəssamlarının yaradıcılığı', 'Sənətşünaslıq və təsviri sənət əsərlərinin təhlili']
   },
 
   'Fiziki tərbiyə': {
     '5-ci sinif': ['Şəxsi gigiyena və orqanizmin möhkəmləndirilməsi', 'Sıra hərəkətləri və gimnastika', 'Qaçış və tullanma texnikası', 'Hərəkətli və milli oyunlar'],
+    '6-cı sinif': ['Gimnastika alətlərində hərəkətlər', 'Qaçış sürəti və dözümlülük məşqləri', 'Həndbol oyununun əsas qaydaları', 'Sağlam həyat tərzi və qidalanma'],
+    '7-ci sinif': ['Voleybol: ötürmələr və hücum zərbələri', 'Basketbol: topun aparılması və səbətə atış', 'Uzunluğa və hündürlüyə tullanma', 'Fiziki keyfiyyətlərin inkişaf etdirilməsi'],
+    '8-ci sinif': ['Futbol və taktiki kombinasiyalar', 'Çeviklik və koordinasiya hərəkətləri', 'Fiziki güc və dözümlülük normativləri', 'İdman yarışlarında təhlükəsizlik qaydaları'],
     '9-cu sinif': ['Yüngül atletika növləri', 'Basketbol və voleybol oyun qaydaları', 'Futbol və taktiki gedişlər', 'Fiziki dözümlülük və güc normativləri']
   },
 
@@ -1231,10 +1240,10 @@ export function getTopicsFor(subjectName: string, grade: string): string[] {
   }
 
   return [
-    `${subjectName} (${grade}): Bölmə 1 – Əsas anlayışlar və nəzəri baza`,
-    `${subjectName} (${grade}): Bölmə 2 – Praktiki tətbiq və qanunauyğunluqlar`,
-    `${subjectName} (${grade}): Bölmə 3 – Məsələ və situasiyalar`,
-    `${subjectName} (${grade}): Bölmə 4 – Ümumiləşdirici təkrar və testlər`
+    'Əsas anlayışlar və nəzəri baza',
+    'Praktiki tətbiq və qanunauyğunluqlar',
+    'Məsələlər və situasiya təhlili',
+    'Ümumiləşdirici təkrar və testlər'
   ];
 }
 
