@@ -128,57 +128,61 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             </p>
           </div>
 
-          {/* 4 Əsas Giriş Düyməsi (İşıqlı rejimdə tam ağ və açıq, Qaranlıq rejimdə tünd) */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mt-4 w-full">
+          {/* 4 Əsas Giriş Düyməsi (Kənar cizgili, havaya qalxmış 3D kölgəli və yüksək effektli) */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5 mt-4 w-full">
+            {/* 1. AI Test Qutusu */}
             <button
               onClick={() => onNavigate('ai_test')}
-              className="p-2.5 sm:p-3 rounded-xl bg-white hover:bg-violet-50/60 dark:bg-slate-900/90 dark:hover:bg-slate-800 border border-slate-200/90 hover:border-violet-300 dark:border-slate-800 dark:hover:border-violet-500/50 text-slate-900 dark:text-white text-left transition-all shadow-xs hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
+              className="p-3 sm:p-3.5 rounded-2xl bg-white hover:bg-violet-50/50 dark:bg-slate-900 dark:hover:bg-slate-850 border-2 border-violet-200/90 hover:border-violet-400 dark:border-violet-800/70 dark:hover:border-violet-500 text-slate-900 dark:text-white text-left transition-all duration-300 ease-out shadow-md shadow-violet-500/10 hover:shadow-xl hover:shadow-violet-500/25 -translate-y-0.5 hover:-translate-y-1.5 flex items-center gap-3 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-950/80 border border-violet-200 dark:border-violet-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <div className="w-9 h-9 rounded-xl bg-violet-100 dark:bg-violet-950/80 border border-violet-300/80 dark:border-violet-500/50 flex items-center justify-center shrink-0 group-hover:scale-110 shadow-xs transition-transform duration-300">
                 <Sparkles className="w-4 h-4 text-violet-600 dark:text-amber-300" />
               </div>
               <div className="min-w-0 flex-1">
                 <span className="text-xs font-black block truncate leading-tight text-slate-900 dark:text-white group-hover:text-violet-700 dark:group-hover:text-violet-300">{t.fastActionAi}</span>
-                <span className="text-[10px] text-violet-600 dark:text-violet-300/80 font-semibold block truncate mt-0.5">Süni İntellekt</span>
+                <span className="text-[10px] text-violet-600 dark:text-violet-300/80 font-bold block truncate mt-0.5">Süni İntellekt</span>
               </div>
             </button>
 
+            {/* 2. İnteraktiv Test Qutusu */}
             <button
               onClick={() => onNavigate('create_test')}
-              className="p-2.5 sm:p-3 rounded-xl bg-white hover:bg-cyan-50/60 dark:bg-slate-900/90 dark:hover:bg-slate-800 border border-slate-200/90 hover:border-cyan-300 dark:border-slate-800 dark:hover:border-cyan-500/50 text-slate-900 dark:text-white text-left transition-all shadow-xs hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
+              className="p-3 sm:p-3.5 rounded-2xl bg-white hover:bg-cyan-50/50 dark:bg-slate-900 dark:hover:bg-slate-850 border-2 border-cyan-200/90 hover:border-cyan-400 dark:border-cyan-800/70 dark:hover:border-cyan-500 text-slate-900 dark:text-white text-left transition-all duration-300 ease-out shadow-md shadow-cyan-500/10 hover:shadow-xl hover:shadow-cyan-500/25 -translate-y-0.5 hover:-translate-y-1.5 flex items-center gap-3 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-950/80 border border-cyan-200 dark:border-cyan-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-950/80 border border-cyan-300/80 dark:border-cyan-500/50 flex items-center justify-center shrink-0 group-hover:scale-110 shadow-xs transition-transform duration-300">
                 <Edit3 className="w-4 h-4 text-cyan-600 dark:text-cyan-300" />
               </div>
               <div className="min-w-0 flex-1">
                 <span className="text-xs font-black block truncate leading-tight text-slate-900 dark:text-white group-hover:text-cyan-700 dark:group-hover:text-cyan-300">{t.fastActionInteractive}</span>
-                <span className="text-[10px] text-cyan-600 dark:text-cyan-300/80 font-semibold block truncate mt-0.5">Online Konstruktor</span>
+                <span className="text-[10px] text-cyan-600 dark:text-cyan-300/80 font-bold block truncate mt-0.5">Online Konstruktor</span>
               </div>
             </button>
 
+            {/* 3. OMR Test Qutusu */}
             <button
               onClick={() => onNavigate('omr_test')}
-              className="p-2.5 sm:p-3 rounded-xl bg-white hover:bg-emerald-50/60 dark:bg-slate-900/90 dark:hover:bg-slate-800 border border-slate-200/90 hover:border-emerald-300 dark:border-slate-800 dark:hover:border-emerald-500/50 text-slate-900 dark:text-white text-left transition-all shadow-xs hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
+              className="p-3 sm:p-3.5 rounded-2xl bg-white hover:bg-emerald-50/50 dark:bg-slate-900 dark:hover:bg-slate-850 border-2 border-emerald-200/90 hover:border-emerald-400 dark:border-emerald-800/70 dark:hover:border-emerald-500 text-slate-900 dark:text-white text-left transition-all duration-300 ease-out shadow-md shadow-emerald-500/10 hover:shadow-xl hover:shadow-emerald-500/25 -translate-y-0.5 hover:-translate-y-1.5 flex items-center gap-3 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300/80 dark:border-emerald-500/50 flex items-center justify-center shrink-0 group-hover:scale-110 shadow-xs transition-transform duration-300">
                 <Printer className="w-4 h-4 text-emerald-600 dark:text-emerald-300" />
               </div>
               <div className="min-w-0 flex-1">
                 <span className="text-xs font-black block truncate leading-tight text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-300">{t.fastActionOmr}</span>
-                <span className="text-[10px] text-emerald-600 dark:text-emerald-300/80 font-semibold block truncate mt-0.5">PDF & Cavab Kartı</span>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-300/80 font-bold block truncate mt-0.5">PDF & Cavab Kartı</span>
               </div>
             </button>
 
+            {/* 4. Regional Reytinq Qutusu */}
             <button
               onClick={() => onNavigate('regional_stats')}
-              className="p-2.5 sm:p-3 rounded-xl bg-white hover:bg-amber-50/60 dark:bg-slate-900/90 dark:hover:bg-slate-800 border border-slate-200/90 hover:border-amber-300 dark:border-slate-800 dark:hover:border-amber-500/50 text-slate-900 dark:text-white text-left transition-all shadow-xs hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
+              className="p-3 sm:p-3.5 rounded-2xl bg-white hover:bg-amber-50/50 dark:bg-slate-900 dark:hover:bg-slate-850 border-2 border-amber-200/90 hover:border-amber-400 dark:border-amber-800/70 dark:hover:border-amber-500 text-slate-900 dark:text-white text-left transition-all duration-300 ease-out shadow-md shadow-amber-500/10 hover:shadow-xl hover:shadow-amber-500/25 -translate-y-0.5 hover:-translate-y-1.5 flex items-center gap-3 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/80 border border-amber-200 dark:border-amber-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/80 border border-amber-300/80 dark:border-amber-500/50 flex items-center justify-center shrink-0 group-hover:scale-110 shadow-xs transition-transform duration-300">
                 <Award className="w-4 h-4 text-amber-600 dark:text-amber-400" />
               </div>
               <div className="min-w-0 flex-1">
                 <span className="text-xs font-black block truncate leading-tight text-slate-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-300">{t.fastActionRegional}</span>
-                <span className="text-[10px] text-amber-600 dark:text-amber-300/80 font-semibold block truncate mt-0.5">Naxçıvan MR Reytinqi</span>
+                <span className="text-[10px] text-amber-600 dark:text-amber-300/80 font-bold block truncate mt-0.5">Naxçıvan MR Reytinqi</span>
               </div>
             </button>
           </div>

@@ -308,29 +308,29 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
   };
 
   return (
-    <div className="w-full min-h-full flex flex-col bg-[#eef6fc] font-sans">
+    <div className="w-full min-h-full flex flex-col bg-[#eef6fc] dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100">
       {/* ==============================================================
           1. YUXARI STATİSTİKA BAŞLIĞI VƏ ƏSAS İDARƏETMƏ ZOLAĞI
           ============================================================== */}
-      <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-4 shrink-0 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-4 shrink-0 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 max-w-7xl mx-auto w-full">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-emerald-200 shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-emerald-200 dark:shadow-none shrink-0">
               <Award className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-tight">
+                <h1 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                   Regional Statistika və Akademik Reytinq
                 </h1>
-                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                   Naxçıvan MR
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
                   IV • VI • IX • XI Siniflər
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Naxçıvanın 8 rayon və şəhəri üzrə 3 mərhələli reytinq sistemi: Şagirdlər • Məktəblər • Rayonlar
               </p>
             </div>
@@ -350,10 +350,10 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
             <button
               type="button"
               onClick={handlePrint}
-              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
+              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer"
               title="Çap et və ya PDF kimi saxla"
             >
-              <Printer className="w-4 h-4 text-slate-600" />
+              <Printer className="w-4 h-4 text-slate-600 dark:text-slate-300" />
               <span className="hidden sm:inline">Çap / PDF</span>
             </button>
           </div>
@@ -363,13 +363,13 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
             TƏLƏB 1: RAYONLAR ÜZRƏ İNTERAKTİV KONTEKST MENYU ZOLAĞI
             (Hover desktop, klik mobil; 5 kontekstual seçim)
             ============================================================== */}
-        <div ref={districtMenuRef} className="max-w-7xl mx-auto w-full pt-4 mt-2 border-t border-slate-100">
+        <div ref={districtMenuRef} className="max-w-7xl mx-auto w-full pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
           <div className="flex items-center justify-between gap-2 mb-2">
-            <span className="text-[11px] font-black uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-indigo-600" />
+            <span className="text-[11px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-1.5">
+              <Building2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
               Naxçıvanın İnzibati Əraziləri (Kontekst Menyusu):
             </span>
-            <span className="text-[10px] text-slate-400 font-semibold hidden sm:inline">
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold hidden sm:inline">
               Üzərinə gəlin və ya klikləyin
             </span>
           </div>
@@ -395,22 +395,22 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                     }}
                     className={`w-full p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between group ${
                       isSelected
-                        ? 'bg-slate-900 border-slate-900 text-white shadow-sm'
-                        : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200 text-slate-800'
+                        ? 'bg-slate-900 border-slate-900 text-white shadow-sm dark:bg-indigo-600 dark:border-indigo-500'
+                        : 'bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200'
                     }`}
                   >
                     <div className="flex items-center justify-between w-full">
                       <span className="font-bold text-[11px] truncate">{d.name.replace(' rayonu', '').replace(' şəhəri', '')}</span>
-                      <MoreVertical className={`w-3 h-3 ${isSelected ? 'text-slate-400' : 'text-slate-400 group-hover:text-slate-700'}`} />
+                      <MoreVertical className={`w-3 h-3 ${isSelected ? 'text-slate-400' : 'text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300'}`} />
                     </div>
-                    <div className="flex items-center justify-between mt-1 pt-1 border-t border-slate-200/40">
-                      <span className={`text-[10px] font-black ${isSelected ? 'text-emerald-300' : 'text-emerald-700'}`}>
+                    <div className="flex items-center justify-between mt-1 pt-1 border-t border-slate-200/40 dark:border-slate-800">
+                      <span className={`text-[10px] font-black ${isSelected ? 'text-emerald-300' : 'text-emerald-700 dark:text-emerald-400'}`}>
                         {distRec && distRec.studentsCount > 0 ? `${distRec.overallScore}%` : '—'}
                       </span>
                       <span className={`text-[9px] font-black px-1 rounded ${
                         distRec && distRec.studentsCount > 0
-                          ? isSelected ? 'bg-emerald-500/30 text-emerald-200' : 'bg-emerald-100 text-emerald-800'
-                          : 'text-slate-400'
+                          ? isSelected ? 'bg-emerald-500/30 text-emerald-200' : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300'
+                          : 'text-slate-400 dark:text-slate-500'
                       }`}>
                         {distRec && distRec.studentsCount > 0 ? `#${distRec.nmrRank}` : '0 şagird'}
                       </span>
@@ -420,13 +420,13 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                   {/* Kontekst Menyu Pəncərəsi (Hover və ya Klik) */}
                   {isMenuOpen && (
                     <div
-                      className={`absolute top-full ${dIdx >= 4 ? 'right-0' : 'left-0'} mt-1 z-50 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 p-1.5 animate-in fade-in zoom-in-95 duration-150`}
+                      className={`absolute top-full ${dIdx >= 4 ? 'right-0' : 'left-0'} mt-1 z-50 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-1.5 animate-in fade-in zoom-in-95 duration-150`}
                       onMouseEnter={() => setHoveredDistrict(d.name)}
                       onMouseLeave={() => setHoveredDistrict(null)}
                     >
-                      <div className="px-3 py-1.5 border-b border-slate-100 mb-1">
-                        <span className="text-[10px] font-black text-slate-900 block truncate">{d.name}</span>
-                        <span className="text-[9px] text-slate-400 block">
+                      <div className="px-3 py-1.5 border-b border-slate-100 dark:border-slate-800 mb-1">
+                        <span className="text-[10px] font-black text-slate-900 dark:text-white block truncate">{d.name}</span>
+                        <span className="text-[9px] text-slate-400 dark:text-slate-500 block">
                           {distRec ? `${distRec.studentsCount} şagird • ${distRec.schoolsCount} məktəb` : 'Məlumat yoxdur'}
                         </span>
                       </div>
@@ -595,60 +595,60 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
           <div className="flex flex-col gap-6 animate-in fade-in duration-200">
             {/* Üst Xülasə Zolağı */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">İştirakçı Şagirdlər</span>
-                <span className="text-2xl font-black text-slate-900 mt-1 block">{overview.totalStudents} şagird</span>
-                <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-bold mt-2 inline-block">
+              <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">İştirakçı Şagirdlər</span>
+                <span className="text-2xl font-black text-slate-900 dark:text-white mt-1 block">{overview.totalStudents} şagird</span>
+                <span className="text-[10px] text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded font-bold mt-2 inline-block">
                   {overview.totalStudents > 0 ? 'Faktiki test verənlər' : 'Məlumat yoxdur'}
                 </span>
               </div>
 
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">İştirakçı Məktəblər</span>
-                <span className="text-2xl font-black text-slate-900 mt-1 block">{overview.totalSchools} məktəb</span>
-                <span className="text-[10px] text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded font-bold mt-2 inline-block">
+              <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">İştirakçı Məktəblər</span>
+                <span className="text-2xl font-black text-slate-900 dark:text-white mt-1 block">{overview.totalSchools} məktəb</span>
+                <span className="text-[10px] text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded font-bold mt-2 inline-block">
                   {regionalData.participatingSchoolsCount} iştirakçı məktəb
                 </span>
               </div>
 
-              <div className="bg-white p-4 rounded-2xl border border-emerald-200 bg-gradient-to-br from-white to-emerald-50/40 shadow-2xs">
-                <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">Naxçıvan MR Orta Nəticə</span>
-                <span className="text-2xl font-black text-emerald-700 mt-1 block">
+              <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-emerald-200 dark:border-emerald-800/80 bg-gradient-to-br from-white to-emerald-50/40 dark:from-slate-900 dark:to-emerald-950/20 shadow-2xs">
+                <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider block">Naxçıvan MR Orta Nəticə</span>
+                <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 mt-1 block">
                   {overview.totalStudents > 0 ? `${overview.overallAverage}%` : 'Məlumat yoxdur'}
                 </span>
-                <span className="text-[10px] text-emerald-700 font-semibold mt-2 block">
+                <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold mt-2 block">
                   Bütün iştirakçıların ədədi ortası
                 </span>
               </div>
 
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Lider Rayon (1-ci Yer)</span>
-                <span className="text-sm font-black text-slate-900 mt-1 truncate block">
+              <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Lider Rayon (1-ci Yer)</span>
+                <span className="text-sm font-black text-slate-900 dark:text-white mt-1 truncate block">
                   {overview.totalStudents > 0 ? `1. ${overview.topDistrict.name} (${overview.topDistrict.score}%)` : 'Məlumat yoxdur'}
                 </span>
-                <span className="text-[10px] text-slate-400 font-semibold mt-2 block">
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold mt-2 block">
                   Faktiki nəticələrə görə
                 </span>
               </div>
             </div>
 
             {/* Rayonlararası Reytinq Cədvəli (Tələb 5) */}
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
-              <div className="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/50">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+              <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-slate-50/50 dark:bg-slate-800/50">
                 <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4 text-emerald-600" />
-                  <h3 className="text-sm font-black text-slate-900 tracking-tight">
+                  <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white tracking-tight">
                     Naxçıvan MR Rayonlarının Ümumi Reytinq Cədvəli (Tələb 5)
                   </h3>
                 </div>
-                <span className="text-xs text-slate-500 font-semibold">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
                   Orta Nəticə və Müvəffəqiyyət Faizlərinə Əsasən Sıralanır
                 </span>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-100/70 text-slate-700 font-black text-[11px] uppercase tracking-wider border-b border-slate-200">
+                  <thead className="bg-slate-100/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
                     <tr>
                       <th className="py-3 px-3 text-center w-14">Reytinq</th>
                       <th className="py-3 px-4">Rayon / Şəhər</th>
@@ -662,53 +662,53 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                       <th className="py-3 px-3 text-center">Əməliyyat</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-medium">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                     {districts.map((dist) => (
-                      <tr key={dist.id} className="hover:bg-slate-50/80 transition-colors">
+                      <tr key={dist.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/60 transition-colors">
                         <td className="py-3 px-3 text-center">
                           <span className={`inline-flex items-center justify-center w-6 h-6 rounded-lg font-black text-xs ${
-                            dist.studentsCount > 0 && dist.nmrRank === 1 ? 'bg-amber-100 text-amber-800 border border-amber-300' :
-                            dist.studentsCount > 0 && dist.nmrRank === 2 ? 'bg-slate-200 text-slate-800' :
-                            dist.studentsCount > 0 && dist.nmrRank === 3 ? 'bg-amber-50 text-amber-900 border border-amber-200' :
-                            'bg-slate-100 text-slate-500'
+                            dist.studentsCount > 0 && dist.nmrRank === 1 ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700' :
+                            dist.studentsCount > 0 && dist.nmrRank === 2 ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200' :
+                            dist.studentsCount > 0 && dist.nmrRank === 3 ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-800' :
+                            'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                           }`}>
                             {dist.studentsCount > 0 ? dist.nmrRank : '—'}
                           </span>
                         </td>
-                        <td className="py-3 px-4 font-bold text-slate-900">
+                        <td className="py-3 px-4 font-bold text-slate-900 dark:text-white">
                           {dist.name}
                         </td>
-                        <td className="py-3 px-3 text-center text-slate-600 font-semibold">
+                        <td className="py-3 px-3 text-center text-slate-600 dark:text-slate-400 font-semibold">
                           {dist.participatingSchoolsCount > 0 ? (
                             <span>{dist.participatingSchoolsCount} / {dist.schoolsCount} məktəb</span>
                           ) : (
-                            <span className="text-slate-400">0 / {dist.schoolsCount}</span>
+                            <span className="text-slate-400 dark:text-slate-500">0 / {dist.schoolsCount}</span>
                           )}
                         </td>
-                        <td className="py-3 px-3 text-center text-slate-700 font-semibold">
-                          {dist.studentsCount > 0 ? `${dist.studentsCount} nəfər` : <span className="text-slate-400">0</span>}
+                        <td className="py-3 px-3 text-center text-slate-700 dark:text-slate-300 font-semibold">
+                          {dist.studentsCount > 0 ? `${dist.studentsCount} nəfər` : <span className="text-slate-400 dark:text-slate-500">0</span>}
                         </td>
-                        <td className="py-3 px-3 text-center text-slate-600">
-                          {dist.totalTestsTaken > 0 ? dist.totalTestsTaken : <span className="text-slate-400">0</span>}
+                        <td className="py-3 px-3 text-center text-slate-600 dark:text-slate-400">
+                          {dist.totalTestsTaken > 0 ? dist.totalTestsTaken : <span className="text-slate-400 dark:text-slate-500">0</span>}
                         </td>
-                        <td className="py-3 px-3 text-center text-slate-800 font-bold">
-                          {dist.studentsCount > 0 ? dist.totalScore : <span className="text-slate-400">—</span>}
+                        <td className="py-3 px-3 text-center text-slate-800 dark:text-slate-200 font-bold">
+                          {dist.studentsCount > 0 ? dist.totalScore : <span className="text-slate-400 dark:text-slate-500">—</span>}
                         </td>
                         <td className="py-3 px-4 text-center">
-                          <span className={`font-black text-sm ${dist.studentsCount > 0 ? 'text-emerald-700' : 'text-slate-400'}`}>
+                          <span className={`font-black text-sm ${dist.studentsCount > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
                             {dist.studentsCount > 0 ? `${dist.overallScore}%` : 'Məlumat yoxdur'}
                           </span>
                         </td>
                         <td className="py-3 px-3 text-center">
-                          <span className={`font-bold ${dist.studentsCount > 0 ? 'text-indigo-700' : 'text-slate-400'}`}>
+                          <span className={`font-bold ${dist.studentsCount > 0 ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'}`}>
                             {dist.studentsCount > 0 ? `${dist.successRate}%` : '—'}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-800 truncate max-w-[220px]">
+                        <td className="py-3 px-4 text-slate-800 dark:text-slate-200 truncate max-w-[220px]">
                           {dist.studentsCount > 0 ? (
                             <><strong>{dist.topSchool.name}</strong> ({dist.topSchool.score}%)</>
                           ) : (
-                            <span className="text-slate-400 text-xs font-semibold">Məlumat yoxdur</span>
+                            <span className="text-slate-400 dark:text-slate-500 text-xs font-semibold">Məlumat yoxdur</span>
                           )}
                         </td>
                         <td className="py-3 px-3 text-center">
@@ -718,7 +718,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                               setSelectedDistrictName(dist.name);
                               setActiveTab('stage2_schools');
                             }}
-                            className="px-2.5 py-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1"
+                            className="px-2.5 py-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1"
                           >
                             <span>Məktəblər</span>
                             <ArrowRight className="w-3 h-3" />
@@ -970,25 +970,25 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
         {activeTab === 'stage2_schools' && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-200">
             {/* Rayon Seçici & Axtarış Zolağı */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <School className="w-5 h-5 text-indigo-600" />
+                <School className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 <div>
-                  <h3 className="text-sm font-black text-slate-900">
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white">
                     2-ci Mərhələ: {selectedDistrictName} Məktəblərinin Reytinqi
                   </h3>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Məktəbi seçərək həmin məktəbin şagirdlərinin fərdi reytinqinə (1-ci Mərhələ) daxil olun
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-bold text-slate-500">Rayon:</span>
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Rayon:</span>
                 <select
                   value={selectedDistrictName}
                   onChange={(e) => setSelectedDistrictName(e.target.value)}
-                  className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none cursor-pointer"
+                  className="px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
                 >
                   {NAKHCHIVAN_DISTRICTS.map((d) => (
                     <option key={d.id} value={d.name}>{d.name}</option>
@@ -1002,26 +1002,26 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Məktəb adı ilə axtar..."
-                    className="pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-indigo-600 w-48"
+                    className="pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:border-indigo-600 w-48"
                   />
                 </div>
               </div>
             </div>
 
             {/* Məktəblərarası Reytinq Cədvəli (Tələb 4) */}
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
-              <div className="p-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                <span className="text-xs font-black uppercase text-slate-800 tracking-wider">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+              <div className="p-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
+                <span className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 tracking-wider">
                   {selectedDistrictName} Məktəbləri ({intraDistrictSchools.length} Məktəb)
                 </span>
-                <span className="text-xs text-slate-500 font-semibold">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
                   Məktəbə klik edərək onun şagird reytinqini aça bilərsiniz
                 </span>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-100/70 text-slate-700 font-black text-[11px] uppercase tracking-wider border-b border-slate-200">
+                  <thead className="bg-slate-100/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
                     <tr>
                       <th className="py-3 px-3 text-center w-14">Sıra</th>
                       <th className="py-3 px-3.5">Məktəbin Rəsmi Adı</th>
@@ -1035,46 +1035,46 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                       <th className="py-3 px-3 text-center">Əməliyyat</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-medium">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                     {intraDistrictSchools
                       .filter((s) => !searchQuery || s.name.toLowerCase().includes(searchQuery.toLowerCase()))
                       .map((sch, idx) => (
-                        <tr key={sch.id} className="hover:bg-slate-50/80 transition-colors">
+                        <tr key={sch.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/60 transition-colors">
                           <td className="py-3 px-3 text-center">
                             <span className={`inline-flex items-center justify-center w-6 h-6 rounded-lg font-black text-xs ${
-                              sch.studentsCount > 0 && sch.districtRank === 1 ? 'bg-amber-100 text-amber-800' :
-                              sch.studentsCount > 0 && sch.districtRank <= 3 ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' :
-                              'bg-slate-100 text-slate-500'
+                              sch.studentsCount > 0 && sch.districtRank === 1 ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300' :
+                              sch.studentsCount > 0 && sch.districtRank <= 3 ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800' :
+                              'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                             }`}>
                               {sch.studentsCount > 0 ? sch.districtRank || idx + 1 : '—'}
                             </span>
                           </td>
-                          <td className="py-3 px-3.5 font-bold text-slate-900">
+                          <td className="py-3 px-3.5 font-bold text-slate-900 dark:text-white">
                             {sch.name}
                           </td>
-                          <td className="py-3 px-3 text-center font-mono text-[11px] text-slate-500">
+                          <td className="py-3 px-3 text-center font-mono text-[11px] text-slate-500 dark:text-slate-400">
                             {sch.utisCode || '700xxxx'}
                           </td>
-                          <td className="py-3 px-3 text-center text-slate-700">
-                            {sch.studentsCount > 0 ? `${sch.studentsCount} şagird` : <span className="text-slate-400 font-semibold">0 şagird</span>}
+                          <td className="py-3 px-3 text-center text-slate-700 dark:text-slate-300">
+                            {sch.studentsCount > 0 ? `${sch.studentsCount} şagird` : <span className="text-slate-400 dark:text-slate-500 font-semibold">0 şagird</span>}
                           </td>
-                          <td className="py-3 px-3 text-center text-slate-600">
-                            {sch.totalTestsTaken > 0 ? sch.totalTestsTaken : <span className="text-slate-400">0</span>}
+                          <td className="py-3 px-3 text-center text-slate-600 dark:text-slate-400">
+                            {sch.totalTestsTaken > 0 ? sch.totalTestsTaken : <span className="text-slate-400 dark:text-slate-500">0</span>}
                           </td>
-                          <td className="py-3 px-3 text-center text-slate-800 font-bold">
-                            {sch.studentsCount > 0 ? sch.totalScore : <span className="text-slate-400">—</span>}
+                          <td className="py-3 px-3 text-center text-slate-800 dark:text-slate-200 font-bold">
+                            {sch.studentsCount > 0 ? sch.totalScore : <span className="text-slate-400 dark:text-slate-500">—</span>}
                           </td>
                           <td className="py-3 px-3 text-center">
-                            <span className={`font-black text-sm ${sch.studentsCount > 0 ? 'text-emerald-700' : 'text-slate-400'}`}>
+                            <span className={`font-black text-sm ${sch.studentsCount > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
                               {sch.studentsCount > 0 ? `${sch.overallScore}%` : 'Məlumat yoxdur'}
                             </span>
                           </td>
                           <td className="py-3 px-3 text-center">
-                            <span className={`font-bold ${sch.studentsCount > 0 ? 'text-indigo-700' : 'text-slate-400'}`}>
+                            <span className={`font-bold ${sch.studentsCount > 0 ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'}`}>
                               {sch.studentsCount > 0 ? `${sch.successRate}%` : '—'}
                             </span>
                           </td>
-                          <td className="py-3 px-3 text-center text-slate-600 font-bold">
+                          <td className="py-3 px-3 text-center text-slate-600 dark:text-slate-400 font-bold">
                             {sch.studentsCount > 0 ? `#${sch.nmrRank}` : '—'}
                           </td>
                           <td className="py-3 px-3 text-center">
@@ -1097,7 +1097,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                               <button
                                 type="button"
                                 onClick={() => setModalSchool(sch)}
-                                className="px-2 py-1 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                                className="px-2 py-1 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
                               >
                                 Ətraflı
                               </button>
@@ -1118,15 +1118,15 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
         {activeTab === 'stage1_students' && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-200">
             {/* Naviqasiya & Məktəb Seçici */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col gap-3">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <GraduationCap className="w-5 h-5 text-emerald-600" />
+                  <GraduationCap className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   <div>
-                    <h3 className="text-sm font-black text-slate-900">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white">
                       1-ci Mərhələ: Məktəb Daxilində Şagird Reytinqi (Tələb 3)
                     </h3>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       {selectedDistrictName} • {selectedSchoolName}
                     </p>
                   </div>
@@ -1136,7 +1136,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                   <button
                     type="button"
                     onClick={() => setActiveTab('stage2_schools')}
-                    className="px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer flex items-center gap-1"
+                    className="px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all cursor-pointer flex items-center gap-1"
                   >
                     <span>Məktəblər Cədvəlinə Qayıt</span>
                   </button>
@@ -1146,7 +1146,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
               {/* Məktəb, Sinif və Axtarış Filtrləri */}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 pt-1">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 block mb-1">Rayon:</label>
+                  <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-1">Rayon:</label>
                   <select
                     value={selectedDistrictName}
                     onChange={(e) => {
@@ -1155,7 +1155,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                       const fSchool = schools.find((s) => s.district === newDist);
                       if (fSchool) setSelectedSchoolName(fSchool.name);
                     }}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-800 dark:text-slate-200 focus:outline-none"
                   >
                     {NAKHCHIVAN_DISTRICTS.map((d) => (
                       <option key={d.id} value={d.name}>{d.name}</option>
@@ -1164,11 +1164,11 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="text-[10px] font-bold text-slate-500 block mb-1">Məktəb:</label>
+                  <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-1">Məktəb:</label>
                   <select
                     value={selectedSchoolName}
                     onChange={(e) => setSelectedSchoolName(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-800 dark:text-slate-200 focus:outline-none"
                   >
                     {districtSchools.map((s) => (
                       <option key={s.id} value={s.name}>
@@ -1179,11 +1179,11 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 block mb-1">Sinif:</label>
+                  <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-1">Sinif:</label>
                   <select
                     value={studentGradeFilter}
                     onChange={(e) => setStudentGradeFilter(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-800 dark:text-slate-200 focus:outline-none"
                   >
                     <option value="all">Bütün Siniflər (IV, VI, IX, XI)</option>
                     {MONITORING_GRADES.map((g) => (
@@ -1195,11 +1195,11 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
             </div>
 
             {/* Məktəbin Şagird Reytinq Cədvəli (Tələb 3) */}
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
-              <div className="p-3.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/50">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+              <div className="p-3.5 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-slate-50/50 dark:bg-slate-800/50">
                 <div className="flex items-center gap-2">
                   <Trophy className="w-4 h-4 text-amber-500" />
-                  <span className="text-xs font-black uppercase text-slate-800 tracking-wider">
+                  <span className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 tracking-wider">
                     {selectedSchoolName} – Şagirdlərin Akademik Reytinqi ({schoolStudents.length} Şagird)
                   </span>
                 </div>
@@ -1211,23 +1211,23 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                     value={studentSearchQuery}
                     onChange={(e) => setStudentSearchQuery(e.target.value)}
                     placeholder="Şagird adı və ya UTİS ilə axtar..."
-                    className="pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-indigo-600 w-56"
+                    className="pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:border-indigo-600 w-56"
                   />
                 </div>
               </div>
 
               {schoolStudents.length === 0 ? (
                 <div className="p-12 text-center flex flex-col items-center justify-center gap-2">
-                  <GraduationCap className="w-12 h-12 text-slate-300" />
-                  <span className="text-sm font-black text-slate-700">Məlumat yoxdur</span>
-                  <span className="text-xs text-slate-400 max-w-md">
+                  <GraduationCap className="w-12 h-12 text-slate-300 dark:text-slate-600" />
+                  <span className="text-sm font-black text-slate-700 dark:text-slate-300">Məlumat yoxdur</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500 max-w-md">
                     «{selectedSchoolName}» üzrə hələlik ATROQ Education sistemində imtahan nəticəsi qeydə alınmayıb.
                   </span>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-100/70 text-slate-700 font-black text-[11px] uppercase tracking-wider border-b border-slate-200">
+                    <thead className="bg-slate-100/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
                       <tr>
                         <th className="py-3 px-3 text-center w-14">Sıra</th>
                         <th className="py-3 px-3.5">Şagirdin Adı və Soyadı</th>
@@ -1240,51 +1240,51 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                         <th className="py-3 px-3 text-center">Reytinq Mövqeyi</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 font-medium">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                       {schoolStudents.map((st, idx) => (
-                        <tr key={st.id} className="hover:bg-slate-50/80 transition-colors">
+                        <tr key={st.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/60 transition-colors">
                           <td className="py-3 px-3 text-center">
                             <span className={`inline-flex items-center justify-center w-6 h-6 rounded-lg font-black text-xs ${
-                              idx === 0 ? 'bg-amber-100 text-amber-800 border border-amber-300' :
-                              idx === 1 ? 'bg-slate-200 text-slate-800' :
-                              idx === 2 ? 'bg-amber-50 text-amber-900 border border-amber-200' :
-                              'bg-slate-100 text-slate-600'
+                              idx === 0 ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700' :
+                              idx === 1 ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200' :
+                              idx === 2 ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-800' :
+                              'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                             }`}>
                               #{idx + 1}
                             </span>
                           </td>
-                          <td className="py-3 px-3.5 font-bold text-slate-900">
+                          <td className="py-3 px-3.5 font-bold text-slate-900 dark:text-white">
                             <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[10px] font-black flex items-center justify-center">
+                              <div className="w-6 h-6 rounded-full bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-[10px] font-black flex items-center justify-center">
                                 {st.firstName.charAt(0) || 'Ş'}
                               </div>
                               <span>{st.fullName}</span>
                             </div>
                           </td>
-                          <td className="py-3 px-3 text-center text-slate-700 font-semibold">
+                          <td className="py-3 px-3 text-center text-slate-700 dark:text-slate-300 font-semibold">
                             {st.grade || '—'}
                           </td>
-                          <td className="py-3 px-3 text-center font-mono text-[11px] text-slate-500">
+                          <td className="py-3 px-3 text-center font-mono text-[11px] text-slate-500 dark:text-slate-400">
                             {st.utisCode || '—'}
                           </td>
-                          <td className="py-3 px-3 text-center text-slate-700">
+                          <td className="py-3 px-3 text-center text-slate-700 dark:text-slate-300">
                             {st.testsCount} test
                           </td>
-                          <td className="py-3 px-3 text-center font-bold text-slate-800">
+                          <td className="py-3 px-3 text-center font-bold text-slate-800 dark:text-slate-200">
                             {st.totalScore} bal
                           </td>
                           <td className="py-3 px-3 text-center">
-                            <span className="font-black text-sm text-emerald-700">
+                            <span className="font-black text-sm text-emerald-700 dark:text-emerald-400">
                               {st.avgPercentage}%
                             </span>
                           </td>
                           <td className="py-3 px-3 text-center">
-                            <span className="font-black text-xs text-indigo-700">
+                            <span className="font-black text-xs text-indigo-700 dark:text-indigo-400">
                               {st.accuracyPercentage}%
                             </span>
                           </td>
                           <td className="py-3 px-3 text-center">
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                               Məktəb #{st.schoolRank || idx + 1}
                             </span>
                           </td>
@@ -1304,7 +1304,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
         {activeTab === 'district_profile' && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-200">
             {/* 8 Rayon Seçim Düymələri */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col gap-2">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col gap-2">
               <span className="text-[11px] font-black uppercase text-slate-700 tracking-wider flex items-center gap-1.5">
                 <Building2 className="w-4 h-4 text-indigo-600" />
                 Statistik Təhlil Üçün Rayon Seçin:
@@ -1335,7 +1335,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
             </div>
 
             {/* Seçilmiş Rayonun Təfərrüatlı Akademik Profili */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col gap-5">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col gap-5">
               <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-700 font-black text-xl flex items-center justify-center shadow-xs">
@@ -1405,7 +1405,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
         {activeTab === 'grade_results' && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-200">
             {/* Sinif Seçici Düymələri */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
               <span className="text-xs font-black uppercase text-slate-800 tracking-wider flex items-center gap-1.5">
                 <GraduationCap className="w-5 h-5 text-indigo-600" />
                 Monitorinq Sinfi Seçin:
@@ -1431,7 +1431,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
             {/* Seçilmiş Sinif Üzrə Rayonların Müqayisəsi */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
               {/* Sol: Cədvəl */}
-              <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col">
                 <div className="p-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
                   <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
                     {selectedGrade} Üzrə Rayonların Göstəriciləri
@@ -1479,7 +1479,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
               </div>
 
               {/* Sağ: Bu Sinifdə Ən Yüksək Nəticə Göstərən Lider Məktəblər */}
-              <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col">
                 <div className="p-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
                   <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
                     {selectedGrade} Üzrə Naxçıvanın Lider Məktəbləri
@@ -1525,7 +1525,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
         {activeTab === 'subject_results' && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-200">
             {/* Step 1: Sinif Seçimi + Step 2: Fənn Seçimi */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col gap-3">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col gap-3">
               <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
                 <span className="text-xs font-black uppercase text-slate-800 tracking-wider flex items-center gap-1.5">
                   <span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">1</span>
@@ -1575,39 +1575,39 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
 
             {/* Fənn Göstəriciləri Kartı */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Naxçıvan MR Orta Nəticə</span>
-                <div className="text-2xl font-black text-indigo-700 mt-1">
+              <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Naxçıvan MR Orta Nəticə</span>
+                <div className="text-2xl font-black text-indigo-700 dark:text-indigo-400 mt-1">
                   {overview.totalStudents > 0 && overview.subjectAverages[selectedSubject] ? `${overview.subjectAverages[selectedSubject]}%` : '—'}
                 </div>
-                <span className="text-[10px] text-slate-500 mt-1">{selectedGrade} • {selectedSubject}</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">{selectedGrade} • {selectedSubject}</span>
               </div>
 
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ən Yüksək Nəticəli Rayon</span>
-                <div className="text-xl font-black text-emerald-700 mt-1">
+              <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Ən Yüksək Nəticəli Rayon</span>
+                <div className="text-xl font-black text-emerald-700 dark:text-emerald-400 mt-1">
                   {overview.totalStudents > 0 && districts[0]?.studentsCount > 0 ? (
                     `${districts[0]?.name} (${districts[0]?.subjectScores[selectedSubject] || 0}%)`
                   ) : (
                     '—'
                   )}
                 </div>
-                <span className="text-[10px] text-emerald-700 font-semibold mt-1">Fənn üzrə rayon birincisi</span>
+                <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold mt-1">Fənn üzrə rayon birincisi</span>
               </div>
 
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ən Yüksək Nəticəli Məktəb</span>
-                <div className="text-sm font-black text-slate-900 mt-1 truncate">
+              <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Ən Yüksək Nəticəli Məktəb</span>
+                <div className="text-sm font-black text-slate-900 dark:text-white mt-1 truncate">
                   {overview.totalStudents > 0 && schools[0]?.studentsCount > 0 ? schools[0]?.name : '—'}
                 </div>
-                <span className="text-xs font-black text-emerald-700 mt-0.5">
+                <span className="text-xs font-black text-emerald-700 dark:text-emerald-400 mt-0.5">
                   {overview.totalStudents > 0 && schools[0]?.studentsCount > 0 ? `${schools[0]?.subjectScores[selectedSubject] || 0}% bal` : 'İştirakçı yoxdur'}
                 </span>
               </div>
             </div>
 
             {/* Fənn Üzrə Rayonların Sıralama Cədvəli */}
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col">
               <div className="p-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
                   {selectedSubject} Üzrə Rayonların Sıralaması ({selectedGrade})
@@ -1660,7 +1660,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
             ============================================================== */}
         {activeTab === 'monitoring_dynamics' && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-200">
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-emerald-600" />
                 <div>
@@ -1683,7 +1683,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
             </div>
 
             {/* Dinamika Cədvəli */}
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-100 text-slate-700 text-[10px] font-black uppercase border-b border-slate-200">
@@ -1751,7 +1751,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
         {activeTab === 'admin_schools' && user.role === 'admin' && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-200">
             {/* Yeni Məktəb Əlavə Etmə Formu */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col gap-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col gap-4">
               <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
                 <PlusCircle className="w-5 h-5 text-indigo-600" />
                 <h3 className="text-sm font-black text-slate-900">
@@ -1823,7 +1823,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
             </div>
 
             {/* Mövcud Məktəblərin Siyahısı */}
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col">
               <div className="p-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
                 <span className="text-xs font-black uppercase text-slate-800 tracking-wider">
                   Mərkəzi Reyestrdəki Məktəblər ({schoolsList.length} Məktəb)
