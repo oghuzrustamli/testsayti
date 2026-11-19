@@ -364,6 +364,7 @@ export const AboutVideoShowcase: React.FC<AboutVideoShowcaseProps> = ({ onClose,
   return (
     <div
       ref={containerRef}
+      data-video-player="true"
       className={`w-full overflow-hidden bg-slate-950 text-white rounded-2xl border border-slate-800 shadow-2xl flex flex-col relative select-none ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : ''
         }`}
     >

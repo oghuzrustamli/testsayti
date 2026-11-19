@@ -308,16 +308,16 @@ export const PdfQuestionSelector: React.FC<PdfQuestionSelectorProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-xs flex flex-col">
       {/* Top Navigation & Toolbar */}
-      <header className="h-16 bg-slate-900 text-white px-4 sm:px-6 flex items-center justify-between border-b border-slate-800 shrink-0 shadow-lg">
+      <header className="h-16 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-4 sm:px-6 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 shrink-0 shadow-xs dark:shadow-lg">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-indigo-600 rounded-xl text-white">
             <FileText className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="font-bold text-sm sm:text-base leading-tight">
+            <h2 className="font-bold text-sm sm:text-base leading-tight text-slate-900 dark:text-white">
               PDF-dən Sualların Seçilməsi
             </h2>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
               {fileName || 'PDF sənədini seçin və sualların ətrafında düzbucaqlı çəkərək kəsin'}
             </p>
           </div>
@@ -327,11 +327,11 @@ export const PdfQuestionSelector: React.FC<PdfQuestionSelectorProps> = ({
         {pdfDoc && (
           <div className="flex items-center gap-3">
             {/* Mode Toggle (Sahə ilə kəsmə vs Mətn seçimi) */}
-            <div className="hidden md:flex items-center p-1 bg-slate-800 rounded-xl border border-slate-700 text-xs font-semibold">
+            <div className="hidden md:flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold">
               <button
                 onClick={() => setMode('crop')}
                 className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition-all ${
-                  mode === 'crop' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  mode === 'crop' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 <Crop className="w-3.5 h-3.5" />
@@ -340,7 +340,7 @@ export const PdfQuestionSelector: React.FC<PdfQuestionSelectorProps> = ({
               <button
                 onClick={() => setMode('text')}
                 className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition-all ${
-                  mode === 'text' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  mode === 'text' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 <Type className="w-3.5 h-3.5" />
@@ -401,7 +401,7 @@ export const PdfQuestionSelector: React.FC<PdfQuestionSelectorProps> = ({
       </header>
 
       {/* Main Workspace */}
-      <div className="flex-1 overflow-auto bg-slate-950 flex flex-col items-center justify-start p-4 relative" ref={containerRef}>
+      <div className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-950 flex flex-col items-center justify-start p-4 relative" ref={containerRef}>
         {/* Toast alert */}
         {toastMsg && (
           <div className="fixed top-20 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-3">
@@ -412,7 +412,7 @@ export const PdfQuestionSelector: React.FC<PdfQuestionSelectorProps> = ({
 
         {/* Initial Screen: Select PDF */}
         {!pdfDoc ? (
-          <div className="my-auto max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center text-white shadow-2xl">
+          <div className="my-auto max-w-lg w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center text-slate-900 dark:text-white shadow-xl">
             <div className="w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center mx-auto mb-4">
               <Upload className="w-8 h-8" />
             </div>
@@ -537,7 +537,7 @@ export const PdfQuestionSelector: React.FC<PdfQuestionSelectorProps> = ({
 
       {/* Bottom Sticky Hint Bar */}
       {pdfDoc && (
-        <footer className="h-12 bg-slate-900 border-t border-slate-800 px-6 flex items-center justify-between text-xs text-slate-400 shrink-0">
+        <footer className="h-12 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>
@@ -547,8 +547,8 @@ export const PdfQuestionSelector: React.FC<PdfQuestionSelectorProps> = ({
             </span>
           </div>
 
-          <div className="font-bold text-white text-xs">
-            Seçilmiş suallar: <span className="text-emerald-400 font-black">{currentQuestionCount}</span> ədəd
+          <div className="font-bold text-slate-900 dark:text-white text-xs">
+            Seçilmiş suallar: <span className="text-emerald-600 dark:text-emerald-400 font-black">{currentQuestionCount}</span> ədəd
           </div>
         </footer>
       )}

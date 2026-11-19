@@ -401,7 +401,7 @@ export const DocSnippetModal: React.FC<DocSnippetModalProps> = ({
 
         {/* Floating Snippet Insertion Card if crop made */}
         {previewSnippetUrl && (
-          <div className="bg-slate-900 text-white p-3 px-4 flex items-center justify-between gap-4 border-b border-slate-800 animate-in slide-in-from-top-2 z-20">
+          <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white p-3 px-4 flex items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 shadow-sm animate-in slide-in-from-top-2 z-20">
             <div className="flex items-center gap-3">
               <img
                 src={previewSnippetUrl}

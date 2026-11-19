@@ -1727,17 +1727,17 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
         <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in">
           <div className="bg-white rounded-3xl shadow-2xl max-w-6xl w-full h-[90vh] flex flex-col overflow-hidden border border-slate-200">
             {/* Modal Header */}
-            <div className="px-6 py-3.5 bg-slate-900 text-white flex items-center justify-between shrink-0">
+            <div className="px-6 py-3.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <h3 className="text-sm font-bold">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                   Şagird İmtahan Baxışı (Önizləmə): {title}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowPreviewModal(false)}
-                className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+                className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>

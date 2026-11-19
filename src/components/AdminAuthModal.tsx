@@ -40,22 +40,21 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ onSuccess, onClo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Dark Futuristic Cyber Backdrop */}
+      {/* Modal Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/85 backdrop-blur-md transition-opacity"
+        className="fixed inset-0 bg-slate-900/40 dark:bg-slate-950/85 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      <div className="relative rounded-3xl bg-slate-900/90 border border-amber-500/40 shadow-[0_0_60px_rgba(245,158,11,0.2)] max-w-sm w-full p-6 sm:p-7 text-center overflow-hidden z-10 text-white animate-in fade-in zoom-in-95">
-        {/* Futuristic Ambient Glow */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-cyan-600/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:20px_20px] opacity-10 pointer-events-none" />
+      <div className="relative rounded-3xl bg-white dark:bg-slate-900/90 border border-amber-300 dark:border-amber-500/40 shadow-2xl max-w-sm w-full p-6 sm:p-7 text-center overflow-hidden z-10 text-slate-900 dark:text-white animate-in fade-in zoom-in-95">
+        {/* Ambient Glow */}
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/10 dark:bg-amber-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-indigo-500/10 dark:bg-cyan-600/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex justify-end relative z-20">
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-amber-400 hover:bg-slate-800/80 rounded-xl transition-all border border-slate-700/50 hover:border-amber-500/40 cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition-all border border-slate-200 dark:border-slate-700/50 cursor-pointer"
             title="Bağla"
           >
             <X className="w-4 h-4" />
@@ -63,33 +62,33 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ onSuccess, onClo
         </div>
 
         {/* Shield Icon Badge */}
-        <div className="relative mx-auto mb-3 w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-400 text-slate-950 flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.5)] border border-amber-300">
+        <div className="relative mx-auto mb-3 w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-400 text-white dark:text-slate-950 flex items-center justify-center shadow-md border border-amber-300">
           <ShieldAlert className="w-8 h-8" />
-          <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-slate-900 animate-pulse" />
+          <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-950/80 border border-amber-500/40 text-[9.5px] font-mono tracking-widest text-amber-300 uppercase shadow-xs mb-2">
-          <Cpu className="w-3 h-3 text-amber-400" />
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/80 border border-amber-200 dark:border-amber-500/40 text-[9.5px] font-mono tracking-widest text-amber-800 dark:text-amber-300 uppercase shadow-xs mb-2">
+          <Cpu className="w-3 h-3 text-amber-600 dark:text-amber-400" />
           <span>CYBER SECURITY CLEARANCE</span>
         </div>
 
-        <h3 className="font-black text-lg bg-gradient-to-r from-amber-200 via-white to-yellow-200 bg-clip-text text-transparent">
+        <h3 className="font-black text-lg text-slate-900 dark:bg-gradient-to-r dark:from-amber-200 dark:via-white dark:to-yellow-200 dark:bg-clip-text dark:text-transparent">
           Administrator Girişi
         </h3>
-        <p className="text-xs text-slate-400 mt-1 mb-5">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-5">
           Təhlükəsizlik üçün baş administrator şifrəsini daxil edin.
         </p>
 
         {errorMsg && (
-          <div className="p-3 mb-4 bg-rose-950/70 border border-rose-500/60 text-rose-300 text-xs rounded-xl flex items-center gap-2 text-left animate-in fade-in">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+          <div className="p-3 mb-4 bg-rose-50 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-500/60 text-rose-700 dark:text-rose-300 text-xs rounded-xl flex items-center gap-2 text-left animate-in fade-in">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500 dark:text-rose-400" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         <form onSubmit={handleAdminLogin} className="flex flex-col gap-3.5">
           <div className="relative">
-            <Lock className="w-4 h-4 text-amber-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Lock className="w-4 h-4 text-amber-500 dark:text-amber-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="password"
               required
@@ -97,22 +96,22 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ onSuccess, onClo
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Admin şifrəsi..."
-              className="w-full pl-10 pr-3 py-2.5 text-xs bg-slate-950/80 border border-slate-700/80 hover:border-amber-500/50 focus:border-amber-400 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 shadow-inner transition-all font-sans"
+              className="w-full pl-10 pr-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-950/80 border border-slate-300 dark:border-slate-700/80 hover:border-amber-500/50 focus:border-amber-500 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 shadow-xs transition-all font-sans"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-[0_0_25px_rgba(245,158,11,0.4)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full py-2.5 bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             <span>{loading ? 'Təsdiqlənir...' : 'GİRİŞİ TƏSDİQLƏ'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        <p className="text-[10px] text-slate-400 mt-4 pt-3 border-t border-slate-800">
-          Demo şifrə: <strong className="font-mono text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/30">admin123</strong>
+        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+          Demo şifrə: <strong className="font-mono text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-500/30">admin123</strong>
         </p>
       </div>
     </div>

@@ -232,6 +232,145 @@
 }
 
 /* ==============================================================
+   ATROQ Education - Pure Light Mode Enforcement Engine
+   When html:not(.dark), guarantee that ALL cards, panels, modals,
+   inputs, headers, and backgrounds are pure, crisp Light Theme.
+   No dark mode background or dark elements remain.
+   ============================================================== */
+html:not(.dark) {
+  color-scheme: light;
+}
+
+html:not(.dark) body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Modals & Popups backdrop in Light Mode */
+html:not(.dark) .fixed.inset-0.bg-slate-950\/85,
+html:not(.dark) .fixed.inset-0.bg-slate-900\/80,
+html:not(.dark) .fixed.inset-0.bg-slate-900\/75,
+html:not(.dark) .fixed.inset-0.bg-slate-900\/70,
+html:not(.dark) .fixed.inset-0.bg-slate-900\/60,
+html:not(.dark) .fixed.inset-0.bg-slate-900\/50 {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Modals, Cards, and Container Panels in Light Mode */
+html:not(.dark) .bg-slate-900\/90:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) .bg-slate-900\/80:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) .bg-slate-900\/70:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) .bg-slate-900\/50:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) div.bg-slate-900:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) section.bg-slate-900:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) header.bg-slate-900:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) footer.bg-slate-900:not([data-video-player="true"]):not([data-video-player="true"] *) {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Inner sub-boxes and input areas in Light Mode */
+html:not(.dark) .bg-slate-950\/85:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) .bg-slate-950\/80:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) .bg-slate-950\/70:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) .bg-slate-950\/60:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) .bg-slate-950\/40:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) div.bg-slate-950:not([data-video-player="true"]):not([data-video-player="true"] *),
+html:not(.dark) section.bg-slate-950:not([data-video-player="true"]):not([data-video-player="true"] *) {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Gradients that were dark */
+html:not(.dark) .bg-gradient-to-b.from-slate-900\/90,
+html:not(.dark) .bg-gradient-to-b.from-slate-900\/80,
+html:not(.dark) .bg-gradient-to-br.from-slate-900 {
+  background-image: none !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Fix text contrast inside originally dark elements when in Light Mode */
+html:not(.dark) div.bg-slate-900:not([data-video-player="true"]):not([data-video-player="true"] *) .text-white,
+html:not(.dark) div.bg-slate-900\/90:not([data-video-player="true"]):not([data-video-player="true"] *) .text-white,
+html:not(.dark) div.bg-slate-950:not([data-video-player="true"]):not([data-video-player="true"] *) .text-white,
+html:not(.dark) section.bg-slate-900:not([data-video-player="true"]):not([data-video-player="true"] *) .text-white,
+html:not(.dark) header.bg-slate-900:not([data-video-player="true"]):not([data-video-player="true"] *) .text-white {
+  color: #0f172a !important;
+}
+
+html:not(.dark) div.bg-slate-900:not([data-video-player="true"]):not([data-video-player="true"] *) .text-slate-400,
+html:not(.dark) div.bg-slate-900\/90:not([data-video-player="true"]):not([data-video-player="true"] *) .text-slate-400,
+html:not(.dark) div.bg-slate-950:not([data-video-player="true"]):not([data-video-player="true"] *) .text-slate-400,
+html:not(.dark) section.bg-slate-900:not([data-video-player="true"]):not([data-video-player="true"] *) .text-slate-400 {
+  color: #64748b !important;
+}
+
+html:not(.dark) div.bg-slate-900:not([data-video-player="true"]):not([data-video-player="true"] *) .text-slate-300,
+html:not(.dark) div.bg-slate-900\/90:not([data-video-player="true"]):not([data-video-player="true"] *) .text-slate-300,
+html:not(.dark) div.bg-slate-950:not([data-video-player="true"]):not([data-video-player="true"] *) .text-slate-300 {
+  color: #475569 !important;
+}
+
+/* Form inputs & textareas in Light Mode */
+html:not(.dark) input:not([type="checkbox"]):not([type="radio"]),
+html:not(.dark) select,
+html:not(.dark) textarea {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Active tab buttons that used dark colors: ensure vibrant primary color in Light Mode */
+html:not(.dark) button.bg-slate-900,
+html:not(.dark) button.bg-slate-800 {
+  background-color: #4f46e5 !important;
+  color: #ffffff !important;
+  border-color: #4338ca !important;
+}
+
+/* Accent Buttons Keep White Text */
+html:not(.dark) button.bg-indigo-600,
+html:not(.dark) button.bg-emerald-600,
+html:not(.dark) button.bg-rose-600,
+html:not(.dark) button.bg-violet-600,
+html:not(.dark) button.bg-sky-600,
+html:not(.dark) button.bg-amber-600,
+html:not(.dark) button[class*="from-indigo-600"],
+html:not(.dark) button[class*="from-violet-600"],
+html:not(.dark) button[class*="from-cyan-600"],
+html:not(.dark) button[class*="from-emerald-500"],
+html:not(.dark) button[class*="from-amber-500"] {
+  color: #ffffff !important;
+}
+
+html:not(.dark) button.bg-indigo-600 *,
+html:not(.dark) button.bg-emerald-600 *,
+html:not(.dark) button.bg-rose-600 *,
+html:not(.dark) button.bg-violet-600 *,
+html:not(.dark) button[class*="from-indigo-600"] *,
+html:not(.dark) button[class*="from-violet-600"] * {
+  color: #ffffff !important;
+}
+
+/* Dark Modal Glow & borders in Light Mode */
+html:not(.dark) .rounded-3xl.bg-slate-900\/90,
+html:not(.dark) .rounded-2xl.bg-slate-900\/90,
+html:not(.dark) .rounded-3xl.bg-slate-900,
+html:not(.dark) .rounded-2xl.bg-slate-900 {
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.12) !important;
+}
+
+/* ==============================================================
    ATROQ Education - Dark Mode Palette & Styling Engine
    ============================================================== */
 html.dark {

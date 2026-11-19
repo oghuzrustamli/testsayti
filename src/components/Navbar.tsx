@@ -100,15 +100,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           className={`flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl font-black text-xs sm:text-sm transition-all duration-200 cursor-pointer shadow-xs shrink-0 border ${
             megaMenuOpen
               ? 'bg-indigo-600 text-white shadow-indigo-200 dark:shadow-indigo-900/40 border-indigo-700 ring-2 ring-indigo-400/40'
-              : 'bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white border-slate-900 dark:border-slate-700 shadow-slate-900/10 hover:shadow-md'
+              : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-950 border-indigo-200/90 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white dark:border-slate-700 shadow-xs hover:shadow-sm'
           }`}
           title={t.controlPanel}
         >
-          <LayoutDashboard className="w-4 h-4 text-indigo-300 shrink-0" />
+          <LayoutDashboard className={`w-4 h-4 shrink-0 ${megaMenuOpen ? 'text-white' : 'text-indigo-600 dark:text-indigo-300'}`} />
           <span className="whitespace-nowrap">{t.controlPanel}</span>
           <ChevronDown
             className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-              megaMenuOpen ? 'rotate-180 text-white' : 'text-slate-400'
+              megaMenuOpen ? 'rotate-180 text-white' : 'text-indigo-500 dark:text-slate-400'
             }`}
           />
         </button>
@@ -247,7 +247,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }}
             className={`px-2 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer text-[11px] sm:text-xs ${
               currentUser.role === 'admin'
-                ? 'bg-slate-900 dark:bg-slate-700 text-white shadow-xs font-black'
+                ? 'bg-indigo-600 text-white shadow-xs font-black dark:bg-slate-700'
                 : 'hover:text-slate-900 dark:hover:text-white'
             }`}
             title="Administrator Girişi"
@@ -285,9 +285,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={onOpenAuthModal}
-            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-cyan-300 hover:text-white border border-cyan-500/30 rounded-xl text-xs font-bold transition-all cursor-pointer"
+            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-cyan-300 dark:border-cyan-500/30 rounded-xl text-xs font-bold transition-all cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-cyan-400" />
             <span>{t.login}</span>
           </button>
         )}

@@ -570,10 +570,10 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
           <button
             type="button"
             onClick={() => setShowPreviewModal(true)}
-            className="h-9 px-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer"
+            className="h-9 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white border border-indigo-200 dark:border-slate-700 rounded-xl text-xs font-bold shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer"
             title="Şagird interfeysində testin önizləməsi"
           >
-            <Eye className="w-3.5 h-3.5 text-emerald-400" />
+            <Eye className="w-3.5 h-3.5 text-indigo-600 dark:text-emerald-400" />
             <span>Şagird Baxışı</span>
           </button>
         </div>
@@ -615,14 +615,14 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
         <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in">
           <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200">
             {/* Modal Header */}
-            <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between shrink-0">
+            <div className="px-6 py-4 bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 <div>
-                  <h3 className="text-sm font-bold">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                     Şagird Baxışı (Canlı Önizləmə)
                   </h3>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     {title || 'Adsız Test'} • {examModel} • {subject}
                   </p>
                 </div>
