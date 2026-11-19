@@ -68,6 +68,81 @@ export type RegionalNavTab =
   | 'monitoring_dynamics'  // Monitorinqlərin müqayisəsi və dinamika
   | 'admin_schools';       // Məktəblərin Mərkəzi Reyestri (Admin)
 
+// Modern Color Schemes for Nakhchivan Districts
+export const DISTRICT_THEMES: Record<string, {
+  gradient: string;
+  badgeBg: string;
+  textColor: string;
+  glow: string;
+  borderColor: string;
+  softBg: string;
+}> = {
+  'Naxçıvan şəhəri': {
+    gradient: 'from-indigo-600 via-indigo-500 to-indigo-400',
+    badgeBg: 'bg-indigo-600 text-white',
+    textColor: 'text-indigo-600 dark:text-indigo-400',
+    glow: 'shadow-indigo-500/30',
+    borderColor: 'border-indigo-400',
+    softBg: 'bg-indigo-50 dark:bg-indigo-950/40'
+  },
+  'Babək rayonu': {
+    gradient: 'from-blue-600 via-sky-500 to-cyan-400',
+    badgeBg: 'bg-blue-600 text-white',
+    textColor: 'text-blue-600 dark:text-blue-400',
+    glow: 'shadow-blue-500/30',
+    borderColor: 'border-blue-400',
+    softBg: 'bg-blue-50 dark:bg-blue-950/40'
+  },
+  'Şərur rayonu': {
+    gradient: 'from-emerald-600 via-teal-500 to-teal-400',
+    badgeBg: 'bg-emerald-600 text-white',
+    textColor: 'text-emerald-600 dark:text-emerald-400',
+    glow: 'shadow-emerald-500/30',
+    borderColor: 'border-emerald-400',
+    softBg: 'bg-emerald-50 dark:bg-emerald-950/40'
+  },
+  'Ordubad rayonu': {
+    gradient: 'from-amber-500 via-orange-500 to-rose-400',
+    badgeBg: 'bg-amber-500 text-white',
+    textColor: 'text-amber-600 dark:text-amber-400',
+    glow: 'shadow-amber-500/30',
+    borderColor: 'border-amber-400',
+    softBg: 'bg-amber-50 dark:bg-amber-950/40'
+  },
+  'Culfa rayonu': {
+    gradient: 'from-purple-600 via-fuchsia-500 to-pink-400',
+    badgeBg: 'bg-purple-600 text-white',
+    textColor: 'text-purple-600 dark:text-purple-400',
+    glow: 'shadow-purple-500/30',
+    borderColor: 'border-purple-400',
+    softBg: 'bg-purple-50 dark:bg-purple-950/40'
+  },
+  'Kəngərli rayonu': {
+    gradient: 'from-teal-600 via-cyan-500 to-sky-400',
+    badgeBg: 'bg-teal-600 text-white',
+    textColor: 'text-teal-600 dark:text-teal-400',
+    glow: 'shadow-teal-500/30',
+    borderColor: 'border-teal-400',
+    softBg: 'bg-teal-50 dark:bg-teal-950/40'
+  },
+  'Şahbuz rayonu': {
+    gradient: 'from-rose-600 via-pink-500 to-orange-400',
+    badgeBg: 'bg-rose-600 text-white',
+    textColor: 'text-rose-600 dark:text-rose-400',
+    glow: 'shadow-rose-500/30',
+    borderColor: 'border-rose-400',
+    softBg: 'bg-rose-50 dark:bg-rose-950/40'
+  },
+  'Sədərək rayonu': {
+    gradient: 'from-violet-600 via-purple-500 to-indigo-400',
+    badgeBg: 'bg-violet-600 text-white',
+    textColor: 'text-violet-600 dark:text-violet-400',
+    glow: 'shadow-violet-500/30',
+    borderColor: 'border-violet-400',
+    softBg: 'bg-violet-50 dark:bg-violet-950/40'
+  }
+};
+
 export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) => {
   // Active navigation tab (Default: 1-ci Mərhələ - Şagird Reytinqi)
   const [activeTab, setActiveTab] = useState<RegionalNavTab>('stage1_students');
@@ -656,30 +731,32 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
               </div>
             </div>
 
-            {/* TƏLƏB 6: RAYONLAR ÜZRƏ İNTERAKTİV MÜQAYİSƏ DİAQRAMI */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col gap-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            {/* TƏLƏB 6: RAYONLAR ÜZRƏ VİZUAL MÜQAYİSƏ DİAQRAMI (KOMPAKT, MODERN VƏ RƏNGLİ) */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col gap-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-indigo-600" />
+                  <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 flex items-center justify-center">
+                    <BarChart3 className="w-4 h-4" />
+                  </div>
                   <div>
-                    <h3 className="text-sm font-black text-slate-900">
+                    <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
                       Rayonlar Üzrə Vizual Müqayisə Diaqramı (Tələb 6)
                     </h3>
-                    <p className="text-xs text-slate-500">
-                      Rayonun sütununa klik edərək həmin rayonun göstəricilərini aktivləşdirin
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Hər rayon üçün fərdi rəng qradiyenti ilə müqayisəli reytinq göstəriciləri
                     </p>
                   </div>
                 </div>
 
-                {/* Diaqram Metrik Seçimi */}
-                <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+                {/* Diaqram Metrik Seçimi - Kompakt Pill Menyu */}
+                <div className="flex items-center gap-1 bg-slate-100/90 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
                   <button
                     type="button"
                     onClick={() => setChartMetric('overall')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       chartMetric === 'overall'
-                        ? 'bg-white text-indigo-700 shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Orta Nəticə (%)
@@ -687,10 +764,10 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                   <button
                     type="button"
                     onClick={() => setChartMetric('success')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       chartMetric === 'success'
-                        ? 'bg-white text-indigo-700 shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Müvəffəqiyyət %
@@ -698,10 +775,10 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                   <button
                     type="button"
                     onClick={() => setChartMetric('students')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       chartMetric === 'students'
-                        ? 'bg-white text-indigo-700 shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Şagird Sayı
@@ -709,97 +786,180 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                 </div>
               </div>
 
-              {/* Sütunlu Diaqram (Hər 8 rayon) */}
-              <div className="grid grid-cols-4 sm:grid-cols-8 gap-3 items-end pt-6 min-h-[220px]">
-                {districts.map((d) => {
-                  const isSelected = d.name === selectedDistrictName;
-                  let val = 0;
-                  let label = '—';
-
-                  if (chartMetric === 'overall') {
-                    val = d.studentsCount > 0 ? d.overallScore : 0;
-                    label = d.studentsCount > 0 ? `${d.overallScore}%` : '—';
-                  } else if (chartMetric === 'success') {
-                    val = d.studentsCount > 0 ? d.successRate : 0;
-                    label = d.studentsCount > 0 ? `${d.successRate}%` : '—';
-                  } else {
-                    val = d.studentsCount;
-                    label = `${d.studentsCount}`;
-                  }
-
-                  const barHeight = chartMetric === 'students'
-                    ? Math.max(16, Math.min(180, val * 10))
-                    : Math.max(16, val * 1.8);
-
-                  return (
-                    <div
-                      key={d.id}
-                      onClick={() => setSelectedDistrictName(d.name)}
-                      className="flex flex-col items-center gap-2 h-full justify-end cursor-pointer group"
-                    >
-                      <span className={`text-[11px] font-black transition-all ${
-                        isSelected ? 'text-indigo-700 scale-110' : 'text-slate-600 group-hover:text-slate-900'
-                      }`}>
-                        {label}
-                      </span>
-                      <div
-                        className={`w-full max-w-[44px] rounded-t-xl transition-all duration-300 relative ${
-                          isSelected
-                            ? 'bg-gradient-to-t from-indigo-700 to-indigo-500 shadow-md shadow-indigo-150 ring-2 ring-indigo-400'
-                            : 'bg-slate-200 hover:bg-slate-300'
-                        }`}
-                        style={{ height: `${barHeight}px` }}
-                      />
-                      <span className={`text-[10px] font-bold text-center truncate max-w-full px-1 ${
-                        isSelected ? 'text-indigo-900 font-black' : 'text-slate-600'
-                      }`}>
-                        {d.name.replace(' rayonu', '').replace(' şəhəri', '')}
-                      </span>
+              {/* Kompakt Modern Diaqram Sahəsi (Arxa fon qrafik xətləri və 8 rəngli sütun) */}
+              {(() => {
+                const maxStudentVal = Math.max(...districts.map(x => x.studentsCount), 10);
+                return (
+                  <div className="relative pt-3 pb-1">
+                    {/* Arxa fon zərif səviyyə xətləri */}
+                    <div className="absolute inset-x-1 sm:inset-x-3 top-7 bottom-12 flex flex-col justify-between pointer-events-none opacity-40">
+                      <div className="w-full border-b border-dashed border-slate-200 dark:border-slate-700 flex justify-end">
+                        <span className="text-[8px] font-bold text-slate-400 -mt-2 bg-white dark:bg-slate-900 px-1">
+                          {chartMetric === 'students' ? maxStudentVal : '100%'}
+                        </span>
+                      </div>
+                      <div className="w-full border-b border-dashed border-slate-200 dark:border-slate-700 flex justify-end">
+                        <span className="text-[8px] font-bold text-slate-400 -mt-2 bg-white dark:bg-slate-900 px-1">
+                          {chartMetric === 'students' ? Math.round(maxStudentVal * 0.75) : '75%'}
+                        </span>
+                      </div>
+                      <div className="w-full border-b border-dashed border-slate-200 dark:border-slate-700 flex justify-end">
+                        <span className="text-[8px] font-bold text-slate-400 -mt-2 bg-white dark:bg-slate-900 px-1">
+                          {chartMetric === 'students' ? Math.round(maxStudentVal * 0.5) : '50%'}
+                        </span>
+                      </div>
+                      <div className="w-full border-b border-dashed border-slate-200 dark:border-slate-700 flex justify-end">
+                        <span className="text-[8px] font-bold text-slate-400 -mt-2 bg-white dark:bg-slate-900 px-1">
+                          {chartMetric === 'students' ? Math.round(maxStudentVal * 0.25) : '25%'}
+                        </span>
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
 
-              {/* Seçilmiş Rayonun Göstəricilər Kartı */}
-              <div className="mt-2 p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 font-black text-sm flex items-center justify-center">
-                    {currentDistrictRecord.studentsCount > 0 ? `#${currentDistrictRecord.nmrRank}` : '—'}
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase">Seçilmiş Rayon</span>
-                    <h4 className="text-sm font-black text-slate-900">{currentDistrictRecord.name}</h4>
-                  </div>
-                </div>
+                    {/* Sütunlu Diaqram (Hər 8 rayon fərdi rənglə) */}
+                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 sm:gap-3 items-end min-h-[175px] sm:min-h-[190px] relative z-10">
+                      {districts.map((d) => {
+                        const isSelected = d.name === selectedDistrictName;
+                        const theme = DISTRICT_THEMES[d.name] || DISTRICT_THEMES['Naxçıvan şəhəri'];
 
-                <div className="flex items-center gap-4 text-xs font-bold">
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Şagird</span>
-                    <span className="text-slate-900 font-black">{currentDistrictRecord.studentsCount}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Orta Bal</span>
-                    <span className="text-emerald-700 font-black">
-                      {currentDistrictRecord.studentsCount > 0 ? `${currentDistrictRecord.overallScore}%` : 'Məlumat yoxdur'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Müvəffəqiyyət</span>
-                    <span className="text-indigo-700 font-black">
-                      {currentDistrictRecord.studentsCount > 0 ? `${currentDistrictRecord.successRate}%` : '—'}
-                    </span>
-                  </div>
-                </div>
+                        let val = 0;
+                        let label = '—';
 
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('stage2_schools')}
-                  className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <span>2-ci Mərhələ: Məktəblərə Bax</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
+                        if (chartMetric === 'overall') {
+                          val = d.studentsCount > 0 ? d.overallScore : 0;
+                          label = d.studentsCount > 0 ? `${d.overallScore}%` : '—';
+                        } else if (chartMetric === 'success') {
+                          val = d.studentsCount > 0 ? d.successRate : 0;
+                          label = d.studentsCount > 0 ? `${d.successRate}%` : '—';
+                        } else {
+                          val = d.studentsCount;
+                          label = `${d.studentsCount}`;
+                        }
+
+                        // Bar height percentage inside track
+                        const barPct = chartMetric === 'students'
+                          ? (val > 0 ? Math.max(12, Math.min(100, (val / maxStudentVal) * 100)) : 0)
+                          : (val > 0 ? Math.max(10, Math.min(100, val)) : 0);
+
+                        return (
+                          <div
+                            key={d.id}
+                            onClick={() => setSelectedDistrictName(d.name)}
+                            className="flex flex-col items-center gap-1.5 h-full justify-end cursor-pointer group select-none"
+                          >
+                            {/* Üst Dəyər Göstəricisi */}
+                            <span className={`text-[10px] sm:text-[11px] transition-all ${
+                              isSelected
+                                ? `font-black px-1.5 py-0.5 rounded-md ${theme.badgeBg} shadow-xs scale-105`
+                                : 'font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white'
+                            }`}>
+                              {label}
+                            </span>
+
+                            {/* Sütun Zolağı (Kompakt və Zərif Track) */}
+                            <div className={`w-full max-w-[38px] sm:max-w-[48px] h-28 sm:h-32 bg-slate-100/80 dark:bg-slate-800/60 rounded-t-xl p-1 flex items-end justify-center relative transition-all group-hover:bg-slate-200/60 ${
+                              isSelected ? 'bg-slate-200/70 dark:bg-slate-800' : ''
+                            }`}>
+                              {/* Rəngli Qradiyent Sütun */}
+                              <div
+                                className={`w-full rounded-t-lg transition-all duration-500 ease-out relative shadow-sm bg-gradient-to-t ${theme.gradient} ${
+                                  isSelected
+                                    ? `ring-2 ${theme.borderColor} ring-offset-2 ring-offset-white dark:ring-offset-slate-900 shadow-md ${theme.glow} scale-x-105`
+                                    : 'opacity-90 group-hover:opacity-100 group-hover:scale-y-[1.02]'
+                                }`}
+                                style={{ height: `${barPct}%` }}
+                              >
+                                {/* Şüşə parıltı effekti (Gloss overlay) */}
+                                <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/35 to-transparent rounded-t-lg pointer-events-none" />
+                              </div>
+                            </div>
+
+                            {/* Alt Rayon Adı və Reytinq */}
+                            <div className="flex flex-col items-center gap-0.5 w-full">
+                              <span className={`text-[9px] font-black px-1 rounded-sm ${
+                                d.nmrRank === 1 && d.studentsCount > 0
+                                  ? 'bg-amber-400 text-amber-950 font-black'
+                                  : d.nmrRank === 2 && d.studentsCount > 0
+                                  ? 'bg-slate-300 text-slate-800'
+                                  : d.nmrRank === 3 && d.studentsCount > 0
+                                  ? 'bg-amber-200 text-amber-900'
+                                  : 'text-slate-400'
+                              }`}>
+                                {d.studentsCount > 0 ? `#${d.nmrRank}` : '—'}
+                              </span>
+                              <span className={`text-[10px] sm:text-[11px] font-bold text-center truncate max-w-full px-0.5 transition-colors ${
+                                isSelected ? `${theme.textColor} font-black` : 'text-slate-700 dark:text-slate-300 group-hover:text-slate-900'
+                              }`}>
+                                {d.name.replace(' rayonu', '').replace(' şəhəri', '')}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Seçilmiş Rayonun Göstəricilər Kartı (Modern Kompakt Qradiyentli) */}
+              {(() => {
+                const activeTheme = DISTRICT_THEMES[currentDistrictRecord.name] || DISTRICT_THEMES['Naxçıvan şəhəri'];
+                return (
+                  <div className={`mt-1 p-3 sm:p-4 rounded-2xl border transition-all ${activeTheme.softBg} ${activeTheme.borderColor} border-opacity-40 flex flex-wrap items-center justify-between gap-3 shadow-2xs`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br ${activeTheme.gradient} text-white font-black text-xs sm:text-sm flex items-center justify-center shadow-md ${activeTheme.glow}`}>
+                        {currentDistrictRecord.studentsCount > 0 ? `#${currentDistrictRecord.nmrRank}` : '—'}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">{currentDistrictRecord.name}</h4>
+                          <span className={`text-[9px] font-black px-1.5 py-0.2 rounded-full ${activeTheme.badgeBg}`}>
+                            {currentDistrictRecord.studentsCount > 0 ? `${currentDistrictRecord.nmrRank}-ci Yer` : 'Məlumat gözlənilir'}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
+                          Rayon mərkəzi: {NAKHCHIVAN_DISTRICTS.find(x => x.name === currentDistrictRecord.name)?.center || 'Naxçıvan'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-xs font-bold">
+                      <div className="bg-white/90 dark:bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-800 text-center">
+                        <span className="text-slate-400 block text-[9px] uppercase font-bold">Şagird</span>
+                        <span className="text-slate-900 dark:text-white font-black text-xs sm:text-sm">{currentDistrictRecord.studentsCount}</span>
+                      </div>
+                      <div className="bg-white/90 dark:bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-800 text-center">
+                        <span className="text-slate-400 block text-[9px] uppercase font-bold">Məktəb</span>
+                        <span className="text-slate-900 dark:text-white font-black text-xs sm:text-sm">{currentDistrictRecord.schoolsCount}</span>
+                      </div>
+                      <div className="bg-white/90 dark:bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-800 text-center">
+                        <span className="text-slate-400 block text-[9px] uppercase font-bold">Orta Bal</span>
+                        <span className="text-emerald-700 dark:text-emerald-400 font-black text-xs sm:text-sm">
+                          {currentDistrictRecord.studentsCount > 0 ? `${currentDistrictRecord.overallScore}%` : '—'}
+                        </span>
+                      </div>
+                      <div className="bg-white/90 dark:bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-800 text-center">
+                        <span className="text-slate-400 block text-[9px] uppercase font-bold">Müvəffəqiyyət</span>
+                        <span className="text-indigo-700 dark:text-indigo-400 font-black text-xs sm:text-sm">
+                          {currentDistrictRecord.studentsCount > 0 ? `${currentDistrictRecord.successRate}%` : '—'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedDistrictName(currentDistrictRecord.name);
+                        setSchoolFilterDistrict(currentDistrictRecord.name);
+                        setActiveTab('stage2_schools');
+                      }}
+                      className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                    >
+                      <span>2-ci Mərhələyə Keç (Məktəblər)</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
