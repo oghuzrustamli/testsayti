@@ -194,9 +194,9 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
   return (
     <div className="flex flex-col gap-4">
       {/* 1. QUESTION TABS / NAVIGATION (Horizontal scroll, non-shrinking per prompt) */}
-      <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex items-center justify-between gap-3">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-thin max-w-full">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1 shrink-0">
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-1 shrink-0">
             Suallar ({questions.length}):
           </span>
 
@@ -209,8 +209,8 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
                 onClick={() => onSelectQuestion(idx)}
                 className={`min-w-[42px] h-[34px] px-2.5 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 transition-all border ${
                   isActive
-                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-200'
-                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-200 dark:shadow-none'
+                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-slate-300'
                 }`}
               >
                 {idx + 1}
@@ -221,7 +221,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
           <button
             type="button"
             onClick={onAddQuestion}
-            className="min-w-[34px] h-[34px] rounded-lg border border-dashed border-indigo-300 text-indigo-600 hover:bg-indigo-50 flex items-center justify-center shrink-0 transition-colors"
+            className="min-w-[34px] h-[34px] rounded-lg border border-dashed border-indigo-300 dark:border-indigo-600 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 flex items-center justify-center shrink-0 transition-colors"
             title="Yeni sual əlavə et"
           >
             <Plus className="w-4 h-4" />
@@ -231,10 +231,10 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
           <button
             type="button"
             onClick={onAddSituationQuestion || onAddQuestion}
-            className="h-[34px] px-2.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs flex items-center gap-1 shrink-0 transition-colors shadow-2xs cursor-pointer"
+            className="h-[34px] px-2.5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 font-bold text-xs flex items-center gap-1 shrink-0 transition-colors shadow-2xs cursor-pointer"
             title="Situasiya tipli sual əlavə et (10 açar söz və AI qiymətləndirmə)"
           >
-            <Layers className="w-3.5 h-3.5 text-amber-600" />
+            <Layers className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
             <span className="hidden sm:inline">+ Situasiya əlavə et</span>
             <span className="sm:hidden">+ Situasiya</span>
           </button>
@@ -291,17 +291,17 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
       </div>
 
       {/* 2. QUESTION EDITOR BODY */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm flex flex-col gap-4 text-slate-800 dark:text-slate-100">
         {/* Top bar: Question Type, Subject & Points */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <span className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center">
+            <span className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-400 font-bold text-xs flex items-center justify-center">
               #{activeQuestionIndex + 1}
             </span>
             <select
               value={currentQ.question_type}
               onChange={(e) => onUpdateQuestion(activeQuestionIndex, { ...currentQ, question_type: e.target.value as QuestionType })}
-              className="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
+              className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
             >
               {QUESTION_TYPES.map(qt => (
                 <option key={qt.type} value={qt.type}>{qt.label}</option>
@@ -310,11 +310,11 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
 
             {/* Subject Selector for Multi-Subject Support */}
             <div className="flex items-center gap-1.5 ml-1">
-              <span className="text-[11px] font-bold text-slate-400">Fənn:</span>
+              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">Fənn:</span>
               <select
                 value={currentQ.subject || 'Riyaziyyat'}
                 onChange={(e) => onUpdateQuestion(activeQuestionIndex, { ...currentQ, subject: e.target.value })}
-                className="bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
+                className="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-indigo-900 dark:text-indigo-300 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
               >
                 {(availableSubjects && availableSubjects.length > 0 ? availableSubjects : ALL_SCHOOL_SUBJECTS.map(s => s.name)).map(sub => (
                   <option key={sub} value={sub}>{sub}</option>
@@ -324,14 +324,14 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <label className="text-xs font-medium text-slate-500">Sualın balı:</label>
+            <label className="text-xs font-medium text-slate-500 dark:text-slate-400">Sualın balı:</label>
             <input
               type="number"
               min="0.5"
               step="0.5"
               value={currentQ.points}
               onChange={(e) => onUpdateQuestion(activeQuestionIndex, { ...currentQ, points: parseFloat(e.target.value) || 1 })}
-              className="w-16 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-16 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 dark:text-slate-100 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
         </div>
@@ -495,13 +495,13 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
             value={currentQ.question_text}
             onChange={(e) => onUpdateQuestion(activeQuestionIndex, { ...currentQ, question_text: e.target.value })}
             placeholder="Sualın mətnini daxil edin. Düsturlar üçün $ düyməsindən istifadə edə bilərsiniz (məsələn: $\frac{a}{b}$)..."
-            className="w-full px-3.5 py-2 text-sm text-slate-800 bg-slate-50/50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-y min-h-[58px]"
+            className="w-full px-3.5 py-2 text-sm text-slate-800 dark:text-slate-100 bg-slate-50/50 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-y min-h-[58px]"
           />
 
           {/* Live KaTeX Render Preview of Question Text */}
           {currentQ.question_text && (
-            <div className="mt-1.5 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 leading-relaxed">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Canlı önbaxış:</span>
+            <div className="mt-1.5 p-2.5 bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
+              <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 block mb-0.5">Canlı önbaxış:</span>
               <MathRenderer content={currentQ.question_text} />
             </div>
           )}
@@ -578,13 +578,13 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
 
         {/* Answer Options OR Open-Ended Answer */}
         {currentQ.question_type === 'open_ended' || currentQ.question_type === 'numeric' ? (
-          <div className="pt-2 border-t border-slate-100">
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-slate-700">Düzgün Cavab (Açıq Sual / Ədədi / İfadə):</span>
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Düzgün Cavab (Açıq Sual / Ədədi / İfadə):</span>
               <button
                 type="button"
                 onClick={() => { setActiveMathTarget('correct_answer'); setShowFormulaModal(true); }}
-                className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer"
               >
                 <Calculator className="w-3 h-3" /> Cavaba düstur əlavə et
               </button>
@@ -595,23 +595,23 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
                 value={currentQ.correct_answer || ''}
                 onChange={(e) => onUpdateQuestion(activeQuestionIndex, { ...currentQ, correct_answer: e.target.value })}
                 placeholder="Düzgün cavabı daxil edin (məs: 24, x=3, və ya $\frac{1}{2}$)..."
-                className="flex-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-slate-800 font-semibold"
+                className="flex-1 px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 font-semibold"
               />
               {currentQ.correct_answer && currentQ.correct_answer.includes('$') && (
-                <div className="px-3 py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-xs font-bold text-indigo-900">
+                <div className="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 rounded-lg text-xs font-bold text-indigo-900 dark:text-indigo-300">
                   <MathRenderer content={currentQ.correct_answer} />
                 </div>
               )}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
               Şagird imtahan zamanı bu sahəyə öz cavabını yazacaq və sistem avtomatik yoxlayacaq.
             </p>
           </div>
         ) : (
-          <div className="pt-2 border-t border-slate-100">
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-slate-700">Cavab Variantları (A, B, C, D, E):</span>
-              <span className="text-[11px] text-slate-400">Düzgün cavabı işarələmək üçün radio düyməsinə klikləyin</span>
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Cavab Variantları (A, B, C, D, E):</span>
+              <span className="text-[11px] text-slate-400 dark:text-slate-500">Düzgün cavabı işarələmək üçün radio düyməsinə klikləyin</span>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -625,8 +625,8 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
                     key={opt.id}
                     className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl border transition-all ${
                       isCorrect
-                        ? 'bg-emerald-50/70 border-emerald-300 ring-1 ring-emerald-300'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
+                        ? 'bg-emerald-50/80 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-600 ring-1 ring-emerald-300 dark:ring-emerald-600'
+                        : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
                   >
                     {/* Select button A/B/C/D/E */}
@@ -635,8 +635,8 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
                       onClick={() => handleSetCorrectOption(opt.id)}
                       className={`w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 transition-colors ${
                         isCorrect
-                          ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-200'
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-200 dark:shadow-none'
+                          : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600'
                       }`}
                     >
                       {opt.id}
@@ -649,12 +649,12 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
                         value={opt.text}
                         onChange={(e) => handleOptionChange(opt.id, e.target.value)}
                         placeholder={`${opt.id} variantının mətni (məsələn: $x=2$)...`}
-                        className="w-full px-2.5 py-1 text-xs text-slate-800 bg-transparent border-0 focus:outline-none focus:ring-0"
+                        className="w-full px-2.5 py-1 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 bg-transparent border-0 focus:outline-none focus:ring-0"
                       />
 
                       {/* Math preview pill if math is in option */}
                       {opt.text && opt.text.includes('$') && (
-                        <div className="shrink-0 max-w-[200px] overflow-hidden truncate px-2 py-0.5 bg-slate-100 rounded text-xs text-slate-800">
+                        <div className="shrink-0 max-w-[200px] overflow-hidden truncate px-2 py-0.5 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded text-xs text-slate-800 dark:text-slate-200">
                           <MathRenderer content={opt.text} />
                         </div>
                       )}
@@ -668,7 +668,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
                         setShowFormulaModal(true);
                         setShowGraphLab(false);
                       }}
-                      className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded"
+                      className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"
                       title="Bu varianta düstur əlavə et"
                     >
                       <Calculator className="w-3.5 h-3.5" />
@@ -681,15 +681,15 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
                         setSnippetTarget(`opt-${opt.id}`);
                         setShowSnippetModal(true);
                       }}
-                      className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                      className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-700 rounded transition-colors"
                       title={`Bu varianta (${opt.id}) PDF/Word-dən kəsib əlavə et`}
                     >
-                      <Scissors className="w-3.5 h-3.5 text-indigo-500" />
+                      <Scissors className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
                     </button>
 
                     {/* Correct badge */}
                     {isCorrect && (
-                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full shrink-0">
+                      <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-700 px-2 py-0.5 rounded-full shrink-0">
                         Düzgün
                       </span>
                     )}
@@ -701,9 +701,9 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
         )}
 
         {/* Explanation Section */}
-        <div className="pt-2 border-t border-slate-100">
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
           <div className="flex items-center justify-between mb-1">
-            <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
               <HelpCircle className="w-3.5 h-3.5 text-amber-500" />
               Sualın İzahı (Cavablı Test və Nəticələr üçün):
             </label>
@@ -714,7 +714,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
                 setShowMathKeyboard(true);
                 setShowGraphLab(false);
               }}
-              className="text-[11px] font-medium text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+              className="text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer"
             >
               <Calculator className="w-3 h-3" /> İzahda düstur
             </button>
@@ -724,7 +724,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
             value={currentQ.explanation || ''}
             onChange={(e) => onUpdateQuestion(activeQuestionIndex, { ...currentQ, explanation: e.target.value })}
             placeholder="Şagirdə və ya imtahan sonrası təhlil üçün sualın addım-addım həll izahını yazın..."
-            className="w-full px-3 py-1.5 text-xs text-slate-800 bg-slate-50/50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-y min-h-[46px]"
+            className="w-full px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 bg-slate-50/50 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-y min-h-[46px]"
           />
         </div>
       </div>

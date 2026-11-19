@@ -475,6 +475,26 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
           }
         }
 
+        // Heuristic A2: if colFirstName is still not matched, scan unassigned columns for pure name strings
+        if (colFirstName === -1) {
+          const sampleRows = rawGrid.slice(headerRowIdx + 1, headerRowIdx + 20);
+          for (let c = 0; c < 15; c++) {
+            if (c === colLastName || c === colFatherName || c === colFullName || c === colUtis || c === colFin || c === colGrade || c === colSchool) continue;
+            let textNameCount = 0;
+            sampleRows.forEach(row => {
+              if (!Array.isArray(row)) return;
+              const val = String(row[c] || '').trim();
+              if (val && /^[A-Za-zƏəÖöÜüŞşÇçĞğıİI]{2,25}$/.test(val) && !val.toLowerCase().includes('sinif') && !val.toLowerCase().includes('məktəb')) {
+                textNameCount++;
+              }
+            });
+            if (textNameCount >= 2) {
+              colFirstName = c;
+              break;
+            }
+          }
+        }
+
         // Heuristic B: if colUtis was not explicitly matched, find column containing 7-digit numbers
         if (colUtis === -1) {
           const sampleRows = rawGrid.slice(headerRowIdx + 1, headerRowIdx + 30);

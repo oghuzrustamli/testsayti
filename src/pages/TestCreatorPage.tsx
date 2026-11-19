@@ -387,29 +387,29 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
       )}
 
       {/* TOP COMPACT PARAMETERS BAR (OMR ilə eyni menyu dizaynı) */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-3 shadow-xs flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3 shadow-xs flex flex-wrap items-center justify-between gap-3 text-slate-800 dark:text-slate-100">
         <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-0">
           {/* 1. ƏSAS MODEL MENYUSU (Blok, Buraxılış, Məktəbdaxili, Liseylər) */}
           <div className="relative shrink-0" ref={categoryMenuRef}>
             <button
               type="button"
               onClick={() => setActiveCategoryMenu(activeCategoryMenu ? null : selectedCategory)}
-              className="h-9 px-3 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl text-xs font-extrabold text-slate-800 shadow-2xs flex items-center justify-between gap-2.5 transition-all cursor-pointer"
+              className="h-9 px-3 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-extrabold text-slate-800 dark:text-slate-100 shadow-2xs flex items-center justify-between gap-2.5 transition-all cursor-pointer"
               title="İmtahan Modeli seçin"
             >
               <div className="flex items-center gap-1.5 min-w-0">
-                <BookOpen className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                <span className="text-slate-500 font-semibold shrink-0">Model:</span>
-                <span className="text-indigo-700 font-bold">
+                <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <span className="text-slate-500 dark:text-slate-400 font-semibold shrink-0">Model:</span>
+                <span className="text-indigo-700 dark:text-indigo-300 font-bold">
                   {OMR_CATEGORIES_DATA.find(c => c.id === selectedCategory)?.label || 'Buraxılış'} • {selectedSubCategory}
                 </span>
               </div>
-              <ChevronDown className={`w-3.5 h-3.5 text-slate-500 shrink-0 transition-transform duration-200 ${activeCategoryMenu ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0 transition-transform duration-200 ${activeCategoryMenu ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Dropdown panel for all 4 category options */}
             {activeCategoryMenu && (
-              <div className="absolute top-full left-0 mt-1.5 w-[380px] bg-white rounded-2xl shadow-2xl border border-slate-200 p-2.5 z-50 animate-in fade-in slide-in-from-top-1">
+              <div className="absolute top-full left-0 mt-1.5 w-[380px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-2.5 z-50 animate-in fade-in slide-in-from-top-1">
                 <div className="grid grid-cols-2 gap-2">
                   {OMR_CATEGORIES_DATA.map((cat) => {
                     const isCatSelected = selectedCategory === cat.id;
@@ -422,13 +422,13 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
                     const Icon = catIcons[cat.id] || BookOpen;
 
                     return (
-                      <div key={cat.id} className="border border-slate-100 rounded-xl p-2 bg-slate-50/70">
-                        <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200/60 text-[11px] font-extrabold text-slate-800">
+                      <div key={cat.id} className="border border-slate-100 dark:border-slate-800 rounded-xl p-2 bg-slate-50/70 dark:bg-slate-800/60">
+                        <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200/60 dark:border-slate-700 text-[11px] font-extrabold text-slate-800 dark:text-slate-200">
                           <div className="flex items-center gap-1">
-                            <Icon className="w-3.5 h-3.5 text-indigo-600" />
+                            <Icon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                             <span>{cat.label}</span>
                           </div>
-                          <span className="text-[9px] font-semibold text-slate-400 bg-white px-1.5 py-0.2 rounded border border-slate-200/60">
+                          <span className="text-[9px] font-semibold text-slate-400 dark:text-slate-400 bg-white dark:bg-slate-900 px-1.5 py-0.2 rounded border border-slate-200/60 dark:border-slate-700">
                             {cat.badge}
                           </span>
                         </div>
@@ -461,7 +461,7 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
                               className={`w-full text-left px-2 py-1 rounded-lg text-[10.5px] font-semibold transition-colors flex items-center justify-between ${
                                 selectedSubCategory === sub.name
                                   ? 'bg-indigo-600 text-white font-bold'
-                                  : 'text-slate-700 hover:bg-slate-200/70'
+                                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-700'
                               }`}
                             >
                               <span>{sub.name}</span>
@@ -481,12 +481,12 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
 
           {/* 2. FƏNN SEÇİMİ (Tək Fənn və ya Çoxfənli Seçim) */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-xs font-bold text-slate-600">Fənn:</span>
+            <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Fənn:</span>
             {!isMultiSubject ? (
               <select
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="h-9 px-2.5 bg-slate-50 hover:bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-800 shadow-2xs focus:border-indigo-500 focus:outline-none cursor-pointer"
+                className="h-9 px-2.5 bg-slate-50 hover:bg-white dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 shadow-2xs focus:border-indigo-500 focus:outline-none cursor-pointer"
               >
                 <option value="Riyaziyyat">Riyaziyyat</option>
                 <option value="Azərbaycan dili">Azərbaycan dili</option>
@@ -502,7 +502,7 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
                 <option value="Məntiq">Məntiq</option>
               </select>
             ) : (
-              <span className="px-2.5 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-xl text-xs font-black">
+              <span className="px-2.5 py-1.5 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-300 rounded-xl text-xs font-black">
                 {selectedSubjects.length} Fənn Seçilib
               </span>
             )}
@@ -512,7 +512,7 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
               className={`h-9 px-2.5 rounded-xl text-xs font-bold transition-all border flex items-center gap-1 cursor-pointer ${
                 isMultiSubject
                   ? 'bg-indigo-600 text-white border-indigo-600 shadow-2xs'
-                  : 'bg-white hover:bg-indigo-50 border-slate-300 text-slate-700 hover:text-indigo-700'
+                  : 'bg-white hover:bg-indigo-50 dark:bg-slate-800 dark:hover:bg-slate-700 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:text-indigo-700 dark:hover:text-indigo-300'
               }`}
               title="Çoxfənli test rejiminə keç və fənləri seç"
             >
@@ -528,12 +528,12 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Testin Adı (Məsələn: IX Sinif Buraxılış İmtahanı Sınaq 1)..."
-              className="w-full h-9 px-3 text-xs bg-slate-50 hover:bg-white border border-slate-300 rounded-xl font-bold text-slate-800 shadow-2xs focus:border-indigo-500 focus:outline-none"
+              className="w-full h-9 px-3 text-xs bg-slate-50 hover:bg-white dark:bg-slate-800 dark:hover:bg-slate-750 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 shadow-2xs focus:border-indigo-500 focus:outline-none"
             />
           </div>
 
           {/* 4. MÜDDƏT */}
-          <div className="flex items-center gap-1 text-xs font-bold text-slate-600 shrink-0">
+          <div className="flex items-center gap-1 text-xs font-bold text-slate-600 dark:text-slate-300 shrink-0">
             <span>Müddət:</span>
             <input
               type="number"
@@ -541,16 +541,16 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
               step="5"
               value={durationMinutes}
               onChange={(e) => setDurationMinutes(parseInt(e.target.value) || 30)}
-              className="w-14 h-9 px-1 bg-white border border-slate-300 rounded-xl text-center text-xs font-bold text-slate-800 shadow-2xs focus:border-indigo-500 focus:outline-none"
+              className="w-14 h-9 px-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-center text-xs font-bold text-slate-800 dark:text-slate-100 shadow-2xs focus:border-indigo-500 focus:outline-none"
             />
-            <span className="text-slate-400 font-normal">dəq</span>
+            <span className="text-slate-400 dark:text-slate-500 font-normal">dəq</span>
           </div>
 
           {/* 5. QİYMƏTLƏNDİRMƏ */}
           <select
             value={gradingRule}
             onChange={(e) => setGradingRule(e.target.value as GradingRule)}
-            className="h-9 px-2 bg-slate-50 hover:bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 shadow-2xs focus:border-indigo-500 focus:outline-none cursor-pointer shrink-0"
+            className="h-9 px-2 bg-slate-50 hover:bg-white dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 shadow-2xs focus:border-indigo-500 focus:outline-none cursor-pointer shrink-0"
             title="Qiymətləndirmə qaydası"
           >
             <option value="standard">Standart (Cəriməsiz)</option>
@@ -561,10 +561,10 @@ export const TestCreatorPage: React.FC<TestCreatorPageProps> = ({
 
         {/* Sağ Tərəf: Sual Sayı, Bal və Canlı Önizləmə */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="px-2.5 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200/80 rounded-xl text-xs font-bold shadow-2xs">
+          <span className="px-2.5 py-1.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800 rounded-xl text-xs font-bold shadow-2xs">
             {questions.length} Sual
           </span>
-          <span className="px-2.5 py-1.5 bg-amber-50 text-amber-800 border border-amber-200/80 rounded-xl text-xs font-bold shadow-2xs">
+          <span className="px-2.5 py-1.5 bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800 rounded-xl text-xs font-bold shadow-2xs">
             {totalPoints} Bal
           </span>
           <button
