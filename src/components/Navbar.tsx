@@ -1,7 +1,7 @@
 // src/components/Navbar.tsx
 // ATROQ Education - Compact, Premium SaaS Management Header
-// Sol: 1. İdarəetmə paneli düyməsi, 2. ATROQ Education loqosu
-// Sağ: 1. Dil seçimi (AZ / EN / RU), 2. Dark / Light rejimi düyməsi + Rol & Profil
+// Sol: 1. ATROQ Education loqosu, 2. İdarəetmə paneli düyməsi
+// Sağ: 1. Yer kürəsi (🌐) dil seçimi, 2. Qaranlıq / İşıqlı rejim düyməsi + Rol & Profil
 
 import React, { useState, useRef } from 'react';
 import { User, UserRole } from '../types';
@@ -14,6 +14,7 @@ import {
   ChevronDown,
   Sun,
   Moon,
+  Globe,
   Sparkles,
   Settings,
   User as UserIcon
@@ -50,6 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const [logoClicks, setLogoClicks] = useState<number>(0);
   const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
+  const [showLangMenu, setShowLangMenu] = useState<boolean>(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState<boolean>(false);
   const triggerBtnRef = useRef<HTMLButtonElement | null>(null);
 
@@ -67,11 +69,30 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="h-16 shrink-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800 sticky top-0 z-40 px-3 sm:px-6 flex items-center justify-between shadow-2xs gap-3 select-none">
       {/* ================================================================= */}
       {/* SOL TƏRƏF:                                                       */}
-      {/* 1. İdarəetmə paneli düyməsi                                       */}
-      {/* 2. ATROQ Education loqosu                                         */}
+      {/* 1. ATROQ Education loqosu                                         */}
+      {/* 2. İdarəetmə paneli düyməsi (Loqonun dərhal sağında)              */}
       {/* ================================================================= */}
       <div className="flex items-center gap-3 sm:gap-4.5 min-w-0">
-        {/* 1. İDARƏETMƏ PANELİ DÜYMƏSİ (Ekranın ən yuxarı sol tərəfində tək sabit düymə) */}
+        {/* 1. ATROQ EDUCATION LOQOSU (Solda birinci) */}
+        <div
+          onClick={handleLogoClick}
+          className="flex items-center gap-2.5 cursor-pointer group shrink-0"
+          title="ATROQ Education"
+        >
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-700 via-indigo-600 to-violet-500 text-white flex items-center justify-center shadow-md shadow-indigo-100 dark:shadow-indigo-900/30 group-hover:scale-105 transition-transform">
+            <GraduationCap className="w-5 h-5" />
+          </div>
+          <div className="flex items-center gap-1.5 leading-none">
+            <span className="font-black text-base text-slate-900 dark:text-white tracking-tight font-sans">
+              ATROQ
+            </span>
+            <span className="text-[10px] uppercase font-black px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800 leading-none">
+              Education
+            </span>
+          </div>
+        </div>
+
+        {/* 2. İDARƏETMƏ PANELİ DÜYMƏSİ (Loqonun dərhal sağında sabit düymə) */}
         <button
           ref={triggerBtnRef}
           type="button"
@@ -91,59 +112,98 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           />
         </button>
-
-        {/* 2. ATROQ EDUCATION LOQOSU (Dərhal düymənin sağında) */}
-        <div
-          onClick={handleLogoClick}
-          className="flex items-center gap-2.5 cursor-pointer group shrink-0"
-          title="ATROQ Education"
-        >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-700 via-indigo-600 to-violet-500 text-white flex items-center justify-center shadow-md shadow-indigo-100 dark:shadow-indigo-900/30 group-hover:scale-105 transition-transform">
-            <GraduationCap className="w-5 h-5" />
-          </div>
-          <div className="flex items-center gap-1.5 leading-none">
-            <span className="font-black text-base text-slate-900 dark:text-white tracking-tight font-sans">
-              ATROQ
-            </span>
-            <span className="text-[10px] uppercase font-black px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800 leading-none">
-              Education
-            </span>
-          </div>
-        </div>
       </div>
 
       {/* ================================================================= */}
       {/* SAĞ TƏRƏF:                                                       */}
-      {/* 1. Dil seçimi (AZ / EN / RU)                                      */}
-      {/* 2. Dark / Light rejimi düyməsi                                    */}
+      {/* 1. Yer kürəsi (🌐) dil seçimi (hover və kliklə açılan menyu)      */}
+      {/* 2. Qaranlıq rejim / İşıqlı rejim düyməsi (Ay / Günəş)             */}
       {/* + Rol Keçidi, PRO Status və Profil menyusu                        */}
       {/* ================================================================= */}
       <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-        {/* 1. DİL SEÇİMİ (AZ / EN / RU) */}
-        <div className="flex items-center p-0.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700 text-xs font-black">
-          {(['az', 'en', 'ru'] as const).map((lang) => (
-            <button
-              key={lang}
-              type="button"
-              onClick={() => setLanguage(lang)}
-              className={`px-2 py-1 rounded-lg uppercase tracking-wider text-[11px] sm:text-xs transition-all cursor-pointer font-extrabold ${
-                language === lang
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-700/60'
-              }`}
-              title={lang === 'az' ? 'Azərbaycan dili' : lang === 'en' ? 'English' : 'Русский язык'}
-            >
-              {lang}
-            </button>
-          ))}
+        {/* 1. DİL SEÇİMİ – YER KÜRƏSİ (🌐) İKONU VƏ AÇILAN MENYU */}
+        <div
+          className="relative"
+          onMouseEnter={() => setShowLangMenu(true)}
+          onMouseLeave={() => setShowLangMenu(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setShowLangMenu((prev) => !prev)}
+            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shadow-xs flex items-center justify-center shrink-0"
+            title={
+              language === 'az'
+                ? 'Azərbaycan dili (Dili dəyiş)'
+                : language === 'en'
+                ? 'English (Change language)'
+                : 'Русский (Сменить язык)'
+            }
+            aria-label="Language"
+          >
+            <Globe className="w-4 h-4 text-slate-700 dark:text-slate-200" />
+          </button>
+
+          {showLangMenu && (
+            <div className="absolute right-0 top-full mt-1.5 w-44 py-1.5 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+              <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800 mb-1">
+                {language === 'az' ? 'Dil seçimi' : language === 'en' ? 'Select language' : 'Выбор языка'}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setLanguage('az');
+                  setShowLangMenu(false);
+                }}
+                className={`w-full text-left px-3 py-2 text-xs font-bold flex items-center justify-between cursor-pointer transition-colors ${
+                  language === 'az'
+                    ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-extrabold'
+                    : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span>Azərbaycan dili</span>
+                {language === 'az' && <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setLanguage('en');
+                  setShowLangMenu(false);
+                }}
+                className={`w-full text-left px-3 py-2 text-xs font-bold flex items-center justify-between cursor-pointer transition-colors ${
+                  language === 'en'
+                    ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-extrabold'
+                    : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span>English</span>
+                {language === 'en' && <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setLanguage('ru');
+                  setShowLangMenu(false);
+                }}
+                className={`w-full text-left px-3 py-2 text-xs font-bold flex items-center justify-between cursor-pointer transition-colors ${
+                  language === 'ru'
+                    ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-extrabold'
+                    : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span>Русский</span>
+                {language === 'ru' && <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>}
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* 2. DARK / LIGHT REJİMİ DÜYMƏSİ */}
+        {/* 2. QARANLIQ REJİM / İŞIQLI REJİM SEÇİMİ */}
         <button
           type="button"
           onClick={toggleTheme}
           className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shadow-xs flex items-center justify-center shrink-0"
           title={theme === 'dark' ? t.lightMode : t.darkMode}
+          aria-label={theme === 'dark' ? t.lightMode : t.darkMode}
         >
           {theme === 'dark' ? (
             <Sun className="w-4 h-4 text-amber-400" />

@@ -131,8 +131,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     proActive: 'PRO Aktivdir',
     login: 'Daxil ol',
     logout: 'Sistemdən Çıxış',
-    lightMode: 'Açıq rejim',
-    darkMode: 'Tünd rejim',
+    lightMode: 'İşıqlı rejim',
+    darkMode: 'Qaranlıq rejim',
     languageName: 'Azərbaycan dili',
     systemStatusActive: 'Sistem aktivdir',
 
@@ -359,8 +359,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     proActive: 'PRO Активен',
     login: 'Войти',
     logout: 'Выход из системы',
-    lightMode: 'Светлая тема',
-    darkMode: 'Тёмная тема',
+    lightMode: 'Светлый режим',
+    darkMode: 'Тёмный режим',
     languageName: 'Русский',
     systemStatusActive: 'Система активна',
 

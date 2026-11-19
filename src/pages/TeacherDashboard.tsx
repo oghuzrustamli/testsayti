@@ -86,82 +86,90 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
 
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-8 max-w-7xl mx-auto w-full select-none">
-      {/* 1. HERO BANNER & TEZ BAŞLAMA PANESİ */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-indigo-900/40">
-        <div className="absolute right-0 top-0 bottom-0 opacity-10 pointer-events-none flex items-center pr-10">
-          <Sparkles className="w-96 h-96 text-indigo-400" />
+      {/* 1. HERO BANNER & TEZ BAŞLAMA PANESİ (Geniş, alçaq və kompakt) */}
+      <div className="w-full relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 text-white p-4 sm:p-5 lg:p-6 shadow-xl border border-indigo-900/40">
+        <div className="absolute right-0 top-0 bottom-0 opacity-10 pointer-events-none flex items-center pr-6">
+          <Sparkles className="w-72 h-72 text-indigo-400" />
         </div>
 
-        <div className="relative z-10 max-w-3xl">
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-indigo-200 text-xs font-semibold backdrop-blur-xs border border-white/10">
-              <Calendar className="w-3.5 h-3.5 text-indigo-300" />
-              {todayStr}
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold backdrop-blur-xs border border-emerald-500/30">
-              <School className="w-3.5 h-3.5" />
-              {user.school || 'ATROQ Education'}
+        <div className="relative z-10 w-full">
+          {/* Üst zolaq: Tarix və Məktəb etiketləri */}
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2 pb-2 border-b border-white/10">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-white/10 text-indigo-200 text-[11px] font-semibold backdrop-blur-xs border border-white/10">
+                <Calendar className="w-3.5 h-3.5 text-indigo-300" />
+                {todayStr}
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 text-[11px] font-semibold backdrop-blur-xs border border-emerald-500/30">
+                <School className="w-3.5 h-3.5" />
+                {user.school || 'ATROQ Education'}
+              </span>
+            </div>
+            <span className="hidden sm:inline-block text-[11px] font-bold text-indigo-300/80">
+              ATROQ Education Platforması
             </span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">
-            {t.welcome}, {user.full_name}
-          </h1>
-          <p className="text-slate-300 text-xs sm:text-sm mt-2 leading-relaxed">
-            {t.welcomeSubtitle}
-          </p>
+          <div className="mt-1 max-w-4xl">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight leading-tight">
+              {t.welcome}, {user.full_name}
+            </h1>
+            <p className="text-slate-300 text-xs sm:text-[13px] mt-1 leading-relaxed">
+              {t.welcomeSubtitle}
+            </p>
+          </div>
 
-          {/* 4 Əsas Giriş Düyməsi (Tez Başlama Kartları) */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-6">
+          {/* 4 Əsas Giriş Düyməsi (Yığcam, tünd fonlu portativ kartlar) */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mt-4 w-full">
             <button
               onClick={() => onNavigate('ai_test')}
-              className="p-3 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-left transition-all shadow-md shadow-indigo-950 flex flex-col justify-between cursor-pointer group border border-violet-400/30"
+              className="p-2.5 sm:p-3 rounded-xl bg-slate-950/85 hover:bg-slate-900 border border-violet-500/30 hover:border-violet-400 text-white text-left transition-all shadow-sm hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+              <div className="w-8 h-8 rounded-lg bg-violet-950/80 border border-violet-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                 <Sparkles className="w-4 h-4 text-amber-300" />
               </div>
-              <div>
-                <span className="text-xs font-black block leading-tight">{t.fastActionAi}</span>
-                <span className="text-[10px] text-indigo-200 block mt-0.5">AI</span>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs font-black block truncate leading-tight group-hover:text-violet-200">{t.fastActionAi}</span>
+                <span className="text-[10px] text-violet-300/70 font-semibold block truncate mt-0.5">Süni İntellekt</span>
               </div>
             </button>
 
             <button
               onClick={() => onNavigate('create_test')}
-              className="p-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white text-left transition-all backdrop-blur-xs flex flex-col justify-between cursor-pointer group border border-white/10"
+              className="p-2.5 sm:p-3 rounded-xl bg-slate-950/85 hover:bg-slate-900 border border-cyan-500/30 hover:border-cyan-400 text-white text-left transition-all shadow-sm hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+              <div className="w-8 h-8 rounded-lg bg-cyan-950/80 border border-cyan-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                 <Edit3 className="w-4 h-4 text-cyan-300" />
               </div>
-              <div>
-                <span className="text-xs font-black block leading-tight">{t.fastActionInteractive}</span>
-                <span className="text-[10px] text-slate-300 block mt-0.5">Online Editor</span>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs font-black block truncate leading-tight group-hover:text-cyan-200">{t.fastActionInteractive}</span>
+                <span className="text-[10px] text-cyan-300/70 font-semibold block truncate mt-0.5">Online Konstruktor</span>
               </div>
             </button>
 
             <button
               onClick={() => onNavigate('omr_test')}
-              className="p-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white text-left transition-all backdrop-blur-xs flex flex-col justify-between cursor-pointer group border border-white/10"
+              className="p-2.5 sm:p-3 rounded-xl bg-slate-950/85 hover:bg-slate-900 border border-emerald-500/30 hover:border-emerald-400 text-white text-left transition-all shadow-sm hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+              <div className="w-8 h-8 rounded-lg bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                 <Printer className="w-4 h-4 text-emerald-300" />
               </div>
-              <div>
-                <span className="text-xs font-black block leading-tight">{t.fastActionOmr}</span>
-                <span className="text-[10px] text-slate-300 block mt-0.5">PDF & OMR</span>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs font-black block truncate leading-tight group-hover:text-emerald-200">{t.fastActionOmr}</span>
+                <span className="text-[10px] text-emerald-300/70 font-semibold block truncate mt-0.5">PDF & Cavab Kartı</span>
               </div>
             </button>
 
             <button
               onClick={() => onNavigate('regional_stats')}
-              className="p-3 rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 text-white text-left transition-all backdrop-blur-xs flex flex-col justify-between cursor-pointer group border border-emerald-400/30"
+              className="p-2.5 sm:p-3 rounded-xl bg-slate-950/85 hover:bg-slate-900 border border-amber-500/30 hover:border-amber-400 text-white text-left transition-all shadow-sm hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-xl bg-emerald-500/30 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <Award className="w-4 h-4 text-emerald-300" />
+              <div className="w-8 h-8 rounded-lg bg-amber-950/80 border border-amber-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Award className="w-4 h-4 text-amber-300" />
               </div>
-              <div>
-                <span className="text-xs font-black block leading-tight">{t.fastActionRegional}</span>
-                <span className="text-[10px] text-emerald-200 block mt-0.5">NMR</span>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs font-black block truncate leading-tight group-hover:text-amber-200">{t.fastActionRegional}</span>
+                <span className="text-[10px] text-amber-300/70 font-semibold block truncate mt-0.5">Naxçıvan MR Reytinqi</span>
               </div>
             </button>
           </div>
