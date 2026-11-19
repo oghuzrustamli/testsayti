@@ -273,10 +273,10 @@ export const MultiSubjectSelector: React.FC<MultiSubjectSelectorProps> = ({
           return (
             <div
               key={sub.name}
-              className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-2 select-none bg-white dark:bg-slate-900/80 ${
+              className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-2 select-none bg-white dark:bg-slate-900/90 ${
                 selected
-                  ? 'border-blue-700 dark:border-blue-600 shadow-2xs'
-                  : 'border-slate-200 dark:border-slate-800 hover:border-blue-700 dark:hover:border-blue-600'
+                  ? 'border-sky-400 dark:border-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.45)] ring-1 ring-sky-400/40'
+                  : 'border-slate-200 dark:border-slate-800 hover:border-sky-400/70 dark:hover:border-sky-400/70'
               }`}
             >
               {/* Checkbox and Subject Name */}
@@ -287,14 +287,14 @@ export const MultiSubjectSelector: React.FC<MultiSubjectSelectorProps> = ({
                 <div
                   className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
                     selected
-                      ? 'bg-indigo-600 border-indigo-600 text-white'
+                      ? 'bg-sky-500 border-sky-400 text-white shadow-[0_0_8px_rgba(56,189,248,0.6)]'
                       : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
                   }`}
                 >
                   {selected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                 </div>
                 <div className="truncate">
-                  <span className={`text-xs block truncate ${selected ? 'font-black text-slate-900 dark:text-white' : 'font-bold text-slate-700 dark:text-slate-300'}`}>
+                  <span className={`text-xs block truncate ${selected ? 'font-black text-slate-900 dark:text-sky-300' : 'font-bold text-slate-700 dark:text-slate-300'}`}>
                     {sub.name}
                   </span>
                   <span className="text-[9px] text-slate-400 dark:text-slate-500 block truncate">
@@ -309,7 +309,7 @@ export const MultiSubjectSelector: React.FC<MultiSubjectSelectorProps> = ({
                   <button
                     type="button"
                     onClick={() => handleUpdateCount(sub.name, count - 5)}
-                    className="w-5 h-5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 rounded text-slate-600 dark:text-slate-200 flex items-center justify-center text-xs font-bold cursor-pointer"
+                    className="w-5 h-5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-sky-400 dark:hover:border-sky-400 rounded text-slate-600 dark:text-slate-200 flex items-center justify-center text-xs font-bold cursor-pointer transition-colors"
                     title="-5 sual"
                   >
                     <Minus className="w-2.5 h-2.5" />
@@ -320,13 +320,13 @@ export const MultiSubjectSelector: React.FC<MultiSubjectSelectorProps> = ({
                     max={100}
                     value={count}
                     onChange={(e) => handleUpdateCount(sub.name, parseInt(e.target.value) || 1)}
-                    className="w-11 h-6 bg-white dark:bg-slate-800 border border-indigo-300 dark:border-indigo-500 rounded text-xs font-black text-indigo-900 dark:text-indigo-300 text-center focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-2xs"
+                    className="w-11 h-6 bg-white dark:bg-slate-800 border border-sky-400 dark:border-sky-400 rounded text-xs font-black text-sky-900 dark:text-sky-300 text-center focus:outline-none focus:ring-1 focus:ring-sky-400 shadow-2xs"
                     title="Bu fənn üzrə sual sayı"
                   />
                   <button
                     type="button"
                     onClick={() => handleUpdateCount(sub.name, count + 5)}
-                    className="w-5 h-5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 rounded text-slate-600 dark:text-slate-200 flex items-center justify-center text-xs font-bold cursor-pointer"
+                    className="w-5 h-5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-sky-400 dark:hover:border-sky-400 rounded text-slate-600 dark:text-slate-200 flex items-center justify-center text-xs font-bold cursor-pointer transition-colors"
                     title="+5 sual"
                   >
                     <Plus className="w-2.5 h-2.5" />
