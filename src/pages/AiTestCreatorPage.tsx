@@ -530,45 +530,45 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
   };
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden bg-[#eef6fc]">
+    <div className="h-full w-full flex flex-col overflow-hidden bg-[#eef6fc] dark:bg-[#070b14]">
       {/* ==============================================================
           MƏRHƏLƏ 1: FƏNN, SİNİF, MÖVZU VƏ TEST PARAMETRLƏRİ
           ============================================================== */}
       {currentStep === 1 && (
         <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
           {/* Yuxarı Başlıq Zolağı */}
-          <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between shrink-0 shadow-2xs z-10">
+          <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between shrink-0 shadow-2xs z-10">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={onBack}
-                className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
                 title="Geri qayıt"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <h1 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                   <span className="w-7 h-7 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-xs">
                     <Sparkles className="w-4 h-4 fill-white" />
                   </span>
                   AI ilə Test Yarat
                 </h1>
-                <p className="text-[11px] text-slate-500 font-medium">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                   Ümumtəhsil məktəblərinin I–XI sinif dərslik proqramına tam uyğun avtomatik test tərtibatçısı
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-bold">
+              <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold">
                 <button
                   type="button"
                   onClick={() => setCreationMode('single')}
                   className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                     creationMode === 'single'
-                      ? 'bg-white text-indigo-700 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-400 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   Tək Fənn
@@ -579,7 +579,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
                   className={`px-3 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     creationMode === 'multi'
                       ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <Layers className="w-3.5 h-3.5" />
@@ -591,74 +591,76 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
 
           {/* ÇOXFƏNLİ REJİM GÖRÜNÜŞÜ (Tələb 1, 2, 3) */}
           {creationMode === 'multi' ? (
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 max-w-5xl mx-auto w-full flex flex-col gap-5 scrollbar-thin">
-              {/* Çoxfənli Komponent */}
-              <MultiSubjectSelector
-                selectedSubjects={multiSubjects}
-                onChange={setMultiSubjects}
-              />
+            <div className="flex-1 overflow-y-auto bg-[#eef6fc] dark:bg-[#070b14] p-4 sm:p-6 scrollbar-thin">
+              <div className="max-w-5xl mx-auto w-full flex flex-col gap-5">
+                {/* Çoxfənli Komponent */}
+                <MultiSubjectSelector
+                  selectedSubjects={multiSubjects}
+                  onChange={setMultiSubjects}
+                />
 
-              {/* Sinif və Çətinlik Parametrləri */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col gap-3">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  {/* Sinif Seçimi */}
-                  <div className="flex flex-col gap-1.5 flex-1 min-w-[240px]">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                      <GraduationCap className="w-4 h-4 text-indigo-600" />
-                      Sinif Seçimi (I–XI Siniflər)
-                    </label>
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {['1-ci sinif', '2-ci sinif', '3-cü sinif', '4-cü sinif', '5-ci sinif', '6-cı sinif', '7-ci sinif', '8-ci sinif', '9-cu sinif', '10-cu sinif', '11-ci sinif'].map((grade) => (
-                        <button
-                          key={grade}
-                          type="button"
-                          onClick={() => setSelectedGrade(grade)}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                            selectedGrade === grade
-                              ? 'bg-slate-900 text-white shadow-2xs'
-                              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                          }`}
-                        >
-                          {grade}
-                        </button>
-                      ))}
+                {/* Sinif və Çətinlik Parametrləri */}
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col gap-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    {/* Sinif Seçimi */}
+                    <div className="flex flex-col gap-1.5 flex-1 min-w-[240px]">
+                      <label className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                        <GraduationCap className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                        Sinif Seçimi (I–XI Siniflər)
+                      </label>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {['1-ci sinif', '2-ci sinif', '3-cü sinif', '4-cü sinif', '5-ci sinif', '6-cı sinif', '7-ci sinif', '8-ci sinif', '9-cu sinif', '10-cu sinif', '11-ci sinif'].map((grade) => (
+                          <button
+                            key={grade}
+                            type="button"
+                            onClick={() => setSelectedGrade(grade)}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              selectedGrade === grade
+                                ? 'bg-slate-900 dark:bg-indigo-600 text-white shadow-2xs'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'
+                            }`}
+                          >
+                            {grade}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Çətinlik */}
+                    <div className="flex flex-col gap-1.5 min-w-[200px]">
+                      <label className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                        <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                        Çətinlik Dərəcəsi
+                      </label>
+                      <select
+                        value={difficulty}
+                        onChange={(e) => setDifficulty(e.target.value as any)}
+                        className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-600 cursor-pointer"
+                      >
+                        <option value="mixed">Qarışıq (Standart DİM balansı)</option>
+                        <option value="easy">Asan (Baza biliklər)</option>
+                        <option value="medium">Orta (Tətbiq və hesablama)</option>
+                        <option value="hard">Çətin (Lisey və olimpiada)</option>
+                      </select>
                     </div>
                   </div>
-
-                  {/* Çətinlik */}
-                  <div className="flex flex-col gap-1.5 min-w-[200px]">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-indigo-600" />
-                      Çətinlik Dərəcəsi
-                    </label>
-                    <select
-                      value={difficulty}
-                      onChange={(e) => setDifficulty(e.target.value as any)}
-                      className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-indigo-600 cursor-pointer"
-                    >
-                      <option value="mixed">Qarışıq (Standart DİM balansı)</option>
-                      <option value="easy">Asan (Baza biliklər)</option>
-                      <option value="medium">Orta (Tətbiq və hesablama)</option>
-                      <option value="hard">Çətin (Lisey və olimpiada)</option>
-                    </select>
-                  </div>
                 </div>
-              </div>
 
-              {/* Əsas Hərəkət Düyməsi */}
-              <div className="pt-1 pb-6 flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleGenerate}
-                  disabled={multiSubjects.length === 0}
-                  className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 hover:from-indigo-700 hover:to-violet-800 text-white font-black text-sm rounded-2xl shadow-xl shadow-indigo-200 flex items-center justify-center gap-2.5 transition-all cursor-pointer transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
-                >
-                  <Sparkles className="w-5 h-5 fill-white" />
-                  <span>
-                    AI ilə Çoxfənli Test Hazırla (Cəmi {multiSubjects.reduce((sum, s) => sum + (s.questionCount || 0), 0)} Sual • {multiSubjects.length} Fənn)
-                  </span>
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </button>
+                {/* Əsas Hərəkət Düyməsi */}
+                <div className="pt-1 pb-6 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleGenerate}
+                    disabled={multiSubjects.length === 0}
+                    className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 hover:from-indigo-700 hover:to-violet-800 text-white font-black text-sm rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2.5 transition-all cursor-pointer transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
+                  >
+                    <Sparkles className="w-5 h-5 fill-white" />
+                    <span>
+                      AI ilə Çoxfənli Test Hazırla (Cəmi {multiSubjects.reduce((sum, s) => sum + (s.questionCount || 0), 0)} Sual • {multiSubjects.length} Fənn)
+                    </span>
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
