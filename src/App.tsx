@@ -106,7 +106,11 @@ export function App() {
         testId={examShareCode}
         onExit={() => {
           setExamShareCode(null);
-          window.history.replaceState({}, document.title, window.location.pathname);
+          try {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+            window.history.replaceState({}, document.title, window.location.pathname);
+          } catch (e) {}
         }}
       />
     );
