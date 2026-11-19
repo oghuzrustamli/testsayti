@@ -150,7 +150,7 @@ export function App() {
       />
 
       <div className="flex-1 min-h-0 flex overflow-hidden relative">
-        {/* Sidebar - Fixed on the left */}
+        {/* Sidebar - Mobile drawer or fallback */}
         <Sidebar
           role={currentUser.role}
           activeTab={activeTab}
@@ -164,7 +164,7 @@ export function App() {
               setEditingTestId(null);
             }
           }}
-          className={`${sidebarOpen ? 'fixed inset-y-0 left-0 z-40 shadow-2xl' : 'hidden lg:flex'} shrink-0 h-full overflow-y-auto`}
+          className={`${sidebarOpen ? 'fixed inset-y-0 left-0 z-40 shadow-2xl flex' : 'hidden'} shrink-0 h-full overflow-y-auto`}
         />
 
         {/* Backdrop for mobile sidebar */}

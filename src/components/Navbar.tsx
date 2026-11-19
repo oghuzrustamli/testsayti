@@ -24,8 +24,10 @@ import {
   Database,
   PlusCircle,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  ChevronDown
 } from 'lucide-react';
+import { NavigationMegaMenu } from './NavigationMegaMenu';
 
 interface NavbarProps {
   currentUser: User;
@@ -87,6 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [logoClicks, setLogoClicks] = useState<number>(0);
   const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
+  const [megaMenuOpen, setMegaMenuOpen] = useState<boolean>(false);
 
   // Secret 10-click logo trigger for admin prompt
   const handleLogoClick = () => {
@@ -110,8 +113,28 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="h-16 shrink-0 bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-40 px-3 sm:px-6 flex items-center justify-between shadow-2xs gap-3 select-none">
-      {/* Sol: Brand Emblem + Sidebar Toggle + Canlı Breadcrumb */}
+      {/* Sol: İdarəetmə Paneli Düyməsi + Brand Emblem + Canlı Breadcrumb */}
       <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+        {/* 1. İDARƏETMƏ PANELİ DÜYMƏSİ (Ekranın ən yuxarı sol tərəfində sabit) */}
+        <button
+          type="button"
+          onClick={() => setMegaMenuOpen(prev => !prev)}
+          className={`flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl font-black text-xs sm:text-sm transition-all duration-200 cursor-pointer shadow-xs shrink-0 border ${
+            megaMenuOpen
+              ? 'bg-indigo-600 text-white shadow-indigo-200 border-indigo-700 ring-2 ring-indigo-400/40'
+              : 'bg-slate-900 hover:bg-slate-800 text-white border-slate-900 shadow-slate-900/10 hover:shadow-md'
+          }`}
+          title="İdarəetmə panelini və bütün bölmələri açın"
+        >
+          <LayoutDashboard className="w-4 h-4 text-indigo-300 shrink-0" />
+          <span className="whitespace-nowrap">İdarəetmə paneli</span>
+          <ChevronDown
+            className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
+              megaMenuOpen ? 'rotate-180 text-white' : 'text-slate-400'
+            }`}
+          />
+        </button>
+
         {/* Mobile Hamburger Menu Toggle */}
         {onToggleSidebar && (
           <button
@@ -121,22 +144,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Yan menyunu aç"
           >
             <Menu className="w-5 h-5" />
-          </button>
-        )}
-
-        {/* Desktop Sidebar Collapse Toggle */}
-        {onToggleSidebarCollapse && (
-          <button
-            type="button"
-            onClick={onToggleSidebarCollapse}
-            className="hidden lg:flex p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/70 rounded-xl transition-all cursor-pointer border border-transparent hover:border-indigo-100"
-            title={isSidebarCollapsed ? 'Menyunu genişləndir' : 'Menyunu yığcamlaşdır'}
-          >
-            {isSidebarCollapsed ? (
-              <PanelLeftOpen className="w-4 h-4" />
-            ) : (
-              <PanelLeftClose className="w-4 h-4" />
-            )}
           </button>
         )}
 
@@ -334,6 +341,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </div>
       </div>
+
+      {/* Yuxarıdan Açılan 2-Sütunlu Kaskad İdarəetmə Paneli Menyu Qutusu */}
+      <NavigationMegaMenu
+        isOpen={megaMenuOpen}
+        onClose={() => setMegaMenuOpen(false)}
+        currentUser={currentUser}
+        activeTab={activeTab}
+        onNavigateTab={(tab) => {
+          setMegaMenuOpen(false);
+          if (onNavigateTab) onNavigateTab(tab);
+        }}
+      />
     </header>
   );
 };
