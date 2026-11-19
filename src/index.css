@@ -161,24 +161,24 @@
   outline-offset: 1px;
 }
 
-/* 3-Column OMR Card Container (Qapalı Test Cavab Kartı - İşıqlı və Gözə Çarpan Parlaq Kənar Çərçivə) */
+/* 3-Column OMR Card Container (Qapalı Test Cavab Kartı - İncə və Tünd Göy Kənar Çərçivə) */
 .omr-column-card {
   display: flex;
   flex-direction: column;
   gap: 2px;
   background-color: #ffffff;
-  border: 2px solid #0ea5e9 !important; /* Parlaq mavi (sky-500) */
+  border: 1px solid #1e3a8a !important; /* İncə və tünd göy (dark navy blue) */
   border-radius: 0.65rem;
   padding: 0.35rem 0.3rem;
   min-width: 145px;
-  box-shadow: 0 0 10px rgba(14, 165, 233, 0.22) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
   transition: all 0.2s ease;
 }
 
 .dark .omr-column-card {
-  background-color: #0f172a;
-  border: 2px solid #22d3ee !important; /* Parlaq neon cyan (cyan-400) */
-  box-shadow: 0 0 14px rgba(34, 211, 238, 0.35) !important;
+  background-color: #0b1322;
+  border: 1px solid #1d4ed8 !important; /* İncə və tünd göy/blue-700 */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
 }
 
 .dark .omr-bubble-btn {
@@ -201,7 +201,7 @@
   transform: none !important;
 }
 
-/* 6-Column Numeric Grid (Açıq Sual Cavab Kartı - İşıqlı və Gözə Çarpan Parlaq Kənar Çərçivə) */
+/* 6-Column Numeric Grid (Açıq Sual Cavab Kartı - İncə və Tünd Göy Kənar Çərçivə) */
 .omr-numeric-grid {
   display: inline-flex;
   gap: 2.5px; /* Üstdəki omr-bubble-row ilə eyni məsafə */
@@ -209,11 +209,17 @@
   align-items: center;
   padding: 3px 5px;
   background-color: #f8fafc;
-  border: 1.5px solid #0ea5e9 !important;
-  box-shadow: 0 0 8px rgba(14, 165, 233, 0.2) !important;
+  border: 1px solid #1e3a8a !important; /* İncə və tünd göy */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
   border-radius: 0.5rem;
   width: fit-content;
   max-width: fit-content;
+}
+
+.dark .omr-numeric-grid {
+  background-color: #0b1322;
+  border: 1px solid #1d4ed8 !important; /* İncə və tünd göy/blue-700 */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
 }
 
 .omr-numeric-col {

@@ -1294,15 +1294,15 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
             </div>
           </div>
 
-          {/* Right Column: OMR Optical Bubble Answer Sheet (Müstəqil Sürüşdürmə, Gözə Çarpan Parlaq Kənar Çərçivə) */}
+          {/* Right Column: OMR Optical Bubble Answer Sheet (Müstəqil Sürüşdürmə, İncə və Tünd Kənar Çərçivə) */}
           <aside
-            className="w-full lg:w-[530px] xl:w-[570px] 2xl:w-[610px] flex flex-col h-1/2 lg:h-full overflow-hidden border-l-2 border-sky-400 dark:border-cyan-400 bg-white dark:bg-slate-900 shadow-xl shrink-0 min-h-0"
+            className="w-full lg:w-[530px] xl:w-[570px] 2xl:w-[610px] flex flex-col h-1/2 lg:h-full overflow-hidden border-l border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg shrink-0 min-h-0"
           >
             {/* OMR Header */}
-            <div className="p-2 sm:p-2.5 border-b border-sky-200 dark:border-slate-800 bg-sky-50/70 dark:bg-slate-900 flex items-center justify-between shrink-0">
+            <div className="p-2 sm:p-2.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900 flex items-center justify-between shrink-0">
               <div>
                 <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-sky-500 dark:bg-cyan-400 animate-pulse"></span>
+                  <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-500 animate-pulse"></span>
                   Optik Cavab Kartı
                 </h3>
                 <div className="flex items-center gap-2 mt-0.5">
@@ -1351,20 +1351,20 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
 
                   return (
                     <div className="flex flex-col gap-3">
-                      {/* 1. QAPALI OMR SUALLARI (DƏQİQ 3 SÜTUN, GÖZƏ ÇARPAN PARLAQ ÇƏRÇİVƏ VƏ OKEAN MAVİSİ FON) */}
+                      {/* 1. QAPALI OMR SUALLARI (DƏQİQ 3 SÜTUN, İNCƏ VƏ TÜND GÖY ÇƏRÇİVƏ) */}
                       {closedQuestions.length > 0 && (
-                        <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-[#eef6fc] dark:bg-[#0c1a2e] border-2 border-sky-400 dark:border-cyan-400 shadow-[0_0_15px_rgba(56,189,248,0.22)] dark:shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+                        <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-300/90 dark:border-slate-700/80 shadow-2xs">
                           <div className="flex items-center justify-between px-1 mb-1">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-sky-950 dark:text-sky-200">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-900 dark:text-slate-200">
                               Qapalı Suallar (1 - {closedQuestions.length})
                             </span>
-                            <span className="text-[9px] text-sky-700 dark:text-cyan-300 font-bold">
+                            <span className="text-[9px] text-blue-700 dark:text-blue-400 font-bold">
                               3 Sütunlu Standart A-E
                             </span>
                           </div>
                           <div className="grid grid-cols-3 gap-2 items-stretch">
                             {columnSlices.map((colQuestions, colIdx) => (
-                              <div key={colIdx} className="omr-column-card bg-white dark:bg-slate-900 border-2 border-sky-400 dark:border-cyan-400 shadow-sm">
+                              <div key={colIdx} className="omr-column-card bg-white dark:bg-slate-900 border border-blue-900/40 dark:border-blue-700/60 shadow-2xs">
                                 <div className="flex flex-col gap-0.5">
                                   {colQuestions.map((q, idxInCol) => {
                                     const originalIndex = questions.findIndex(orig => orig.id === q.id);
@@ -1376,7 +1376,7 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                                         key={q.id || qNum}
                                         className={`px-1.5 sm:px-2 py-0.5 rounded-md border flex items-center justify-between gap-1.5 transition-colors relative ${currentSelection
                                           ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/40 dark:border-emerald-700'
-                                          : 'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 hover:border-sky-300 dark:hover:border-sky-700'
+                                          : 'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-600'
                                           }`}
                                       >
                                         {/* Sual nömrəsi: Həmişə sabit mövqedə, z-index 10, variant seçildikdə heç vaxt itmir */}
@@ -1413,14 +1413,14 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                         </div>
                       )}
 
-                      {/* 2. AÇIQ SUALLAR (RƏQƏMLİ) - GÖZƏ ÇARPAN PARLAQ ÇƏRÇİVƏ VƏ OKEAN MAVİSİ FON */}
+                      {/* 2. AÇIQ SUALLAR (RƏQƏMLİ) - İNCƏ VƏ TÜND GÖY ÇƏRÇİVƏ */}
                       {openQuestions.length > 0 && (
-                        <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-[#eef6fc] dark:bg-[#0c1a2e] border-2 border-sky-400 dark:border-cyan-400 shadow-[0_0_15px_rgba(56,189,248,0.22)] dark:shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+                        <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-300/90 dark:border-slate-700/80 shadow-2xs">
                           <div className="flex items-center justify-between px-1 mb-1">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-sky-950 dark:text-sky-200">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-900 dark:text-slate-200">
                               Açıq Cavablı Suallar ({openQuestions.length})
                             </span>
-                            <span className="text-[9px] text-sky-700 dark:text-cyan-300 font-bold">
+                            <span className="text-[9px] text-blue-700 dark:text-blue-400 font-bold">
                               6-Sütunlu Standart Rəqəm Matrisi
                             </span>
                           </div>
@@ -1434,14 +1434,14 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                               return (
                                 <div
                                   key={q.id || qNum}
-                                  className="w-full bg-white dark:bg-slate-900 border-2 border-sky-400 dark:border-cyan-400 shadow-sm dark:shadow-[0_0_12px_rgba(34,211,238,0.25)] rounded-xl p-2.5 flex flex-col gap-1.5"
+                                  className="w-full bg-white dark:bg-slate-900 border border-blue-900/40 dark:border-blue-700/60 shadow-2xs rounded-xl p-2.5 flex flex-col gap-1.5"
                                 >
-                                  <div className="flex items-center justify-between pb-1 border-b border-sky-200 dark:border-slate-800 text-[10px]">
+                                  <div className="flex items-center justify-between pb-1 border-b border-slate-200 dark:border-slate-800 text-[10px]">
                                     <div className="flex items-center gap-1.5">
                                       <span className="w-6 min-w-[24px] font-mono font-black text-[12px] text-slate-900 dark:text-slate-100 shrink-0 select-none">
                                         {qNum < 10 ? '0' + qNum : qNum}.
                                       </span>
-                                      <span className="bg-sky-100/80 dark:bg-sky-950 text-sky-900 dark:text-sky-300 border border-sky-300 dark:border-sky-800 font-extrabold px-1.5 py-0.2 rounded text-[8.5px]">
+                                      <span className="bg-blue-50 dark:bg-blue-950 text-blue-900 dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-extrabold px-1.5 py-0.2 rounded text-[8.5px]">
                                         Açıq Sual
                                       </span>
                                     </div>
