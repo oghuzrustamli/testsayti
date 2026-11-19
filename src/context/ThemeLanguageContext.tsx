@@ -30,13 +30,10 @@ export const ThemeLanguageProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const t = TRANSLATIONS[language] || TRANSLATIONS.az;
 
-  // 2. Theme state (Default: 'light')
+  // 2. Theme state (İşıqlı rejim tələbinə əsasən susmaya görə 'light')
   const [theme, setThemeState] = useState<Theme>(() => {
     try {
-      const saved = localStorage.getItem(THEME_STORAGE_KEY);
-      if (saved === 'dark' || saved === 'light') {
-        return saved;
-      }
+      localStorage.setItem(THEME_STORAGE_KEY, 'light');
     } catch (e) {
       // ignore
     }

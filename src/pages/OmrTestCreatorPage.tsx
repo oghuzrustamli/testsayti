@@ -953,7 +953,7 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
   const unansweredCount = questionCount - answeredCount;
 
   return (
-    <div className="h-full flex flex-col bg-slate-100 overflow-hidden">
+    <div className="h-full flex flex-col bg-[#eef6fc] overflow-hidden">
       {/* 1. TOP HEADER TOOLBAR */}
       <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0 shadow-2xs z-10">
         <div className="flex items-center gap-3">

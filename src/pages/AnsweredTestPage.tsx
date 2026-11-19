@@ -400,7 +400,7 @@ export const AnsweredTestPage: React.FC<AnsweredTestPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col justify-between">
+    <div className="min-h-screen bg-[#eef6fc] flex flex-col justify-between">
       {/* 1. TOP CONTROL BAR (Hidden during printing) */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3 shadow-2xs no-print">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">

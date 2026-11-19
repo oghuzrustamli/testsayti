@@ -530,7 +530,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
   };
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden bg-slate-50">
+    <div className="h-full w-full flex flex-col overflow-hidden bg-[#eef6fc]">
       {/* ==============================================================
           MƏRHƏLƏ 1: FƏNN, SİNİF, MÖVZU VƏ TEST PARAMETRLƏRİ
           ============================================================== */}

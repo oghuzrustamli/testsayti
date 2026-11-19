@@ -233,7 +233,7 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
   };
 
   return (
-    <div className="w-full min-h-full flex flex-col bg-slate-50 font-sans">
+    <div className="w-full min-h-full flex flex-col bg-[#eef6fc] font-sans">
       {/* ==============================================================
           1. YUXARI STATİSTİKA BAŞLIĞI VƏ ƏSAS İDARƏETMƏ ZOLAĞI
           ============================================================== */}
