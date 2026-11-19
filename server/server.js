@@ -968,10 +968,12 @@ app.get('/api/share/:code', (req, res) => {
       exam_model: test.exam_model,
       grade_group: test.grade_group,
       duration_minutes: test.duration_minutes,
-      total_questions: sanitizedQuestions.length,
+      total_questions: sanitizedQuestions.length || test.total_questions || 25,
       total_points: test.total_points,
-      test_mode: test.test_mode,
-      pdf_url: test.pdf_url || (test.test_mode === 'answered' ? '/sample_exam.pdf' : null)
+      test_mode: test.test_mode || 'answered',
+      pdf_url: test.pdf_url || (test.test_mode === 'answered' ? '/sample_exam.pdf' : null),
+      answer_key_json: test.answer_key_json,
+      share_code: shareLink ? shareLink.unique_code : null
     },
     questions: sanitizedQuestions
   });
@@ -993,9 +995,9 @@ app.post('/api/exam/start', (req, res) => {
   const cleanUtis = (utis_code || '').trim();
   if (cleanUtis) {
     try {
-      const existing = db.prepare('SELECT id, status FROM TestSessions WHERE test_id = ? AND utis_code = ?').get(test_id, cleanUtis);
-      if (existing) {
-        return res.status(400).json({ error: 'Bu UTİS kodu ilə artıq bu testdə iştirak qeydə alınıb.' });
+      const existing = db.prepare('SELECT id, status, started_at FROM TestSessions WHERE test_id = ? AND utis_code = ? ORDER BY started_at DESC LIMIT 1').get(test_id, cleanUtis);
+      if (existing && existing.status === 'in_progress') {
+        return res.status(200).json({ session_id: existing.id, started_at: existing.started_at, resumed: true });
       }
     } catch (e) {}
   }
