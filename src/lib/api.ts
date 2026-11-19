@@ -1047,6 +1047,48 @@ export const api = {
     return { message: is_archived === 1 ? 'Şagird arxivə göndərildi' : 'Şagird aktiv bazaya bərpa edildi' };
   },
 
+  async deleteStudentDatabaseItem(id: string): Promise<any> {
+    try {
+      const res = await fetch(`${API_BASE}/student-database/${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) return await res.json();
+    } catch {}
+
+    try {
+      const saved = localStorage.getItem(LS_STUDENT_DB_KEY);
+      if (saved) {
+        const list: StudentDatabaseItem[] = JSON.parse(saved);
+        const filtered = list.filter(s => s.id !== id);
+        localStorage.setItem(LS_STUDENT_DB_KEY, JSON.stringify(filtered));
+      }
+    } catch {}
+
+    return { message: 'Şagird silindi' };
+  },
+
+  async bulkDeleteStudentDatabaseItems(ids: string[]): Promise<any> {
+    try {
+      const res = await fetch(`${API_BASE}/student-database/bulk-delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids }),
+      });
+      if (res.ok) return await res.json();
+    } catch {}
+
+    try {
+      const saved = localStorage.getItem(LS_STUDENT_DB_KEY);
+      if (saved) {
+        const list: StudentDatabaseItem[] = JSON.parse(saved);
+        const filtered = list.filter(s => !ids.includes(s.id));
+        localStorage.setItem(LS_STUDENT_DB_KEY, JSON.stringify(filtered));
+      }
+    } catch {}
+
+    return { message: `${ids.length} şagird silindi` };
+  },
+
   async importStudentsFromExcel(students: StudentImportItem[], file_name: string): Promise<any> {
     try {
       const res = await fetch(`${API_BASE}/student-database/import`, {

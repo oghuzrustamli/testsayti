@@ -32,7 +32,11 @@ import {
   Check,
   ArrowUpDown,
   TrendingUp,
-  FileText
+  FileText,
+  Trash2,
+  CheckSquare,
+  Square,
+  AlertTriangle
 } from 'lucide-react';
 
 const ROMAN_CLASSES = [
@@ -99,6 +103,12 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
   const [showHistoryModal, setShowHistoryModal] = useState<boolean>(false);
   const [importHistory, setImportHistory] = useState<ImportHistoryItem[]>([]);
   const [loadingHistory, setLoadingHistory] = useState<boolean>(false);
+
+  // Selection and Delete States (Tələb 3 & 4)
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [studentToDeleteSingle, setStudentToDeleteSingle] = useState<StudentDatabaseItem | null>(null);
 
   // Form State for Add / Edit
   const [formFirstName, setFormFirstName] = useState<string>('');
@@ -255,7 +265,64 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
     return `${fin.substring(0, 2)}***${fin.substring(fin.length - 2)}`;
   };
 
-  // Excel Upload & Parse
+  // Selection Logic (Tələb 3 & 4)
+  const toggleSelectStudent = (id: string) => {
+    setSelectedStudentIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const isAllVisibleSelected = useMemo(() => {
+    if (students.length === 0) return false;
+    return students.every(s => selectedStudentIds.includes(s.id));
+  }, [students, selectedStudentIds]);
+
+  const handleToggleSelectAll = () => {
+    if (isAllVisibleSelected) {
+      const visibleIds = new Set(students.map(s => s.id));
+      setSelectedStudentIds(prev => prev.filter(id => !visibleIds.has(id)));
+    } else {
+      const visibleIds = students.map(s => s.id);
+      setSelectedStudentIds(prev => Array.from(new Set([...prev, ...visibleIds])));
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedStudentIds([]);
+  };
+
+  const handleRequestDeleteSelected = () => {
+    if (selectedStudentIds.length === 0) return;
+    setStudentToDeleteSingle(null);
+    setShowDeleteModal(true);
+  };
+
+  const handleRequestDeleteSingle = (student: StudentDatabaseItem) => {
+    setStudentToDeleteSingle(student);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      setIsDeleting(true);
+      if (studentToDeleteSingle) {
+        await api.deleteStudentDatabaseItem(studentToDeleteSingle.id);
+        setSelectedStudentIds(prev => prev.filter(id => id !== studentToDeleteSingle.id));
+      } else if (selectedStudentIds.length > 0) {
+        await api.bulkDeleteStudentDatabaseItems(selectedStudentIds);
+        setSelectedStudentIds([]);
+      }
+      setShowDeleteModal(false);
+      setStudentToDeleteSingle(null);
+      await loadStudents();
+    } catch (err: any) {
+      alert(err.message || 'Silinmə zamanı xəta baş verdi');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Excel Upload & Intelligent UTİS Column Mapping (Tələb 1 & 2)
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -265,81 +332,238 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
     reader.onload = (evt) => {
       try {
         const data = new Uint8Array(evt.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
+        // cellDates & raw: false keeps formatted string representation, preserving leading zeros (e.g. 0123456)
+        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
-        const json: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+        
+        // Read 2D grid
+        const rawGrid: any[][] = XLSX.utils.sheet_to_json(worksheet, {
+          header: 1,
+          raw: false,
+          defval: ''
+        });
 
-        if (!json || json.length === 0) {
+        if (!rawGrid || rawGrid.length === 0) {
           alert('Excel faylında məlumat tapılmadı.');
           return;
         }
 
-        // Validate and normalize rows
-        const normalizedRows: StudentImportItem[] = json.map((row) => {
-          // Normalize column keys (lowercase, trim)
-          const keys = Object.keys(row);
-          const findVal = (patterns: string[]) => {
-            const foundKey = keys.find(k => patterns.some(p => k.toLowerCase().replace(/[\s_\-]/g, '').includes(p)));
-            return foundKey ? row[foundKey]?.toString().trim() : '';
-          };
+        // 1. Detect Header Row Index (Search top 15 rows for table headers)
+        let headerRowIdx = 0;
+        let maxHeaderScore = -1;
 
-          const rawFirstName = findVal(['ad', 'first', 'adı']) || '';
-          const rawLastName = findVal(['soyad', 'last', 'soyadı']) || '';
-          const rawFatherName = findVal(['ata', 'father', 'ataadı']) || '';
-          const rawUtis = findVal(['utis', 'utiscode', 'utiskodu']) || '';
-          const rawFin = findVal(['fin', 'finkodu', 'fincode']) || '';
-          const rawGrade = findVal(['sinif', 'grade', 'sinfi', 'class']) || 'IX sinif';
-          const rawSchool = findVal(['mekteb', 'school', 'məktəb', 'məktəbi']) || '1 nömrəli tam orta məktəb';
+        for (let r = 0; r < Math.min(15, rawGrid.length); r++) {
+          const row = rawGrid[r];
+          if (!Array.isArray(row)) continue;
+          let score = 0;
+          for (const cell of row) {
+            const c = String(cell || '').toLowerCase().replace(/[\s_\-.,/\\()]/g, '');
+            if (c.includes('soyad') || c.includes('familiy') || c.includes('surname')) score += 4;
+            if (c === 'ad' || c === 'adi' || c.includes('firstname') || c.includes('sagirdinadi')) score += 4;
+            if (c.includes('ata') || c.includes('father') || c.includes('patronymic') || c.includes('otchest')) score += 4;
+            if (c.includes('utis') || c.includes('studentcode')) score += 5;
+            if (c.includes('fin') || c.includes('pin')) score += 5;
+            if (c.includes('sinif') || c.includes('sinfi') || c.includes('grade') || c.includes('class')) score += 3;
+            if (c.includes('mekteb') || c.includes('school') || c.includes('muessise')) score += 2;
+            if (c === 'saa' || c === 'fio' || c.includes('tamad')) score += 3;
+          }
+          if (score > maxHeaderScore) {
+            maxHeaderScore = score;
+            headerRowIdx = r;
+          }
+        }
 
-          const validationErrors: string[] = [];
-          if (!rawFirstName) validationErrors.push('Ad daxil edilməyib');
-          if (!rawLastName) validationErrors.push('Soyad daxil edilməyib');
+        // 2. Map Column Indices from detected Header Row
+        let colLastName = -1;
+        let colFirstName = -1;
+        let colFatherName = -1;
+        let colFullName = -1;
+        let colUtis = -1;
+        let colFin = -1;
+        let colGrade = -1;
+        let colSchool = -1;
 
-          let cleanUtis = rawUtis.replace(/\D/g, '');
-          if (cleanUtis && cleanUtis.length !== 7) {
-            validationErrors.push('UTİS 7 rəqəmli olmalıdır');
+        const headerCells = rawGrid[headerRowIdx] || [];
+        headerCells.forEach((cell, idx) => {
+          const norm = String(cell || '').toLowerCase().trim().replace(/[\s_\-.,/\\()]/g, '');
+          if (!norm) return;
+
+          // Priority 1: UTİS kodu
+          if (norm.includes('utis') || norm.includes('studentcode') || (norm.includes('sagird') && norm.includes('kod'))) {
+            colUtis = idx;
+            return;
           }
 
-          // Normalize Grade to I-XI Roman standard
-          let normalizedGrade = rawGrade;
-          const matchNum = rawGrade.match(/\d+/);
-          if (matchNum) {
-            const num = parseInt(matchNum[0]);
-            if (num >= 1 && num <= 11) {
-              normalizedGrade = ROMAN_CLASSES[num - 1];
+          // Priority 2: FİN / PİN kodu
+          if (norm.includes('fin') || norm.includes('pin')) {
+            colFin = idx;
+            return;
+          }
+
+          // Priority 3: Ata adı (Strictly check BEFORE Ad!)
+          if (norm.includes('ata') || norm.includes('father') || norm.includes('patronymic') || norm.includes('otchest')) {
+            colFatherName = idx;
+            return;
+          }
+
+          // Priority 4: Soyad (Strictly check BEFORE Ad!)
+          if (norm.includes('soyad') || norm.includes('familiy') || norm.includes('lastname') || norm.includes('surname')) {
+            colLastName = idx;
+            return;
+          }
+
+          // Priority 5: Full Name (S.A.A., FİO, Tam adı)
+          if (norm === 'saa' || norm === 'fio' || norm.includes('tamad') || norm.includes('adsoyad') || norm.includes('soyadad') || norm.includes('fullname')) {
+            colFullName = idx;
+            return;
+          }
+
+          // Priority 6: Ad (Strictly after soyad, ata, and full name)
+          if (norm === 'ad' || norm === 'adi' || norm === 'ism' || norm.includes('firstname') || norm.includes('first') || norm.includes('sagirdinadi')) {
+            colFirstName = idx;
+            return;
+          }
+
+          // Priority 7: Sinif
+          if (norm.includes('sinif') || norm.includes('sinfi') || norm.includes('grade') || norm.includes('class')) {
+            colGrade = idx;
+            return;
+          }
+
+          // Priority 8: Məktəb
+          if (norm.includes('mekteb') || norm.includes('school') || norm.includes('muessise')) {
+            colSchool = idx;
+            return;
+          }
+        });
+
+        // Fallback column positions if no headers were matched
+        if (colFirstName === -1 && colLastName === -1 && colFullName === -1) {
+          colFirstName = 1;
+          colLastName = 2;
+          colFatherName = 3;
+          colUtis = 4;
+          colFin = 5;
+          colGrade = 6;
+          colSchool = 7;
+        }
+
+        // 3. Process Data Rows (starting after headerRowIdx)
+        const dataRows = rawGrid.slice(headerRowIdx + 1);
+        const normalizedRows: StudentImportItem[] = [];
+
+        for (const row of dataRows) {
+          if (!Array.isArray(row) || row.every(c => String(c || '').trim() === '')) {
+            continue;
+          }
+
+          let firstName = colFirstName !== -1 ? String(row[colFirstName] || '').trim() : '';
+          let lastName = colLastName !== -1 ? String(row[colLastName] || '').trim() : '';
+          let fatherName = colFatherName !== -1 ? String(row[colFatherName] || '').trim() : '';
+
+          // If single full name column exists (e.g. "Əliyev Murad Rəşad" or "Əliyev Murad Rəşad oğlu")
+          if ((!firstName || !lastName) && colFullName !== -1) {
+            const fullNameRaw = String(row[colFullName] || '').trim();
+            const parts = fullNameRaw.split(/\s+/).filter(Boolean);
+            if (parts.length >= 2) {
+              if (!lastName) lastName = parts[0];
+              if (!firstName) firstName = parts[1];
+              if (!fatherName && parts.length > 2) fatherName = parts.slice(2).join(' ');
+            } else if (parts.length === 1 && !firstName) {
+              firstName = parts[0];
             }
           }
 
-          // Check if already in active students
+          // UTİS: preserve as string with leading zeros, remove accidental leading quotes
+          let rawUtis = colUtis !== -1 ? String(row[colUtis] || '').trim().replace(/^'/, '') : '';
+          const cleanUtis = rawUtis;
+
+          // FİN: preserve as uppercase string
+          let rawFin = colFin !== -1 ? String(row[colFin] || '').trim().replace(/^'/, '').toUpperCase() : '';
+
+          // Sinif: Normalize to I-XI Roman standard (no parallel)
+          let rawGrade = colGrade !== -1 ? String(row[colGrade] || '').trim() : '';
+          let normalizedGrade = 'IX sinif';
+          if (rawGrade) {
+            const romanMatch = rawGrade.toUpperCase().match(/\b(XI|X|IX|VIII|VII|VI|V|IV|III|II|I)\b/);
+            if (romanMatch) {
+              normalizedGrade = `${romanMatch[1]} sinif`;
+            } else {
+              const numMatch = rawGrade.match(/\d+/);
+              if (numMatch) {
+                const num = parseInt(numMatch[0]);
+                if (num >= 1 && num <= 11) {
+                  normalizedGrade = ROMAN_CLASSES[num - 1];
+                }
+              }
+            }
+          }
+
+          // School
+          let rawSchool = colSchool !== -1 ? String(row[colSchool] || '').trim() : '';
+          if (!rawSchool) rawSchool = '1 nömrəli tam orta məktəb';
+
+          // Validation Warnings
+          const validationErrors: string[] = [];
+          if (!firstName && !lastName) {
+            validationErrors.push('Ad və soyad daxil edilməyib');
+          } else {
+            if (!firstName) validationErrors.push('Ad qeyd olunmayıb');
+            if (!lastName) validationErrors.push('Soyad qeyd olunmayıb');
+          }
+          if (!fatherName) {
+            validationErrors.push('Ata adı qeyd olunmayıb');
+          }
+          if (!cleanUtis) {
+            validationErrors.push('UTİS kodu qeyd olunmayıb');
+          } else if (cleanUtis.length !== 7) {
+            validationErrors.push('UTİS 7 rəqəmli olmalıdır');
+          }
+          if (!rawFin) {
+            validationErrors.push('FİN kodu qeyd olunmayıb');
+          } else if (rawFin.length !== 7) {
+            validationErrors.push('FİN kodu 7 simvol olmalıdır');
+          }
+
+          // Check if already in active students (to prevent duplicates)
           const isExisting = students.some(
-            s => (cleanUtis && s.utis_code === cleanUtis) ||
-                 (rawFin && s.fin_code && s.fin_code.toUpperCase() === rawFin.toUpperCase())
+            s => (cleanUtis && s.utis_code && s.utis_code === cleanUtis) ||
+                 (rawFin && s.fin_code && s.fin_code.toUpperCase() === rawFin) ||
+                 (s.first_name.toLowerCase() === firstName.toLowerCase() &&
+                  s.last_name.toLowerCase() === lastName.toLowerCase() &&
+                  (!fatherName || !s.father_name || s.father_name.toLowerCase() === fatherName.toLowerCase()))
           );
 
           let status: StudentImportItem['status'] = 'new';
-          if (validationErrors.length > 0) {
+          if (!firstName || !lastName) {
             status = 'invalid';
           } else if (isExisting) {
             status = 'needs_update';
           }
 
-          return {
-            first_name: rawFirstName,
-            last_name: rawLastName,
-            father_name: rawFatherName,
+          normalizedRows.push({
+            first_name: firstName,
+            last_name: lastName,
+            father_name: fatherName,
             utis_code: cleanUtis,
-            fin_code: rawFin.toUpperCase(),
+            fin_code: rawFin,
             grade_class: normalizedGrade,
             school_name: rawSchool,
             status,
             validation_errors: validationErrors,
-          };
-        });
+          });
+        }
+
+        if (normalizedRows.length === 0) {
+          alert('Excel faylında etibarlı şagird məlumatı tapılmadı.');
+          return;
+        }
 
         setParsedImportRows(normalizedRows);
         setImportStep(2);
-      } catch (parseErr) {
+      } catch (parseErr: any) {
+        console.error('Excel parse error:', parseErr);
         alert('Excel faylını oxuyarkən xəta baş verdi. Zəhmət olmasa fayl formatını yoxlayın.');
       }
     };
@@ -645,6 +869,43 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
         </div>
       </div>
 
+      {/* Selection Action Toolbar (Tələb 3 & 4: "Seç", "Seçilənləri sil", "Hamısını seç") */}
+      {selectedStudentIds.length > 0 && (
+        <div className="bg-indigo-600 dark:bg-indigo-950 text-white p-3.5 sm:p-4 rounded-2xl shadow-lg border border-indigo-500/30 flex flex-wrap items-center justify-between gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-white/20 text-white flex items-center justify-center font-black text-sm shrink-0">
+              {selectedStudentIds.length}
+            </div>
+            <div>
+              <span className="font-black text-xs sm:text-sm block">
+                {selectedStudentIds.length} şagird seçildi
+              </span>
+              <span className="text-[11px] text-indigo-200 block">
+                {selectedGrade !== 'all' ? `Yalnız «${selectedGrade}» şagirdləri` : 'Bütün siniflər üzrə'}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleClearSelection}
+              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all cursor-pointer"
+            >
+              Seçimi Ləğv Et
+            </button>
+            <button
+              type="button"
+              onClick={handleRequestDeleteSelected}
+              className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black flex items-center gap-1.5 shadow-md shadow-rose-900/30 transition-all cursor-pointer"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Seçilənləri Sil ({selectedStudentIds.length})</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 5. Main Student Table */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xs overflow-hidden flex flex-col">
         {loading ? (
@@ -684,7 +945,17 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 select-none">
-                  <th className="py-3.5 px-3 text-center w-12">№</th>
+                  {/* Master Checkbox */}
+                  <th className="py-3.5 px-3 text-center w-10">
+                    <input
+                      type="checkbox"
+                      checked={isAllVisibleSelected}
+                      onChange={handleToggleSelectAll}
+                      className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+                      title={isAllVisibleSelected ? "Bütün seçimləri ləğv et" : "Cari səhifədəki bütün şagirdləri seç"}
+                    />
+                  </th>
+                  <th className="py-3.5 px-2 text-center w-12">№</th>
                   <th
                     className="py-3.5 px-3 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400"
                     onClick={() => {
@@ -743,14 +1014,27 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
                 {students.map((st, idx) => {
                   const rowNum = (page - 1) * pageSize + idx + 1;
                   const isRevealed = !!revealedFins[st.id];
+                  const isSelected = selectedStudentIds.includes(st.id);
 
                   return (
                     <tr
                       key={st.id}
-                      className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors group"
+                      className={`hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors group ${
+                        isSelected ? 'bg-indigo-50/70 dark:bg-indigo-950/40' : ''
+                      }`}
                     >
+                      {/* Checkbox */}
+                      <td className="py-3 px-3 text-center">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleSelectStudent(st.id)}
+                          className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+                        />
+                      </td>
+
                       {/* № */}
-                      <td className="py-3 px-3 text-center text-slate-400 font-mono text-[11px]">
+                      <td className="py-3 px-2 text-center text-slate-400 font-mono text-[11px]">
                         {rowNum}
                       </td>
 
@@ -823,7 +1107,7 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
                         {st.school_name || '1 nömrəli tam orta məktəb'}
                       </td>
 
-                      {/* Əməliyyatlar: Bax, Redaktə et, Arxivə göndər */}
+                      {/* Əməliyyatlar: Bax, Redaktə et, Arxivə göndər, Sil */}
                       <td className="py-3 px-3 text-right pr-4">
                         <div className="flex items-center justify-end gap-1">
                           {/* Bax (Profil) */}
@@ -853,11 +1137,21 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
                             className={`p-1.5 rounded-lg transition-colors ${
                               st.is_archived === 1
                                 ? 'text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/60'
-                                : 'text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/60'
+                                : 'text-slate-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/60'
                             }`}
                             title={st.is_archived === 1 ? 'Aktiv bazaya bərpa et' : 'Arxivə göndər'}
                           >
                             {st.is_archived === 1 ? <RotateCcw className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
+                          </button>
+
+                          {/* Sil (Tələb 3) */}
+                          <button
+                            type="button"
+                            onClick={() => handleRequestDeleteSingle(st)}
+                            className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/60 rounded-lg transition-colors"
+                            title="Şagirdi bazadan sil"
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -1411,9 +1705,37 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
                           <td className="py-2 px-3 font-bold text-slate-900 dark:text-white">
                             {row.first_name} {row.last_name}
                           </td>
-                          <td className="py-2 px-3 text-slate-600 dark:text-slate-300">{row.father_name || '—'}</td>
-                          <td className="py-2 px-3 font-mono font-bold text-indigo-700 dark:text-indigo-400">{row.utis_code || '—'}</td>
-                          <td className="py-2 px-3 font-mono text-slate-600 dark:text-slate-300">{row.fin_code || '—'}</td>
+                          <td className="py-2 px-3">
+                            {row.father_name ? (
+                              <span className="text-slate-800 dark:text-slate-200">{row.father_name}</span>
+                            ) : (
+                              <span className="text-amber-600 dark:text-amber-400 text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-200/50">
+                                Ata adı boşdur
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-2 px-3 font-mono">
+                            {row.utis_code ? (
+                              <span className="font-bold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-1.5 py-0.5 rounded border border-indigo-200/50">
+                                {row.utis_code}
+                              </span>
+                            ) : (
+                              <span className="text-amber-600 dark:text-amber-400 text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-200/50">
+                                UTİS yoxdur
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-2 px-3 font-mono">
+                            {row.fin_code ? (
+                              <span className="text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200/60">
+                                {row.fin_code}
+                              </span>
+                            ) : (
+                              <span className="text-amber-600 dark:text-amber-400 text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-200/50">
+                                FİN yoxdur
+                              </span>
+                            )}
+                          </td>
                           <td className="py-2 px-3 font-bold text-sky-700 dark:text-sky-300">{row.grade_class}</td>
                           <td className="py-2 px-3">
                             {row.status === 'new' && (
@@ -1557,6 +1879,126 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
                 </table>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ===================================================================== */}
+      {/* MODAL 5: ŞAGİRDLƏRİN SİLİNMƏSİ TƏSDİQ MODALI (Tələb 3, 4 & 5)         */}
+      {/* ===================================================================== */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-7 animate-in fade-in zoom-in-95">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-black text-slate-900 dark:text-white text-base">
+                  {studentToDeleteSingle
+                    ? 'Şagirdin Silinməsini Təsdiq Edin'
+                    : 'Seçilmiş Şagirdlərin Silinməsini Təsdiq Edin'}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                  {studentToDeleteSingle
+                    ? `«${studentToDeleteSingle.first_name} ${studentToDeleteSingle.last_name}» adlı şagird məktəb bazasından silinəcəkdir.`
+                    : `Cəmi ${selectedStudentIds.length} nəfər şagird məktəb bazasından silinəcəkdir.`}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setStudentToDeleteSingle(null);
+                }}
+                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Target Details */}
+            {studentToDeleteSingle ? (
+              <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/60 text-xs mb-4 flex flex-col gap-1.5">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Şagird:</span>
+                  <strong className="text-slate-800 dark:text-slate-200 font-bold">
+                    {studentToDeleteSingle.first_name} {studentToDeleteSingle.last_name} {studentToDeleteSingle.father_name ? `(${studentToDeleteSingle.father_name} qızı/oğlu)` : ''}
+                  </strong>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Sinfi:</span>
+                  <span className="font-bold text-sky-600 dark:text-sky-400">{studentToDeleteSingle.grade_class}</span>
+                </div>
+                <div className="flex justify-between font-mono">
+                  <span className="text-slate-400">UTİS / FİN:</span>
+                  <span className="text-slate-700 dark:text-slate-300">{studentToDeleteSingle.utis_code || '—'} / {studentToDeleteSingle.fin_code || '—'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Məktəb:</span>
+                  <span className="text-slate-600 dark:text-slate-300 truncate max-w-[240px]">{studentToDeleteSingle.school_name}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/60 text-xs mb-4 flex flex-col gap-1.5">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Seçilmiş Şagird Sayı:</span>
+                  <strong className="text-rose-600 dark:text-rose-400 font-black text-sm">
+                    {selectedStudentIds.length} nəfər
+                  </strong>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Sinif Filtri:</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-300">
+                    {selectedGrade !== 'all' ? selectedGrade : 'Bütün Siniflər'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Yalnız seçilmiş {selectedStudentIds.length} şagird silinəcək, digər sinif və şagirdlərin məlumatlarına toxunulmayacaq.
+                </p>
+              </div>
+            )}
+
+            {/* Safety Guarantee Callout */}
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 rounded-xl mb-5 flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+              <p className="text-[11px] text-emerald-800 dark:text-emerald-300 leading-relaxed font-medium">
+                <strong>İmtahan Nəticələrinin Qorunması:</strong> Şagirdlərin əvvəllər iştirak etdiyi sınaq imtahanlarının nəticələri və jurnalları arxivdə etibarlı saxlanılacaq və itirilməyəcəkdir.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setStudentToDeleteSingle(null);
+                }}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-xs transition-colors cursor-pointer"
+              >
+                İmtina
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={handleConfirmDelete}
+                className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md shadow-rose-200 dark:shadow-none transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Silinir...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    <span>Bəli, Sil</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

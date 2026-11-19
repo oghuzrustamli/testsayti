@@ -1491,7 +1491,7 @@ app.post('/api/student-database/import', (req, res) => {
 
     const fullName = `${fName} ${lName}`;
 
-    // Check if exists by UTIS or FIN
+    // Check if exists by UTIS, FIN or Name + Father name
     let existing = null;
     if (utis) {
       existing = db.prepare('SELECT id FROM Students WHERE utis_code = ?').get(utis);
@@ -1499,16 +1499,40 @@ app.post('/api/student-database/import', (req, res) => {
     if (!existing && fin) {
       existing = db.prepare('SELECT id FROM Students WHERE fin_code = ?').get(fin);
     }
+    if (!existing && fName && lName) {
+      if (fatName) {
+        existing = db.prepare("SELECT id FROM Students WHERE LOWER(first_name) = LOWER(?) AND LOWER(last_name) = LOWER(?) AND LOWER(COALESCE(father_name, '')) = LOWER(?)").get(fName, lName, fatName);
+      } else {
+        existing = db.prepare("SELECT id FROM Students WHERE LOWER(first_name) = LOWER(?) AND LOWER(last_name) = LOWER(?)").get(fName, lName);
+      }
+    }
 
     if (existing) {
       db.prepare(`
         UPDATE Students SET
-          full_name = ?, first_name = ?, last_name = ?, father_name = ?,
-          utis_code = COALESCE(?, utis_code),
-          fin_code = COALESCE(?, fin_code),
-          grade_class = ?, school_name = ?, updated_at = ?, is_archived = 0
+          full_name = ?,
+          first_name = ?,
+          last_name = ?,
+          father_name = CASE WHEN ? != '' THEN ? ELSE father_name END,
+          utis_code = CASE WHEN ? != '' THEN ? ELSE utis_code END,
+          fin_code = CASE WHEN ? != '' THEN ? ELSE fin_code END,
+          grade_class = CASE WHEN ? != '' THEN ? ELSE grade_class END,
+          school_name = CASE WHEN ? != '' THEN ? ELSE school_name END,
+          updated_at = ?,
+          is_archived = 0
         WHERE id = ?
-      `).run(fullName, fName, lName, fatName, utis || null, fin || null, grade, school, now, existing.id);
+      `).run(
+        fullName,
+        fName,
+        lName,
+        fatName, fatName,
+        utis, utis,
+        fin, fin,
+        grade, grade,
+        school, school,
+        now,
+        existing.id
+      );
       updatedCount++;
     } else {
       const newId = 'std-' + Math.random().toString(36).substring(2, 9);
@@ -1698,6 +1722,47 @@ app.patch('/api/student-database/:id/archive', (req, res) => {
   `).run(targetArchived, targetArchived === 1 ? now : null, now, id);
 
   res.json({ message: targetArchived === 1 ? 'Şagird arxivə göndərildi' : 'Şagird aktiv bazaya bərpa edildi' });
+});
+
+// Bulk delete students
+app.post('/api/student-database/bulk-delete', (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: 'Silinəcək şagirdlər seçilməyib' });
+  }
+
+  try {
+    const placeholders = ids.map(() => '?').join(',');
+    // Preserve exam sessions: detach student_id but preserve test history and student snapshots
+    db.prepare(`UPDATE TestSessions SET student_id = NULL WHERE student_id IN (${placeholders})`).run(...ids);
+    const result = db.prepare(`DELETE FROM Students WHERE id IN (${placeholders})`).run(...ids);
+
+    res.json({
+      message: `${result.changes} şagird bazadan silindi`,
+      deleted_count: result.changes
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Silinmə zamanı xəta: ' + err.message });
+  }
+});
+
+// Single student delete
+app.delete('/api/student-database/:id', (req, res) => {
+  const { id } = req.params;
+  try {
+    const student = db.prepare('SELECT * FROM Students WHERE id = ?').get(id);
+    if (!student) {
+      return res.status(404).json({ error: 'Şagird tapılmadı' });
+    }
+
+    // Preserve exam sessions
+    db.prepare('UPDATE TestSessions SET student_id = NULL WHERE student_id = ?').run(id);
+    db.prepare('DELETE FROM Students WHERE id = ?').run(id);
+
+    res.json({ message: 'Şagird bazadan silindi', id });
+  } catch (err) {
+    res.status(500).json({ error: 'Silinmə zamanı xəta: ' + err.message });
+  }
 });
 
 // ==========================================
