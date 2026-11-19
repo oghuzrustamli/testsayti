@@ -231,3 +231,121 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* ==============================================================
+   ATROQ Education - Dark Mode Palette & Styling Engine
+   ============================================================== */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #020617 !important; /* slate-950 */
+  color: #f8fafc !important; /* slate-50 */
+}
+
+/* Background overrides in dark mode */
+.dark .bg-slate-50,
+.dark .bg-slate-100 {
+  background-color: #090e17 !important;
+}
+
+.dark .bg-white {
+  background-color: #0f172a !important; /* slate-900 */
+  color: #f1f5f9 !important;
+}
+
+.dark .bg-white\/95,
+.dark .bg-white\/90,
+.dark .bg-white\/80 {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+}
+
+.dark .bg-slate-50\/90,
+.dark .bg-slate-50\/80,
+.dark .bg-slate-50\/70 {
+  background-color: #0b1120 !important;
+}
+
+/* Text overrides in dark mode */
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-slate-700 {
+  color: #f8fafc !important;
+}
+
+.dark .text-slate-600,
+.dark .text-slate-500 {
+  color: #94a3b8 !important; /* slate-400 */
+}
+
+.dark .text-indigo-950 {
+  color: #e0e7ff !important;
+}
+
+/* Borders in dark mode */
+.dark .border-slate-200,
+.dark .border-slate-200\/90,
+.dark .border-slate-200\/80,
+.dark .border-slate-200\/70,
+.dark .border-slate-200\/60,
+.dark .border-slate-100 {
+  border-color: #1e293b !important; /* slate-800 */
+}
+
+.dark .border-slate-300 {
+  border-color: #334155 !important; /* slate-700 */
+}
+
+/* Headers, Cards, and Panels */
+.dark header {
+  background-color: rgba(15, 23, 42, 0.96) !important;
+  border-color: #1e293b !important;
+}
+
+/* Cards & containers shadow in dark mode */
+.dark .shadow-xs,
+.dark .shadow-sm,
+.dark .shadow-md,
+.dark .shadow-lg,
+.dark .shadow-xl,
+.dark .shadow-2xl {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Inputs, Textareas, and Selects in dark mode */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark select,
+.dark textarea {
+  background-color: #0b1120 !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: #6366f1 !important;
+}
+
+/* Tables in dark mode */
+.dark table thead th {
+  background-color: #1e293b !important;
+  color: #cbd5e1 !important;
+}
+
+.dark table tbody tr {
+  border-color: #1e293b !important;
+}
+
+.dark table tbody tr:hover {
+  background-color: rgba(30, 41, 59, 0.4) !important;
+}
+
+/* Custom scrollbars in dark mode */
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
