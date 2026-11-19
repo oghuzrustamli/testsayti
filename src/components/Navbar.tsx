@@ -66,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="h-16 shrink-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800 sticky top-0 z-40 px-3 sm:px-6 flex items-center justify-between shadow-2xs gap-3 select-none">
+    <header className="h-16 shrink-0 bg-white/95 backdrop-blur-md border-b border-sky-100 sticky top-0 z-40 px-3 sm:px-6 flex items-center justify-between shadow-2xs gap-3 select-none text-slate-900">
       {/* ================================================================= */}
       {/* SOL TƏRƏF:                                                       */}
       {/* 1. ATROQ Education loqosu                                         */}
@@ -79,8 +79,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="flex items-center gap-2 cursor-pointer group shrink-0"
           title="ATROQ Education"
         >
-          {/* Loqonun arxa fonu: Həm Dark, həm Light rejimdə loqonun və yazının 100% aydın seçilməsi üçün ağ premium kapsul */}
-          <div className="bg-white px-2.5 sm:px-3 py-1 rounded-xl border border-slate-200/90 dark:border-slate-700/80 shadow-xs flex items-center justify-center group-hover:shadow-md group-hover:border-indigo-300 transition-all">
+          {/* Loqonun arxa fonu: Ağ premium kapsul */}
+          <div className="bg-white px-2.5 sm:px-3 py-1 rounded-xl border border-slate-200/90 shadow-xs flex items-center justify-center group-hover:shadow-md group-hover:border-indigo-300 transition-all">
             <img
               src="/assets/atroq-logo.png"
               alt="ATROQ Education"
@@ -96,16 +96,16 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={() => setMegaMenuOpen((prev) => !prev)}
           className={`flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl font-black text-xs sm:text-sm transition-all duration-200 cursor-pointer shadow-xs shrink-0 border ${
             megaMenuOpen
-              ? 'bg-indigo-600 text-white shadow-indigo-200 dark:shadow-indigo-900/40 border-indigo-700 ring-2 ring-indigo-400/40'
-              : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-950 border-indigo-200/90 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white dark:border-slate-700 shadow-xs hover:shadow-sm'
+              ? 'bg-indigo-600 text-white shadow-indigo-200 border-indigo-700 ring-2 ring-indigo-400/40'
+              : 'bg-sky-50 hover:bg-sky-100 text-slate-900 border-sky-200/90 shadow-xs hover:shadow-sm'
           }`}
           title={t.controlPanel}
         >
-          <LayoutDashboard className={`w-4 h-4 shrink-0 ${megaMenuOpen ? 'text-white' : 'text-indigo-600 dark:text-indigo-300'}`} />
+          <LayoutDashboard className={`w-4 h-4 shrink-0 ${megaMenuOpen ? 'text-white' : 'text-indigo-600'}`} />
           <span className="whitespace-nowrap">{t.controlPanel}</span>
           <ChevronDown
             className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-              megaMenuOpen ? 'rotate-180 text-white' : 'text-indigo-500 dark:text-slate-400'
+              megaMenuOpen ? 'rotate-180 text-white' : 'text-slate-500'
             }`}
           />
         </button>

@@ -384,21 +384,14 @@ html.dark body {
   color: #f8fafc !important; /* slate-50 */
 }
 
-/* Background overrides in dark mode */
+/* Background overrides: Ağ qutular hər zaman təmiz ağ (#ffffff) qalmalıdır */
+.bg-white {
+  background-color: #ffffff !important;
+}
+
 .dark .bg-slate-50,
 .dark .bg-slate-100 {
   background-color: #090e17 !important;
-}
-
-.dark .bg-white {
-  background-color: #0f172a !important; /* slate-900 */
-  color: #f1f5f9 !important;
-}
-
-.dark .bg-white\/95,
-.dark .bg-white\/90,
-.dark .bg-white\/80 {
-  background-color: rgba(15, 23, 42, 0.95) !important;
 }
 
 .dark .bg-slate-50\/90,
@@ -437,10 +430,9 @@ html.dark body {
   border-color: #334155 !important; /* slate-700 */
 }
 
-/* Headers, Cards, and Panels */
-.dark header {
-  background-color: rgba(15, 23, 42, 0.96) !important;
-  border-color: #1e293b !important;
+/* Headers and Panels */
+header {
+  border-color: #e0f2fe;
 }
 
 /* Cards & containers shadow in dark mode */
