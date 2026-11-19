@@ -94,7 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           ref={triggerBtnRef}
           type="button"
           onClick={() => setMegaMenuOpen((prev) => !prev)}
-          className={`flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl font-black text-xs sm:text-sm transition-all duration-200 cursor-pointer shadow-xs shrink-0 border ${
+          className={`flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl font-black text-xs sm:text-sm transition-all duration-200 cursor-pointer shadow-xs shrink-0 border dark-tricolor-border nav-menu-btn relative ${
             megaMenuOpen
               ? 'bg-indigo-600 text-white shadow-indigo-200 dark:shadow-indigo-900/50 border-indigo-700 ring-2 ring-indigo-400/40'
               : 'bg-sky-50 hover:bg-sky-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border-sky-200/90 dark:border-slate-700 shadow-xs hover:shadow-sm'
@@ -127,7 +127,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={() => setShowLangMenu((prev) => !prev)}
-            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shadow-xs flex items-center justify-center shrink-0"
+            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shadow-xs flex items-center justify-center shrink-0 dark-tricolor-border nav-menu-btn relative"
             title={
               language === 'az'
                 ? 'Azərbaycan dili (Dili dəyiş)'
@@ -151,7 +151,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setLanguage('az');
                   setShowLangMenu(false);
                 }}
-                className={`w-full text-left px-3 py-2 text-xs font-bold flex items-center justify-between cursor-pointer transition-colors ${
+                className={`w-full text-left px-3 py-2 text-xs font-bold flex items-center justify-between cursor-pointer transition-colors dark-tricolor-border relative ${
                   language === 'az'
                     ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-extrabold'
                     : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -166,7 +166,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setLanguage('en');
                   setShowLangMenu(false);
                 }}
-                className={`w-full text-left px-3 py-2 text-xs font-bold flex items-center justify-between cursor-pointer transition-colors ${
+                className={`w-full text-left px-3 py-2 text-xs font-bold flex items-center justify-between cursor-pointer transition-colors dark-tricolor-border relative ${
                   language === 'en'
                     ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-extrabold'
                     : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -181,7 +181,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setLanguage('ru');
                   setShowLangMenu(false);
                 }}
-                className={`w-full text-left px-3 py-2 text-xs font-bold flex items-center justify-between cursor-pointer transition-colors ${
+                className={`w-full text-left px-3 py-2 text-xs font-bold flex items-center justify-between cursor-pointer transition-colors dark-tricolor-border relative ${
                   language === 'ru'
                     ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-extrabold'
                     : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -198,7 +198,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <button
           type="button"
           onClick={toggleTheme}
-          className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shadow-xs flex items-center justify-center shrink-0"
+          className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer shadow-xs flex items-center justify-center shrink-0 dark-tricolor-border relative nav-menu-btn"
           title={theme === 'dark' ? t.lightMode : t.darkMode}
           aria-label={theme === 'dark' ? t.lightMode : t.darkMode}
         >
@@ -343,7 +343,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setShowProfileMenu(false);
                         if (onNavigateTab) onNavigateTab('classes');
                       }}
-                      className="w-full px-3 py-2 text-left text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg flex items-center gap-2 cursor-pointer font-bold"
+                      className="w-full px-3 py-2 text-left text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg flex items-center gap-2 cursor-pointer font-bold dark-tricolor-border relative"
                     >
                       <UserIcon className="w-3.5 h-3.5 text-slate-400" />
                       <span>{t.classesTitle}</span>
@@ -354,7 +354,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setShowProfileMenu(false);
                         if (onNavigateTab) onNavigateTab('settings');
                       }}
-                      className="w-full px-3 py-2 text-left text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg flex items-center gap-2 cursor-pointer font-bold"
+                      className="w-full px-3 py-2 text-left text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg flex items-center gap-2 cursor-pointer font-bold dark-tricolor-border relative"
                     >
                       <Settings className="w-3.5 h-3.5 text-slate-400" />
                       <span>{t.settingsTitle}</span>

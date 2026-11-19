@@ -526,7 +526,7 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
                       handleItemClick(cat.subItems[0].id);
                     }
                   }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-left transition-all cursor-pointer group ${
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl sm:rounded-2xl text-left transition-all cursor-pointer group dark-tricolor-border mega-menu-cat-btn relative ${
                     isSelected
                       ? 'bg-white dark:bg-slate-900 text-indigo-950 dark:text-white font-black shadow-xs border border-sky-200/90 dark:border-slate-700 ring-1 ring-sky-500/10'
                       : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-900/60 border border-transparent font-bold'
@@ -612,7 +612,7 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
                   <div
                     key={sub.id}
                     onClick={() => handleItemClick(sub.id)}
-                    className={`group p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                    className={`group p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 dark-tricolor-border mega-menu-sub-card relative ${
                       isItemActive
                         ? 'bg-sky-50/90 dark:bg-indigo-950/60 border-sky-300 dark:border-indigo-700 text-slate-950 dark:text-white shadow-xs'
                         : 'bg-white dark:bg-slate-950/80 hover:bg-sky-50/50 dark:hover:bg-slate-800/80 border-slate-200/90 dark:border-slate-800 hover:border-sky-300 dark:hover:border-indigo-700 hover:shadow-xs text-slate-900 dark:text-white'

@@ -133,7 +133,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             {/* 1. AI Test Qutusu */}
             <button
               onClick={() => onNavigate('ai_test')}
-              className="px-3 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-violet-50/60 dark:bg-slate-900 dark:hover:bg-slate-850 border border-violet-200/70 hover:border-violet-400 dark:border-violet-800/50 dark:hover:border-violet-600 text-slate-900 dark:text-white text-left transition-all duration-200 ease-out shadow-xs hover:shadow-md hover:shadow-violet-500/15 -translate-y-0.5 hover:-translate-y-1 flex items-center gap-2.5 cursor-pointer group"
+              className="px-3 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-violet-50/60 dark:bg-slate-900 dark:hover:bg-slate-850 border border-violet-200/70 hover:border-violet-400 dark:border-violet-800/50 dark:hover:border-violet-600 text-slate-900 dark:text-white text-left transition-all duration-200 ease-out shadow-xs hover:shadow-md hover:shadow-violet-500/15 -translate-y-0.5 hover:-translate-y-1 flex items-center gap-2.5 cursor-pointer group dark-tricolor-border relative"
             >
               <div className="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-950/80 border border-violet-200/80 dark:border-violet-700/50 flex items-center justify-center shrink-0 group-hover:scale-105 shadow-2xs transition-transform">
                 <Sparkles className="w-3.5 h-3.5 text-violet-600 dark:text-amber-300" />
@@ -147,7 +147,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             {/* 2. İnteraktiv Test Qutusu */}
             <button
               onClick={() => onNavigate('create_test')}
-              className="px-3 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-cyan-50/60 dark:bg-slate-900 dark:hover:bg-slate-850 border border-cyan-200/70 hover:border-cyan-400 dark:border-cyan-800/50 dark:hover:border-cyan-600 text-slate-900 dark:text-white text-left transition-all duration-200 ease-out shadow-xs hover:shadow-md hover:shadow-cyan-500/15 -translate-y-0.5 hover:-translate-y-1 flex items-center gap-2.5 cursor-pointer group"
+              className="px-3 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-cyan-50/60 dark:bg-slate-900 dark:hover:bg-slate-850 border border-cyan-200/70 hover:border-cyan-400 dark:border-cyan-800/50 dark:hover:border-cyan-600 text-slate-900 dark:text-white text-left transition-all duration-200 ease-out shadow-xs hover:shadow-md hover:shadow-cyan-500/15 -translate-y-0.5 hover:-translate-y-1 flex items-center gap-2.5 cursor-pointer group dark-tricolor-border relative"
             >
               <div className="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-950/80 border border-cyan-200/80 dark:border-cyan-700/50 flex items-center justify-center shrink-0 group-hover:scale-105 shadow-2xs transition-transform">
                 <Edit3 className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-300" />
@@ -161,7 +161,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             {/* 3. OMR Test Qutusu */}
             <button
               onClick={() => onNavigate('omr_test')}
-              className="px-3 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-emerald-50/60 dark:bg-slate-900 dark:hover:bg-slate-850 border border-emerald-200/70 hover:border-emerald-400 dark:border-emerald-800/50 dark:hover:border-emerald-600 text-slate-900 dark:text-white text-left transition-all duration-200 ease-out shadow-xs hover:shadow-md hover:shadow-emerald-500/15 -translate-y-0.5 hover:-translate-y-1 flex items-center gap-2.5 cursor-pointer group"
+              className="px-3 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-emerald-50/60 dark:bg-slate-900 dark:hover:bg-slate-850 border border-emerald-200/70 hover:border-emerald-400 dark:border-emerald-800/50 dark:hover:border-emerald-600 text-slate-900 dark:text-white text-left transition-all duration-200 ease-out shadow-xs hover:shadow-md hover:shadow-emerald-500/15 -translate-y-0.5 hover:-translate-y-1 flex items-center gap-2.5 cursor-pointer group dark-tricolor-border relative"
             >
               <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-200/80 dark:border-emerald-700/50 flex items-center justify-center shrink-0 group-hover:scale-105 shadow-2xs transition-transform">
                 <Printer className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300" />
@@ -175,7 +175,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             {/* 4. Regional Reytinq Qutusu */}
             <button
               onClick={() => onNavigate('regional_stats')}
-              className="px-3 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-amber-50/60 dark:bg-slate-900 dark:hover:bg-slate-850 border border-amber-200/70 hover:border-amber-400 dark:border-amber-800/50 dark:hover:border-amber-600 text-slate-900 dark:text-white text-left transition-all duration-200 ease-out shadow-xs hover:shadow-md hover:shadow-amber-500/15 -translate-y-0.5 hover:-translate-y-1 flex items-center gap-2.5 cursor-pointer group"
+              className="px-3 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-amber-50/60 dark:bg-slate-900 dark:hover:bg-slate-850 border border-amber-200/70 hover:border-amber-400 dark:border-amber-800/50 dark:hover:border-amber-600 text-slate-900 dark:text-white text-left transition-all duration-200 ease-out shadow-xs hover:shadow-md hover:shadow-amber-500/15 -translate-y-0.5 hover:-translate-y-1 flex items-center gap-2.5 cursor-pointer group dark-tricolor-border relative"
             >
               <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/80 border border-amber-200/80 dark:border-amber-700/50 flex items-center justify-center shrink-0 group-hover:scale-105 shadow-2xs transition-transform">
                 <Award className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />

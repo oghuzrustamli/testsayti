@@ -609,3 +609,54 @@ header {
   background: #475569;
 }
 
+/* ==============================================================
+   ATROQ Education - Dark Mode Menu Hover Tricolor Border
+   Tünd Göy (#1e40af / #1d4ed8), Qırmızı (#dc2626), Sarı (#f59e0b)
+   Mausu üzərinə gətirəndə çox incə (1px) zərif çərçivə xətti
+   ============================================================== */
+.dark-tricolor-border {
+  position: relative;
+  isolation: isolate;
+}
+
+.dark-tricolor-border::before,
+html.dark aside button::before,
+html.dark .sidebar-menu-btn::before,
+html.dark .mega-menu-cat-btn::before,
+html.dark .mega-menu-sub-card::before,
+html.dark .nav-menu-btn::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 28%, #dc2626 62%, #f59e0b 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 25;
+}
+
+html.dark .dark-tricolor-border:hover::before,
+html.dark aside button:hover::before,
+html.dark .sidebar-menu-btn:hover::before,
+html.dark .mega-menu-cat-btn:hover::before,
+html.dark .mega-menu-sub-card:hover::before,
+html.dark .nav-menu-btn:hover::before {
+  opacity: 1;
+}
+
+html.dark .dark-tricolor-border:hover,
+html.dark aside button:hover,
+html.dark .sidebar-menu-btn:hover,
+html.dark .mega-menu-cat-btn:hover,
+html.dark .mega-menu-sub-card:hover,
+html.dark .nav-menu-btn:hover {
+  box-shadow: 0 0 10px -2px rgba(29, 78, 216, 0.3), 0 0 10px -2px rgba(220, 38, 38, 0.2), 0 0 8px -2px rgba(245, 158, 11, 0.2);
+}
+
+
