@@ -581,7 +581,7 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
   // 1. Initial State: Name Prompt Screen
   if (!isExamStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-indigo-50/50 via-white to-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#eef6fc] dark:bg-[#090e17] flex items-center justify-center p-4">
         <div className="bg-white border border-slate-200 rounded-3xl shadow-xl max-w-lg w-full p-6 sm:p-8 animate-in fade-in zoom-in-95">
           <div className="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-200 mb-5 mx-auto">
             <GraduationCap className="w-8 h-8" />
@@ -950,16 +950,16 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
   const answeredCount = Object.keys(answers).filter(k => answers[k] && answers[k].trim() !== '').length;
 
   return (
-    <div className="min-h-screen bg-[#eef6fc] flex flex-col justify-between">
+    <div className="h-screen max-h-screen overflow-hidden bg-[#eef6fc] dark:bg-[#090e17] flex flex-col select-none">
       {/* Top Header Bar */}
-      <header className="h-14 sm:h-16 bg-white border-b border-slate-200 sticky top-0 z-30 px-3 sm:px-6 flex items-center justify-between shadow-2xs">
+      <header className="h-14 sm:h-16 shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 px-3 sm:px-6 flex items-center justify-between shadow-2xs">
         <div className="flex items-center gap-2 sm:gap-3 truncate">
           <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-black text-xs shrink-0">
             EDX
           </div>
           <div className="truncate">
             <div className="flex items-center gap-1.5">
-              <h2 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
+              <h2 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white truncate">
                 {test?.title || 'Sınaq İmtahanı'}
               </h2>
               <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${isOmrMode ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'
@@ -967,7 +967,7 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                 {isOmrMode ? 'OMR' : 'İnteraktiv'}
               </span>
             </div>
-            <span className="text-[10px] text-slate-400 block truncate">
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">
               Şagird: <strong>{studentName} {studentSurname}</strong> ({className || 'Standart'})
             </span>
           </div>
@@ -997,7 +997,7 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
 
           <button
             onClick={() => setShowConfirmSubmit(true)}
-            className="px-3 sm:px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1"
+            className="px-3 sm:px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1 cursor-pointer"
           >
             <Send className="w-3.5 h-3.5" />
             <span>Testi Bitir</span>
@@ -1009,41 +1009,42 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
       {isOmrMode ? (
         /* ==================================================================== */
         /* OMR TEST MODE: Left PDF Document Viewer, Right OMR Optical Bubbles   */
+        /* (Hər iki hissə tam müstəqil olaraq sürüşdürülür - Tələb 9)          */
         /* ==================================================================== */
-        <main className="flex-1 flex flex-col lg:flex-row overflow-hidden h-[calc(100vh-64px)]">
+        <main className="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden">
           {/* Left Column: PDF Viewer */}
-          <div className="flex-1 min-w-0 border-b lg:border-b-0 lg:border-r border-slate-200 bg-slate-200 flex flex-col h-[50vh] lg:h-full overflow-hidden">
+          <div className="flex-1 min-w-0 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 flex flex-col h-[50vh] lg:h-full overflow-hidden min-h-0">
             {/* Document Toolbar */}
-            <div className="bg-white border-b border-slate-200 px-4 py-2 flex items-center justify-between text-xs text-slate-600 shrink-0">
+            <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2 flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 shrink-0">
               <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-indigo-600" />
-                <span className="font-bold text-slate-800 text-xs">
+                <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">
                   {docType === 'docx' ? 'Sınaq Sənədi (Word)' : 'Sınaq Sənədi (PDF)'}
                 </span>
               </div>
 
               {docType === 'pdf' && pdfDoc && (
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 border border-indigo-100 rounded-lg text-[11px] font-bold text-indigo-800">
-                    <Layers className="w-3.5 h-3.5 text-indigo-600" />
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-100 dark:border-indigo-800 rounded-lg text-[11px] font-bold text-indigo-800 dark:text-indigo-300">
+                    <Layers className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                     <span>Davamlı Baxış (Cəmi {totalPages} Səhifə)</span>
                   </div>
 
-                  <div className="h-4 w-px bg-slate-200 mx-1" />
+                  <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
 
                   <button
                     onClick={() => setScale(s => Math.max(0.7, s - 0.15))}
-                    className="p-1 border border-slate-200 rounded hover:bg-slate-50 cursor-pointer"
+                    className="p-1 border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer"
                     title="Uzaqlaşdır"
                   >
                     <ZoomOut className="w-3.5 h-3.5" />
                   </button>
-                  <span className="text-[10px] text-slate-500 font-mono w-9 text-center font-bold">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono w-9 text-center font-bold">
                     {Math.round(scale * 100)}%
                   </span>
                   <button
                     onClick={() => setScale(s => Math.min(2.0, s + 0.15))}
-                    className="p-1 border border-slate-200 rounded hover:bg-slate-50 cursor-pointer"
+                    className="p-1 border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer"
                     title="Yaxınlaşdır"
                   >
                     <ZoomIn className="w-3.5 h-3.5" />
@@ -1053,14 +1054,14 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
             </div>
 
             {/* Canvas / Word Viewer Container (Müstəqil Təkərlə Aşağı-Yuxarı Sürüşdürmə - Tələb 9) */}
-            <div className="flex-1 overflow-y-auto overscroll-contain independent-scroll p-4 flex flex-col items-center min-h-0">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain independent-scroll p-4 flex flex-col items-center">
               {pdfLoading ? (
                 <div className="m-auto text-center text-xs text-slate-400">
                   <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-indigo-500" />
                   Sənəd yüklənir...
                 </div>
               ) : docType === 'docx' && wordHtml ? (
-                <div className="bg-white shadow-xl rounded-xl p-8 sm:p-10 max-w-3xl w-full border border-slate-200 font-serif leading-relaxed text-slate-800 prose prose-slate">
+                <div className="bg-white dark:bg-slate-900 shadow-xl rounded-xl p-8 sm:p-10 max-w-3xl w-full border border-slate-200 dark:border-slate-800 font-serif leading-relaxed text-slate-800 dark:text-slate-200 prose prose-slate">
                   <div dangerouslySetInnerHTML={{ __html: wordHtml }} />
                 </div>
               ) : pdfDoc ? (
@@ -1075,9 +1076,9 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                   ))}
                 </div>
               ) : (
-                <div className="m-auto text-center p-6 bg-white rounded-2xl border border-slate-200 max-w-sm">
+                <div className="m-auto text-center p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-sm">
                   <FileText className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-xs text-slate-600 font-bold">Sənəd birbaşa göstərilmir</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-bold">Sənəd birbaşa göstərilmir</p>
                   <p className="text-[11px] text-slate-400 mt-1">
                     Zəhmət olmasa sualları müəlliminizdən aldığınız kağız və ya elektron vərəq üzrə oxuyaraq sağ tərəfdəki OMR cavab kartını doldurun.
                   </p>
@@ -1088,10 +1089,10 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
 
           {/* Right Column: OMR Optical Bubble Answer Sheet (Müstəqil Sürüşdürmə & Bərabər Simmetrik Boşluq) */}
           <aside
-            className="w-full lg:w-[530px] xl:w-[570px] 2xl:w-[610px] bg-white flex flex-col h-[50vh] lg:h-full overflow-hidden border-l border-slate-200 shadow-lg shrink-0 min-h-0"
+            className="w-full lg:w-[530px] xl:w-[570px] 2xl:w-[610px] bg-white dark:bg-slate-900 flex flex-col h-[50vh] lg:h-full overflow-hidden border-l border-slate-200 dark:border-slate-800 shadow-lg shrink-0 min-h-0"
           >
             {/* OMR Header */}
-            <div className="p-2 sm:p-2.5 border-b border-slate-200 bg-slate-50/70 flex items-center justify-between shrink-0">
+            <div className="p-2 sm:p-2.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/90 flex items-center justify-between shrink-0">
               <div>
                 <h3 className="font-extrabold text-xs sm:text-sm text-slate-900">
                   Optik Cavab Kartı
@@ -1199,12 +1200,17 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                         </div>
                       )}
 
-                      {/* 2. AÇIQ SUALLAR (RƏQƏMLİ) - DƏQİQ 2 SÜTUN (Yanaşı yerləşmə) */}
+                      {/* 2. AÇIQ SUALLAR (RƏQƏMLİ) - QAPALI SUALLARLA EYNİ OKEAN MAVİSİ VƏ AĞ KART DİZAYNI */}
                       {openQuestions.length > 0 && (
-                        <div className="pt-2 border-t border-slate-200">
-                          <span className="text-[10px] font-extrabold text-indigo-900 block mb-1.5 uppercase tracking-wider">
-                            Açıq Cavablı Suallar ({openQuestions.length})
-                          </span>
+                        <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-[#eef6fc] dark:bg-[#0c1a2e] border border-sky-200/90 dark:border-sky-900/50 shadow-2xs">
+                          <div className="flex items-center justify-between px-1 mb-1">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-sky-950 dark:text-sky-200">
+                              Açıq Cavablı Suallar ({openQuestions.length})
+                            </span>
+                            <span className="text-[9px] text-sky-700 dark:text-sky-400 font-bold">
+                              6-Sütunlu Standart Rəqəm Matrisi
+                            </span>
+                          </div>
                           <div className="grid grid-cols-2 gap-2">
                             {openQuestions.map((q) => {
                               const originalIndex = questions.findIndex(orig => orig.id === q.id);
@@ -1215,19 +1221,19 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                               return (
                                 <div
                                   key={q.id || qNum}
-                                  className="bg-[#f4f9fd] dark:bg-slate-900 border border-sky-200/90 dark:border-sky-900/60 rounded-xl p-2 flex flex-col gap-1 shadow-2xs"
+                                  className="bg-white dark:bg-slate-900 border border-sky-100 dark:border-slate-800 rounded-xl p-2.5 flex flex-col gap-1.5 shadow-2xs"
                                 >
                                   <div className="flex items-center justify-between pb-1 border-b border-sky-100 dark:border-slate-800 text-[10px]">
                                     <div className="flex items-center gap-1.5">
-                                      <span className="font-mono font-bold text-slate-900 dark:text-slate-100 shrink-0 min-w-[28px]">
+                                      <span className="w-6 min-w-[24px] font-mono font-black text-[12px] text-slate-900 dark:text-slate-100 shrink-0 select-none">
                                         {qNum < 10 ? '0' + qNum : qNum}.
                                       </span>
-                                      <span className="bg-sky-100 dark:bg-sky-950 text-sky-900 dark:text-sky-300 font-extrabold px-1.5 py-0.2 rounded text-[8.5px]">
+                                      <span className="bg-sky-100/80 dark:bg-sky-950 text-sky-900 dark:text-sky-300 border border-sky-200/80 dark:border-sky-900 font-extrabold px-1.5 py-0.2 rounded text-[8.5px]">
                                         Açıq Sual
                                       </span>
                                     </div>
                                     {currentSelection && (
-                                      <span className="font-mono font-bold text-emerald-700 bg-emerald-100 px-1 py-0.2 rounded text-[9px]">
+                                      <span className="font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-800 px-1 py-0.2 rounded text-[9px]">
                                         {currentSelection}
                                       </span>
                                     )}

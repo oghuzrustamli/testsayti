@@ -778,7 +778,7 @@ export const AiTestCreatorPage: React.FC<AiTestCreatorPageProps> = ({
             {/* ==============================================================
                 SAĞ PANEL: SEÇİLMİŞ FƏNNƏ AİD KONTEKST MENYU VƏ MÖVZU BAZASI
                 ============================================================== */}
-            <div className="lg:col-span-8 xl:col-span-8.5 bg-slate-50 flex flex-col h-full overflow-y-auto p-3 sm:p-5 gap-4 scrollbar-thin">
+            <div className="lg:col-span-8 xl:col-span-8.5 bg-[#eef6fc] dark:bg-[#090e17] flex flex-col h-full overflow-y-auto p-3 sm:p-5 gap-4 scrollbar-thin">
               {/* Kontekst Menyu Başlığı - Seçilmiş Fənn Kartı */}
               <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">

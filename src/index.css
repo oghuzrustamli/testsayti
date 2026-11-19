@@ -20,6 +20,12 @@
     background-color: #090e17 !important;
     color: #f8fafc !important;
   }
+
+  html:not(.dark),
+  html:not(.dark) body,
+  html:not(.dark) #root {
+    background-color: #eef6fc !important;
+  }
 }
 
 /* ==============================================================
@@ -305,6 +311,17 @@
   border-color: #34d399 !important;
   color: #ffffff !important;
   transform: none !important;
+}
+
+.dark .omr-numeric-grid {
+  background-color: #0c1a2e;
+  border-color: #1e293b;
+}
+
+.dark .omr-numeric-box {
+  background-color: #0f172a;
+  border-color: #475569;
+  color: #f8fafc;
 }
 
 /* ==============================================================

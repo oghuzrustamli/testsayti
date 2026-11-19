@@ -1473,16 +1473,16 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                     </div>
                   )}
 
-                  {/* 2. AÇIQ SUALLAR (RƏQƏMLİ 6-SÜTUNLU GRİD) - YANAŞI 2 SÜTUN */}
+                  {/* 2. AÇIQ SUALLAR (RƏQƏMLİ 6-SÜTUNLU GRİD) - QAPALI SUALLARLA EYNİ OKEAN MAVİSİ VƏ AĞ KART DİZAYNI */}
                   {openRows.length > 0 && (
-                    <div className="pt-2.5 border-t border-slate-200 flex flex-col gap-1.5">
-                      <div className="flex items-center justify-between px-1">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-indigo-900 flex items-center gap-1">
-                          <Plus className="w-3 h-3 text-indigo-600" />
+                    <div className="flex flex-col gap-1.5 p-2.5 rounded-2xl bg-[#eef6fc] dark:bg-[#0c1a2e] border border-sky-200/90 dark:border-sky-900/50 shadow-2xs">
+                      <div className="flex items-center justify-between px-1 mb-1">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-sky-950 dark:text-sky-200 flex items-center gap-1">
+                          <Plus className="w-3 h-3 text-sky-700 dark:text-sky-300" />
                           Açıq Cavablı Suallar ({openRows.length})
                         </span>
-                        <span className="text-[9px] font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200">
-                          6-Sütunlu Rəqəm Matrisi
+                        <span className="text-[9px] text-sky-700 dark:text-sky-400 font-bold">
+                          6-Sütunlu Standart Rəqəm Matrisi
                         </span>
                       </div>
 
@@ -1499,15 +1499,15 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                           return (
                             <div
                               key={row.number}
-                              className="w-full bg-[#f4f9fd] dark:bg-slate-900 border border-sky-200/90 dark:border-sky-900/60 rounded-xl p-2 flex flex-col gap-1.5 shadow-2xs"
+                              className="w-full bg-white dark:bg-slate-900 border border-sky-100 dark:border-slate-800 rounded-xl p-2.5 flex flex-col gap-1.5 shadow-2xs"
                             >
                               {/* Header */}
                               <div className="flex items-center justify-between pb-1 border-b border-sky-100 dark:border-slate-800 text-[10px]">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
+                                  <span className="w-6 min-w-[24px] font-mono font-black text-[12px] text-slate-900 dark:text-slate-100 shrink-0 select-none">
                                     {row.number < 10 ? `0${row.number}` : row.number}.
                                   </span>
-                                  <span className="bg-sky-100 dark:bg-sky-950 text-sky-900 dark:text-sky-300 font-extrabold px-1.5 py-0.2 rounded text-[8.5px]">
+                                  <span className="bg-sky-100/80 dark:bg-sky-950 text-sky-900 dark:text-sky-300 border border-sky-200/80 dark:border-sky-900 font-extrabold px-1.5 py-0.2 rounded text-[8.5px]">
                                     Açıq Sual
                                   </span>
                                 </div>
@@ -1819,24 +1819,31 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                         </div>
                       )}
 
-                      {/* 2. AÇIQ SUALLAR (RƏQƏMLİ) - DƏQİQ 2 SÜTUN (Yanaşı yerləşmə) */}
+                      {/* 2. AÇIQ SUALLAR (RƏQƏMLİ) - QAPALI SUALLARLA EYNİ OKEAN MAVİSİ VƏ AĞ KART DİZAYNI */}
                       {openRows.length > 0 && (
-                        <div className="pt-2 border-t border-slate-200">
-                          <span className="text-[10px] font-extrabold text-indigo-900 block mb-1.5 uppercase tracking-wider">
-                            Açıq Cavablı Suallar ({openRows.length})
-                          </span>
+                        <div className="flex flex-col gap-1.5 p-2 rounded-2xl bg-[#eef6fc] dark:bg-[#0c1a2e] border border-sky-200/90 dark:border-sky-900/50 shadow-2xs">
+                          <div className="flex items-center justify-between px-1 mb-1">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-sky-950 dark:text-sky-200">
+                              Açıq Cavablı Suallar ({openRows.length})
+                            </span>
+                            <span className="text-[9px] text-sky-700 dark:text-sky-400 font-bold">
+                              6-Sütunlu Standart Rəqəm Matrisi
+                            </span>
+                          </div>
                           <div className="grid grid-cols-2 gap-2">
                             {openRows.map((r) => {
                               const studentCols = parseStringToColumns(previewAnswers[r.number] || '');
                               return (
-                                <div key={r.number} className="p-2 rounded-xl border-2 border-indigo-200 bg-slate-50 flex flex-col gap-1 shadow-2xs">
-                                  <div className="flex items-center justify-between text-[11px] pb-1 border-b border-indigo-100">
+                                <div key={r.number} className="w-full bg-white dark:bg-slate-900 border border-sky-100 dark:border-slate-800 rounded-xl p-2.5 flex flex-col gap-1.5 shadow-2xs">
+                                  <div className="flex items-center justify-between text-[11px] pb-1 border-b border-sky-100 dark:border-slate-800">
                                     <div className="flex items-center gap-1.5">
-                                      <span className="font-mono font-bold text-slate-800 shrink-0 min-w-[28px]">{r.number}.</span>
-                                      <span className="bg-indigo-100 text-indigo-800 font-extrabold px-1.5 py-0.2 rounded text-[8.5px]">Açıq Sual</span>
+                                      <span className="w-6 min-w-[24px] font-mono font-black text-[12px] text-slate-900 dark:text-slate-100 shrink-0 select-none">
+                                        {r.number < 10 ? `0${r.number}` : r.number}.
+                                      </span>
+                                      <span className="bg-sky-100/80 dark:bg-sky-950 text-sky-900 dark:text-sky-300 border border-sky-200/80 dark:border-sky-900 font-extrabold px-1.5 py-0.2 rounded text-[8.5px]">Açıq Sual</span>
                                     </div>
                                     {previewAnswers[r.number] && (
-                                      <span className="font-mono font-bold text-emerald-700 bg-emerald-100 px-1 py-0.2 rounded text-[9px]">
+                                      <span className="font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-800 px-1 py-0.2 rounded text-[9px]">
                                         {previewAnswers[r.number]}
                                       </span>
                                     )}
