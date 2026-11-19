@@ -350,6 +350,24 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
         }
 
         // 1. Detect Header Row Index (Search top 15 rows for table headers)
+        const cleanHeader = (val: any) => {
+          if (!val) return '';
+          return String(val)
+            .replace(/\u0130/g, 'i') // Capital dotted İ -> i
+            .replace(/\u0131/g, 'i') // Small dotless ı -> i
+            .replace(/\u0049/g, 'i') // Capital Latin I -> i
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '') // remove combining accents
+            .replace(/ə/g, 'e')
+            .replace(/ö/g, 'o')
+            .replace(/ü/g, 'u')
+            .replace(/ş/g, 's')
+            .replace(/ç/g, 'c')
+            .replace(/ğ/g, 'g')
+            .replace(/[\s_\-.,/\\():#№]/g, '');
+        };
+
         let headerRowIdx = 0;
         let maxHeaderScore = -1;
 
@@ -358,15 +376,15 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
           if (!Array.isArray(row)) continue;
           let score = 0;
           for (const cell of row) {
-            const c = String(cell || '').toLowerCase().replace(/[\s_\-.,/\\()]/g, '');
-            if (c.includes('soyad') || c.includes('familiy') || c.includes('surname')) score += 4;
-            if (c === 'ad' || c === 'adi' || c.includes('firstname') || c.includes('sagirdinadi')) score += 4;
-            if (c.includes('ata') || c.includes('father') || c.includes('patronymic') || c.includes('otchest')) score += 4;
-            if (c.includes('utis') || c.includes('studentcode')) score += 5;
-            if (c.includes('fin') || c.includes('pin')) score += 5;
+            const c = cleanHeader(cell);
+            if (c.includes('soyad') || c.includes('familiy') || c.includes('surname')) score += 5;
+            if (c === 'ad' || c === 'adi' || c.includes('firstname') || (c.includes('sagird') && c.includes('ad')) || c.startsWith('ad')) score += 5;
+            if (c.includes('ata') || c.includes('father') || c.includes('patronymic') || c.includes('otchest')) score += 5;
+            if (c.includes('utis') || c.includes('studentcode')) score += 6;
+            if (c.includes('fin') || c.includes('pin')) score += 6;
             if (c.includes('sinif') || c.includes('sinfi') || c.includes('grade') || c.includes('class')) score += 3;
             if (c.includes('mekteb') || c.includes('school') || c.includes('muessise')) score += 2;
-            if (c === 'saa' || c === 'fio' || c.includes('tamad')) score += 3;
+            if (c === 'saa' || c === 'fio' || c.includes('tamad')) score += 4;
           }
           if (score > maxHeaderScore) {
             maxHeaderScore = score;
@@ -386,7 +404,7 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
 
         const headerCells = rawGrid[headerRowIdx] || [];
         headerCells.forEach((cell, idx) => {
-          const norm = String(cell || '').toLowerCase().trim().replace(/[\s_\-.,/\\()]/g, '');
+          const norm = cleanHeader(cell);
           if (!norm) return;
 
           // Priority 1: UTİS kodu
@@ -420,7 +438,15 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
           }
 
           // Priority 6: Ad (Strictly after soyad, ata, and full name)
-          if (norm === 'ad' || norm === 'adi' || norm === 'ism' || norm.includes('firstname') || norm.includes('first') || norm.includes('sagirdinadi')) {
+          if (
+            norm === 'ad' ||
+            norm === 'adi' ||
+            norm === 'ism' ||
+            norm === 'first' ||
+            norm.includes('firstname') ||
+            (norm.includes('sagird') && norm.includes('ad')) ||
+            norm.startsWith('ad')
+          ) {
             colFirstName = idx;
             return;
           }
@@ -438,7 +464,45 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
           }
         });
 
-        // Fallback column positions if no headers were matched
+        // Heuristic A: if colFirstName was not explicitly matched, check position between Soyad and Ata adı
+        if (colFirstName === -1) {
+          if (colLastName !== -1 && colFatherName !== -1 && colFatherName - colLastName === 2) {
+            colFirstName = colLastName + 1;
+          } else if (colLastName === 1 && colFatherName === 3) {
+            colFirstName = 2;
+          } else if (colLastName === 2 && colFatherName === 3) {
+            colFirstName = 1;
+          }
+        }
+
+        // Heuristic B: if colUtis was not explicitly matched, find column containing 7-digit numbers
+        if (colUtis === -1) {
+          const sampleRows = rawGrid.slice(headerRowIdx + 1, headerRowIdx + 30);
+          const colCounts: Record<number, number> = {};
+          sampleRows.forEach(row => {
+            if (!Array.isArray(row)) return;
+            row.forEach((val, cIdx) => {
+              if (cIdx === colFirstName || cIdx === colLastName || cIdx === colFatherName || cIdx === colFin || cIdx === colGrade) return;
+              const sVal = String(val || '').trim();
+              if (/^\d{6,8}$/.test(sVal)) {
+                colCounts[cIdx] = (colCounts[cIdx] || 0) + 1;
+              }
+            });
+          });
+          let bestCol = -1;
+          let bestCount = 0;
+          Object.entries(colCounts).forEach(([cStr, count]) => {
+            if (count > bestCount) {
+              bestCount = count;
+              bestCol = parseInt(cStr);
+            }
+          });
+          if (bestCol !== -1 && bestCount >= 2) {
+            colUtis = bestCol;
+          }
+        }
+
+        // Fallback column positions if no headers were matched at all
         if (colFirstName === -1 && colLastName === -1 && colFullName === -1) {
           colFirstName = 1;
           colLastName = 2;
@@ -475,6 +539,13 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
             }
           }
 
+          // Auto-fill fallback so student is never completely locked out
+          if (!firstName && lastName) {
+            firstName = lastName;
+          } else if (!lastName && firstName) {
+            lastName = firstName;
+          }
+
           // UTİS: preserve as string with leading zeros, remove accidental leading quotes
           let rawUtis = colUtis !== -1 ? String(row[colUtis] || '').trim().replace(/^'/, '') : '';
           const cleanUtis = rawUtis;
@@ -506,12 +577,6 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
 
           // Validation Warnings
           const validationErrors: string[] = [];
-          if (!firstName && !lastName) {
-            validationErrors.push('Ad və soyad daxil edilməyib');
-          } else {
-            if (!firstName) validationErrors.push('Ad qeyd olunmayıb');
-            if (!lastName) validationErrors.push('Soyad qeyd olunmayıb');
-          }
           if (!fatherName) {
             validationErrors.push('Ata adı qeyd olunmayıb');
           }
@@ -531,15 +596,13 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
             s => (cleanUtis && s.utis_code && s.utis_code === cleanUtis) ||
                  (rawFin && s.fin_code && s.fin_code.toUpperCase() === rawFin) ||
                  (s.first_name.toLowerCase() === firstName.toLowerCase() &&
-                  s.last_name.toLowerCase() === lastName.toLowerCase() &&
-                  (!fatherName || !s.father_name || s.father_name.toLowerCase() === fatherName.toLowerCase()))
+                  s.last_name.toLowerCase() === lastName.toLowerCase())
           );
 
-          let status: StudentImportItem['status'] = 'new';
-          if (!firstName || !lastName) {
+          let status: StudentImportItem['status'] = isExisting ? 'needs_update' : 'new';
+          if (!firstName && !lastName) {
             status = 'invalid';
-          } else if (isExisting) {
-            status = 'needs_update';
+            validationErrors.push('Ad və soyad daxil edilməyib');
           }
 
           normalizedRows.push({
@@ -1772,12 +1835,12 @@ export const StudentDatabasePage: React.FC<StudentDatabasePageProps> = ({ user }
 
                   <button
                     type="button"
-                    disabled={isImporting || importSummary.newCount + importSummary.updateCount === 0}
+                    disabled={isImporting || parsedImportRows.filter(r => r.status !== 'invalid').length === 0}
                     onClick={handleExecuteImport}
                     className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-md shadow-emerald-200 dark:shadow-none flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
                   >
                     <Check className="w-4 h-4" />
-                    <span>{isImporting ? 'İdxal edilir...' : `İdxalı Təsdiq Et (${importSummary.newCount + importSummary.updateCount} şagird)`}</span>
+                    <span>{isImporting ? 'İdxal edilir...' : `İdxalı Təsdiq Et (${parsedImportRows.filter(r => r.status !== 'invalid').length} şagird)`}</span>
                   </button>
                 </div>
               </div>
