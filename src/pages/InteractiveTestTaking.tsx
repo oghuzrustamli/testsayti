@@ -293,16 +293,16 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                 id: `q-omr-${ak.number || idx + 1}`,
                 subject: testData.test.subject || 'Ümumi',
                 question_text: `Sual №${ak.number || idx + 1}`,
-                question_type: ak.type === 'numeric_grid' ? ('numeric' as const) : ('single_choice' as const),
-                options: ak.type === 'numeric_grid' ? [] : [
+                question_type: ak.type === 'numeric_grid' ? ('numeric' as const) : ak.type === 'situation' ? ('situation' as const) : ('single_choice' as const),
+                options: ak.type === 'numeric_grid' || ak.type === 'situation' ? [] : [
                   { id: 'A', text: 'A' },
                   { id: 'B', text: 'B' },
                   { id: 'C', text: 'C' },
                   { id: 'D', text: 'D' },
                   { id: 'E', text: 'E' },
                 ],
-                correct_answer: ak.answer || 'A',
-                points: 4,
+                correct_answer: ak.answer || (ak.type === 'numeric_grid' ? '' : 'A'),
+                points: ak.points || (ak.type === 'situation' ? 6 : 4),
                 order_index: idx
               }));
             } else {
@@ -975,91 +975,164 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
               </div>
             </div>
 
-            {/* Situasiya Suallarının AI Qiymətləndirmə Təhlili (Tələb 3, 4) */}
-            {Object.keys(situationEvaluations).length > 0 && (
-              <div className="mt-5 pt-4 border-t border-indigo-100 flex flex-col gap-3 text-left">
-                <div className="flex items-center gap-2 text-indigo-950 font-bold text-xs uppercase tracking-wider">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
-                  <span>Süni İntellektlə Situasiya Təhlili</span>
-                </div>
+            {/* Açıq və Situasiya Tipli Sualların Xülasə Nəticələri (İstər OMR, istərsə İnteraktiv: Sual mətni göstərilmir, Yalnız cavablar və bal) */}
+            {(() => {
+              const openTypeQuestions = questions.filter(
+                q => q.question_type === 'open_ended' || q.question_type === 'numeric' || q.question_type === 'situation'
+              );
+              if (openTypeQuestions.length === 0) return null;
 
-                {questions.filter(q => q.question_type === 'situation').map((q, idx) => {
-                  const ev = situationEvaluations[q.id];
-                  if (!ev) return null;
-                  const studentAns = answers[q.id] || '';
+              const isAnswerCorrect = (studentAns: string, correctAns: string) => {
+                if (!studentAns || !correctAns) return false;
+                const sTrim = studentAns.trim().toUpperCase();
+                const cTrim = correctAns.trim().toUpperCase();
+                if (sTrim === cTrim) return true;
+                const sNorm = sTrim.replace(',', '.').replace(/\s+/g, '');
+                const cNorm = cTrim.replace(',', '.').replace(/\s+/g, '');
+                if (sNorm === cNorm && sNorm !== '') return true;
+                const sNum = parseFloat(sNorm);
+                const cNum = parseFloat(cNorm);
+                if (!isNaN(sNum) && !isNaN(cNum) && Math.abs(sNum - cNum) < 1e-9) return true;
+                return false;
+              };
 
-                  return (
-                    <div key={q.id} className="p-3 bg-white rounded-xl border border-indigo-200/80 shadow-2xs flex flex-col gap-2 text-xs">
-                      <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-                        <span className="font-extrabold text-indigo-900">
-                          Situasiya Sualı №{idx + 1}
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-black text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-lg">
-                            {ev.score} / {ev.max_points} bal
-                          </span>
-                          <span className="text-[10px] font-bold text-slate-500">
-                            ({ev.tier_label})
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Student's answer */}
-                      <div className="p-2 bg-slate-50 rounded-lg text-slate-700 text-[11px] leading-relaxed">
-                        <strong className="block text-[10px] text-slate-400 mb-0.5">Şagirdin Cavabı:</strong>
-                        {studentAns || <span className="italic text-slate-400">Cavab yazılmayıb</span>}
-                      </div>
-
-                      {/* Matched Keywords */}
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] font-bold text-slate-500">Aşkar edilən açar sözlər ({ev.matched_keywords.length}/10):</span>
-                        <div className="flex flex-wrap gap-1">
-                          {ev.matched_keywords.map((m, mi) => (
-                            <span key={mi} className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-bold flex items-center gap-1">
-                              <CheckCircle className="w-2.5 h-2.5 text-emerald-600" />
-                              {m.keyword} {m.matched_term !== m.keyword && <span className="opacity-75">({m.matched_term})</span>}
-                            </span>
-                          ))}
-                          {ev.missing_keywords.map((k, ki) => (
-                            <span key={ki} className="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-400 text-[10px]">
-                              {k}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* AI Feedback */}
-                      <div className="text-[11px] text-slate-600 bg-amber-50/60 p-2 rounded-lg border border-amber-200/60">
-                        <strong>AI Rəyi:</strong> {ev.ai_feedback}
-                      </div>
-
-                      {/* Teacher Score Override (Tələb 4) */}
-                      <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
-                        <span className="text-slate-400">Balı əl ilə dəyiş (Müəllim):</span>
-                        <div className="flex items-center gap-1">
-                          <input
-                            type="number"
-                            min={0}
-                            max={ev.max_points}
-                            step="0.5"
-                            defaultValue={ev.score}
-                            onChange={(e) => {
-                              const newScore = parseFloat(e.target.value) || 0;
-                              setSituationEvaluations(prev => ({
-                                ...prev,
-                                [q.id]: { ...prev[q.id], score: newScore, teacher_override_score: newScore }
-                              }));
-                            }}
-                            className="w-14 px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-center font-bold text-indigo-700 text-xs"
-                          />
-                          <span className="text-[10px] text-slate-500">bal</span>
-                        </div>
-                      </div>
+              return (
+                <div className="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2.5 text-left">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-indigo-950 dark:text-indigo-200 font-extrabold text-xs uppercase tracking-wider">
+                      <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                      <span>Açıq Tipli Sualların Nəticələri ({openTypeQuestions.length} sual)</span>
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                    <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
+                      (Yalnız cavablar və bal)
+                    </span>
+                  </div>
+
+                  <div className="divide-y divide-slate-100 dark:divide-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900/90 shadow-2xs">
+                    {openTypeQuestions.map((q) => {
+                      const originalIndex = questions.findIndex(item => item.id === q.id);
+                      const qNum = originalIndex >= 0 ? originalIndex + 1 : 1;
+                      const studentAns = (answers[q.id] || '').trim();
+                      const ev = situationEvaluations[q.id];
+                      const isSituation = q.question_type === 'situation';
+                      const qPoints = q.points || (isSituation ? 6 : 4);
+
+                      let isCorrect = false;
+                      let earnedPoints = 0;
+                      if (isSituation && ev) {
+                        earnedPoints = typeof ev.teacher_override_score === 'number' ? ev.teacher_override_score : ev.score;
+                        isCorrect = earnedPoints > 0;
+                      } else if (!isSituation && q.correct_answer) {
+                        isCorrect = isAnswerCorrect(studentAns, q.correct_answer);
+                        earnedPoints = isCorrect ? qPoints : 0;
+                      }
+
+                      return (
+                        <div
+                          key={q.id}
+                          className={`p-3 transition-colors flex flex-col gap-2 ${
+                            isCorrect
+                              ? 'bg-emerald-50/30 dark:bg-emerald-950/20'
+                              : studentAns
+                              ? 'bg-rose-50/30 dark:bg-rose-950/20'
+                              : 'bg-slate-50/50 dark:bg-slate-900/50'
+                          }`}
+                        >
+                          {/* Sual Başlığı: Sual №, Fənn, Açıq/Situasiya və QARŞISINDA Sualın Balı */}
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="font-black text-xs text-slate-900 dark:text-white">
+                                Sual №{qNum}
+                              </span>
+                              {q.subject && (
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
+                                  {q.subject}
+                                </span>
+                              )}
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border border-indigo-200/50">
+                                {isSituation ? 'Situasiya Sualı' : 'Açıq Sual'}
+                              </span>
+                            </div>
+
+                            {/* QARŞISINDA Sualın Balı */}
+                            <div className="flex items-center gap-1.5">
+                              <span className={`px-2.5 py-0.5 rounded-lg font-black text-xs font-mono border ${
+                                isCorrect
+                                  ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                                  : studentAns
+                                  ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+                              }`}>
+                                {isSituation && ev
+                                  ? `${earnedPoints} / ${ev.max_points} bal`
+                                  : `${earnedPoints} / ${qPoints} bal`}
+                              </span>
+                              {isSituation && ev?.tier_label && (
+                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 hidden sm:inline">
+                                  ({ev.tier_label})
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Sual mətni göstərilmir, YALNIZ şagird cavabı və düzgün cavab */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between">
+                              <span className="text-[10px] font-bold text-slate-400">Şagirdin Cavabı:</span>
+                              <strong className={`font-mono text-xs ${studentAns ? (isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400') : 'text-slate-400 italic'}`}>
+                                {studentAns || 'Cavab yazılmayıb'}
+                              </strong>
+                            </div>
+
+                            <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between">
+                              <span className="text-[10px] font-bold text-slate-400">Düzgün Cavab:</span>
+                              <strong className="font-mono text-xs text-emerald-600 dark:text-emerald-400">
+                                {isSituation
+                                  ? (q.situation_model_answer || 'Standart cavab meyarı')
+                                  : (q.correct_answer || '—')}
+                              </strong>
+                            </div>
+                          </div>
+
+                          {/* Situasiya üçün AI rəyi və açar sözlər (kompakt) */}
+                          {isSituation && ev && (
+                            <div className="flex flex-col gap-1.5 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                              {ev.ai_feedback && (
+                                <div className="text-[11px] text-amber-900 dark:text-amber-200 bg-amber-50/80 dark:bg-amber-950/40 p-2 rounded-xl border border-amber-200/60 dark:border-amber-800/50">
+                                  <strong>AI Rəyi:</strong> {ev.ai_feedback}
+                                </div>
+                              )}
+                              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                                <span>Açar sözlər ({ev.matched_keywords.length}/10 uyğun)</span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-slate-400">Balı əl ilə dəyiş:</span>
+                                  <input
+                                    type="number"
+                                    min={0}
+                                    max={ev.max_points}
+                                    step="0.5"
+                                    defaultValue={earnedPoints}
+                                    onChange={(e) => {
+                                      const newScore = parseFloat(e.target.value) || 0;
+                                      setSituationEvaluations(prev => ({
+                                        ...prev,
+                                        [q.id]: { ...prev[q.id], score: newScore, teacher_override_score: newScore }
+                                      }));
+                                    }}
+                                    className="w-14 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded text-center font-bold text-indigo-700 dark:text-indigo-400 text-xs"
+                                  />
+                                  <span className="text-[10px]">bal</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           <button

@@ -258,32 +258,102 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                   </h4>
                   {sessionDetail.answers.map((ans: any, idx: number) => {
                     const isCorrect = ans.is_correct === 1;
+                    const isOpenQuestion = ans.question_type === 'open_ended' || ans.question_type === 'numeric' || ans.question_type === 'situation' || (!ans.options || ans.options.length === 0);
+                    const qPoints = ans.points || 4;
+
+                    // Open-ended / Numeric / Situation questions: Omit question body to keep page compact and clean
+                    if (isOpenQuestion) {
+                      return (
+                        <div
+                          key={ans.question_id || idx}
+                          className={`p-3 rounded-2xl border text-xs flex flex-col gap-2 ${
+                            isCorrect ? 'bg-emerald-50/40 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-800' : 'bg-rose-50/40 border-rose-200 dark:bg-rose-950/20 dark:border-rose-800'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="font-black text-slate-900 dark:text-white">
+                                Sual {idx + 1}
+                              </span>
+                              {ans.subject && (
+                                <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[10px]">
+                                  {ans.subject}
+                                </span>
+                              )}
+                              <span className="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold text-[10px] border border-indigo-200 dark:border-indigo-800">
+                                Açıq Sual
+                              </span>
+                            </div>
+
+                            {/* QARŞISINDA Sualın Balı və Statusu */}
+                            <div className="flex items-center gap-1.5">
+                              <span className={`px-2.5 py-0.5 rounded-lg font-black font-mono text-xs border ${
+                                isCorrect
+                                  ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                                  : 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700'
+                              }`}>
+                                {isCorrect ? qPoints : 0} / {qPoints} bal
+                              </span>
+                              <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                                isCorrect ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200'
+                              }`}>
+                                {isCorrect ? 'Düzgün Cavab' : 'Səhv Cavab'}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Cavablar: Sualın öz mətni göstərilmir, YALNIZ cavablar */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                            <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                              <span className="text-[10px] font-bold text-slate-400">Şagirdin cavabı:</span>
+                              <strong className={`font-mono text-xs ${isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                                {ans.selected_answer || 'Boş'}
+                              </strong>
+                            </div>
+                            <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                              <span className="text-[10px] font-bold text-slate-400">Düzgün cavab:</span>
+                              <strong className="font-mono text-xs text-emerald-600 dark:text-emerald-400">
+                                {ans.correct_answer || '—'}
+                              </strong>
+                            </div>
+                          </div>
+
+                          {ans.explanation && (
+                            <div className="mt-1 p-2 bg-white/80 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px]">
+                              <strong>İzah:</strong> <MathRenderer content={ans.explanation} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+
+                    // Closed Multiple-Choice Questions: Render standard options and question
                     return (
                       <div
                         key={ans.question_id || idx}
                         className={`p-4 rounded-xl border text-xs ${
-                          isCorrect ? 'bg-emerald-50/30 border-emerald-200' : 'bg-rose-50/30 border-rose-200'
+                          isCorrect ? 'bg-emerald-50/30 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-800' : 'bg-rose-50/30 border-rose-200 dark:bg-rose-950/20 dark:border-rose-800'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-slate-900">
+                            <span className="font-bold text-slate-900 dark:text-white">
                               Sual {idx + 1}:
                             </span>
                             {ans.subject && (
-                              <span className="px-2 py-0.2 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[10px]">
+                              <span className="px-2 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[10px]">
                                 {ans.subject}
                               </span>
                             )}
                           </div>
                           <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
-                            isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                            isCorrect ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200'
                           }`}>
                             {isCorrect ? 'Düzgün Cavab' : 'Səhv Cavab'}
                           </span>
                         </div>
 
-                      <div className="mb-2 text-slate-800 font-medium leading-relaxed">
+                      <div className="mb-2 text-slate-800 dark:text-slate-200 font-medium leading-relaxed">
                         <MathRenderer content={ans.question_text} />
                       </div>
 
@@ -294,12 +364,12 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                             key={o.id}
                             className={`p-1.5 rounded border text-[11px] flex items-center gap-1.5 ${
                               ans.selected_answer === o.id && isCorrect
-                                ? 'bg-emerald-100 border-emerald-400 font-bold text-emerald-900'
+                                ? 'bg-emerald-100 border-emerald-400 font-bold text-emerald-900 dark:bg-emerald-900/60 dark:text-emerald-200'
                                 : ans.selected_answer === o.id && !isCorrect
-                                ? 'bg-rose-100 border-rose-400 font-bold text-rose-900'
+                                ? 'bg-rose-100 border-rose-400 font-bold text-rose-900 dark:bg-rose-900/60 dark:text-rose-200'
                                 : ans.correct_answer === o.id
-                                ? 'bg-emerald-50 border-emerald-300 font-bold text-emerald-800'
-                                : 'bg-slate-50 border-slate-200 text-slate-600'
+                                ? 'bg-emerald-50 border-emerald-300 font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                : 'bg-slate-50 border-slate-200 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300'
                             }`}
                           >
                             <span className="font-bold">{o.id}:</span>
@@ -308,13 +378,13 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                         ))}
                       </div>
 
-                      <div className="flex items-center gap-4 text-[11px] text-slate-600 pt-1 border-t border-slate-200/60">
-                        <span>Şagirdin seçdiyi: <strong className={isCorrect ? 'text-emerald-700' : 'text-rose-700'}>{ans.selected_answer || 'Boş'}</strong></span>
-                        <span>Düzgün variant: <strong className="text-emerald-700">{ans.correct_answer}</strong></span>
+                      <div className="flex items-center gap-4 text-[11px] text-slate-600 dark:text-slate-400 pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+                        <span>Şagirdin seçdiyi: <strong className={isCorrect ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}>{ans.selected_answer || 'Boş'}</strong></span>
+                        <span>Düzgün variant: <strong className="text-emerald-700 dark:text-emerald-400">{ans.correct_answer}</strong></span>
                       </div>
 
                       {ans.explanation && (
-                        <div className="mt-2 p-2 bg-white/80 rounded border border-slate-200 text-slate-700 text-[11px]">
+                        <div className="mt-2 p-2 bg-white/80 dark:bg-slate-800/80 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px]">
                           <strong>İzah:</strong> <MathRenderer content={ans.explanation} />
                         </div>
                       )}
