@@ -163,18 +163,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <X className="w-4 h-4" />
         </button>
 
-        {/* Brand & Futuristic Status Header */}
-        <div className="text-center mb-6 relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-[10px] font-mono tracking-widest text-cyan-300 uppercase shadow-[0_0_15px_rgba(6,182,212,0.3)] mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-            <Cpu className="w-3 h-3 text-cyan-400" />
-            <span>ATROQ EDUCATION v2.5 • AI PORTAL</span>
+        {/* Brand & Logo Header */}
+        <div className="text-center mb-5 relative flex flex-col items-center">
+          <div className="flex justify-center mb-2.5">
+            <img
+              src="/assets/atroq-logo.png"
+              alt="ATROQ Education Logo"
+              className="h-14 sm:h-16 w-auto object-contain dark:brightness-125 dark:drop-shadow-[0_0_12px_rgba(255,255,255,0.35)]"
+            />
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-cyan-300 via-indigo-200 to-purple-300 bg-clip-text text-transparent">
+          <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/80 border border-cyan-200 dark:border-cyan-500/40 text-[10px] font-mono tracking-widest text-cyan-800 dark:text-cyan-300 uppercase shadow-xs mb-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+            <Cpu className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
+            <span>AI TƏHSİL PORTALI</span>
+          </div>
+
+          <h2 className="text-lg sm:text-xl font-black tracking-tight text-slate-900 dark:bg-gradient-to-r dark:from-cyan-300 dark:via-indigo-200 dark:to-purple-300 dark:bg-clip-text dark:text-transparent">
             {mode === 'login' ? 'Gələcəyin İmtahan Platforması' : 'Yeni Hesab Qeydiyyatı'}
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             {mode === 'login'
               ? 'Hesabınıza daxil olaraq sınaqlar və OMR kartlarını idarə edin'
               : 'ATROQ Education platformasına qoşularaq innovativ imtahanlar yaradın'}

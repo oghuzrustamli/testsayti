@@ -163,12 +163,12 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
           </div>
 
           {/* Logo & Title */}
-          <div className="flex items-center justify-center gap-2.5 mb-1.5">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-sky-500 to-blue-700 p-0.5 shadow-md flex items-center justify-center">
-              <div className="w-full h-full bg-white dark:bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <Cpu className="w-5 h-5 text-indigo-600 dark:text-sky-400" />
-              </div>
-            </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-2">
+            <img
+              src="/assets/atroq-logo.png"
+              alt="ATROQ Education"
+              className="h-14 sm:h-16 w-auto object-contain dark:brightness-125 dark:drop-shadow-[0_0_12px_rgba(255,255,255,0.35)]"
+            />
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:via-slate-100 dark:to-sky-300">
               ATROQ Education
             </h1>

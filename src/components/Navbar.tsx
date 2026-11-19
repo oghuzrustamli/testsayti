@@ -76,19 +76,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* 1. ATROQ EDUCATION LOQOSU (Solda birinci) */}
         <div
           onClick={handleLogoClick}
-          className="flex items-center gap-2.5 cursor-pointer group shrink-0"
+          className="flex items-center gap-2 cursor-pointer group shrink-0"
           title="ATROQ Education"
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-700 via-indigo-600 to-violet-500 text-white flex items-center justify-center shadow-md shadow-indigo-100 dark:shadow-indigo-900/30 group-hover:scale-105 transition-transform">
-            <GraduationCap className="w-5 h-5" />
-          </div>
-          <div className="flex items-center gap-1.5 leading-none">
-            <span className="font-black text-base text-slate-900 dark:text-white tracking-tight font-sans">
-              ATROQ
-            </span>
-            <span className="text-[10px] uppercase font-black px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800 leading-none">
-              Education
-            </span>
+          <div className="h-10 sm:h-11 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <img
+              src="/assets/atroq-logo.png"
+              alt="ATROQ Education"
+              className="h-8 sm:h-9 w-auto object-contain dark:brightness-125 dark:contrast-125 dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]"
+            />
           </div>
         </div>
 

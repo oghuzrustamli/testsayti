@@ -61,10 +61,13 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ onSuccess, onClo
           </button>
         </div>
 
-        {/* Shield Icon Badge */}
-        <div className="relative mx-auto mb-3 w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-400 text-white dark:text-slate-950 flex items-center justify-center shadow-md border border-amber-300">
-          <ShieldAlert className="w-8 h-8" />
-          <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
+        {/* Official ATROQ Logo */}
+        <div className="flex justify-center mb-2.5">
+          <img
+            src="/assets/atroq-logo.png"
+            alt="ATROQ Education Logo"
+            className="h-14 sm:h-16 w-auto object-contain dark:brightness-125 dark:drop-shadow-[0_0_12px_rgba(255,255,255,0.35)]"
+          />
         </div>
 
         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/80 border border-amber-200 dark:border-amber-500/40 text-[9.5px] font-mono tracking-widest text-amber-800 dark:text-amber-300 uppercase shadow-xs mb-2">

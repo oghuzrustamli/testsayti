@@ -93,8 +93,8 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
         </div>
 
         <div className="relative z-10 w-full">
-          {/* Üst zolaq: Tarix və Məktəb etiketləri */}
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-2 pb-2 border-b border-indigo-100 dark:border-white/10">
+          {/* Üst zolaq: Tarix, Məktəb etiketləri və Rəsmi ATROQ Loqosu */}
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-2 pb-2.5 border-b border-indigo-100 dark:border-white/10">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-white dark:bg-white/10 text-indigo-700 dark:text-indigo-200 text-[11px] font-semibold shadow-2xs border border-indigo-200/80 dark:border-white/10">
                 <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-300" />
@@ -105,9 +105,15 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                 {user.school || 'ATROQ Education'}
               </span>
             </div>
-            <span className="hidden sm:inline-block text-[11px] font-bold text-indigo-700 dark:text-indigo-300/80">
-              ATROQ Education Platforması
-            </span>
+
+            {/* Xoş gəlmisiniz panelinin yuxarı sağında rəsmi ATROQ Education Loqosu */}
+            <div className="flex items-center gap-2">
+              <img
+                src="/assets/atroq-logo.png"
+                alt="ATROQ Education"
+                className="h-9 sm:h-10 w-auto object-contain dark:brightness-125 dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.35)]"
+              />
+            </div>
           </div>
 
           <div className="mt-1 max-w-4xl">
