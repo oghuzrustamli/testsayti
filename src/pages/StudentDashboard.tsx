@@ -61,20 +61,20 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   return (
     <div className="p-4 sm:p-8 max-w-6xl mx-auto w-full flex flex-col gap-6">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-indigo-950 rounded-3xl p-6 sm:p-8 text-white relative shadow-xl overflow-hidden">
+      <div className="bg-gradient-to-r from-indigo-50/90 via-white to-sky-50/70 dark:from-indigo-950 dark:via-indigo-900 dark:to-slate-950 rounded-3xl p-6 sm:p-8 text-slate-900 dark:text-white border border-indigo-100 dark:border-indigo-900 relative shadow-sm dark:shadow-xl overflow-hidden">
         <div className="relative z-10 max-w-xl">
           <div className="flex items-center gap-2 mb-2">
-            <span className="p-1.5 bg-indigo-700 rounded-lg">
-              <GraduationCap className="w-4 h-4 text-white" />
+            <span className="p-1.5 bg-indigo-100 dark:bg-indigo-700 rounded-lg text-indigo-700 dark:text-white">
+              <GraduationCap className="w-4 h-4" />
             </span>
-            <span className="text-xs bg-white/10 px-2.5 py-0.5 rounded-full font-medium">
+            <span className="text-xs bg-indigo-50 dark:bg-white/10 text-indigo-700 dark:text-white border border-indigo-200/80 dark:border-white/10 px-2.5 py-0.5 rounded-full font-bold">
               Şagird Portalı
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
             Salam, {user.full_name}!
           </h1>
-          <p className="text-indigo-200 text-xs sm:text-sm mt-1 leading-relaxed">
+          <p className="text-slate-600 dark:text-indigo-200 text-xs sm:text-sm mt-1 leading-relaxed">
             Müəlliminizin göndərdiyi sınaq kodunu daxil edərək və ya aktiv imtahanlar siyahısından seçərək testə başlayın.
           </p>
         </div>

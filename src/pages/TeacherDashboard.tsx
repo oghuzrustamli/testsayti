@@ -86,90 +86,90 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
 
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-8 max-w-7xl mx-auto w-full select-none">
-      {/* 1. HERO BANNER & TEZ BAŞLAMA PANESİ (Geniş, alçaq və kompakt) */}
-      <div className="w-full relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 text-white p-4 sm:p-5 lg:p-6 shadow-xl border border-indigo-900/40">
+      {/* 1. HERO BANNER & TEZ BAŞLAMA PANESİ (Geniş, alçaq, işıqlı rejimdə tam açıq, qaranlıq rejimdə tünd) */}
+      <div className="w-full relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-indigo-50/90 via-white to-sky-50/70 dark:from-slate-950 dark:via-indigo-950 dark:to-slate-900 text-slate-900 dark:text-white p-4 sm:p-5 lg:p-6 shadow-sm dark:shadow-xl border border-indigo-100 dark:border-indigo-900/40">
         <div className="absolute right-0 top-0 bottom-0 opacity-10 pointer-events-none flex items-center pr-6">
           <Sparkles className="w-72 h-72 text-indigo-400" />
         </div>
 
         <div className="relative z-10 w-full">
           {/* Üst zolaq: Tarix və Məktəb etiketləri */}
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-2 pb-2 border-b border-white/10">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2 pb-2 border-b border-indigo-100 dark:border-white/10">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-white/10 text-indigo-200 text-[11px] font-semibold backdrop-blur-xs border border-white/10">
-                <Calendar className="w-3.5 h-3.5 text-indigo-300" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-white dark:bg-white/10 text-indigo-700 dark:text-indigo-200 text-[11px] font-semibold shadow-2xs border border-indigo-200/80 dark:border-white/10">
+                <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-300" />
                 {todayStr}
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 text-[11px] font-semibold backdrop-blur-xs border border-emerald-500/30">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-[11px] font-semibold shadow-2xs border border-emerald-200/80 dark:border-emerald-500/30">
                 <School className="w-3.5 h-3.5" />
                 {user.school || 'ATROQ Education'}
               </span>
             </div>
-            <span className="hidden sm:inline-block text-[11px] font-bold text-indigo-300/80">
+            <span className="hidden sm:inline-block text-[11px] font-bold text-indigo-700 dark:text-indigo-300/80">
               ATROQ Education Platforması
             </span>
           </div>
 
           <div className="mt-1 max-w-4xl">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight leading-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight leading-tight text-slate-900 dark:text-white">
               {t.welcome}, {user.full_name}
             </h1>
-            <p className="text-slate-300 text-xs sm:text-[13px] mt-1 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-[13px] mt-1 leading-relaxed">
               {t.welcomeSubtitle}
             </p>
           </div>
 
-          {/* 4 Əsas Giriş Düyməsi (Yığcam, tünd fonlu portativ kartlar) */}
+          {/* 4 Əsas Giriş Düyməsi (İşıqlı rejimdə tam ağ və açıq, Qaranlıq rejimdə tünd) */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mt-4 w-full">
             <button
               onClick={() => onNavigate('ai_test')}
-              className="p-2.5 sm:p-3 rounded-xl bg-slate-950/85 hover:bg-slate-900 border border-violet-500/30 hover:border-violet-400 text-white text-left transition-all shadow-sm hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
+              className="p-2.5 sm:p-3 rounded-xl bg-white hover:bg-violet-50/60 dark:bg-slate-950/85 dark:hover:bg-slate-900 border border-slate-200/90 hover:border-violet-300 dark:border-violet-500/30 dark:hover:border-violet-400 text-slate-900 dark:text-white text-left transition-all shadow-xs hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-lg bg-violet-950/80 border border-violet-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <Sparkles className="w-4 h-4 text-amber-300" />
+              <div className="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-950/80 border border-violet-200 dark:border-violet-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Sparkles className="w-4 h-4 text-violet-600 dark:text-amber-300" />
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-xs font-black block truncate leading-tight group-hover:text-violet-200">{t.fastActionAi}</span>
-                <span className="text-[10px] text-violet-300/70 font-semibold block truncate mt-0.5">Süni İntellekt</span>
+                <span className="text-xs font-black block truncate leading-tight text-slate-900 dark:text-white group-hover:text-violet-700 dark:group-hover:text-violet-200">{t.fastActionAi}</span>
+                <span className="text-[10px] text-violet-600 dark:text-violet-300/70 font-semibold block truncate mt-0.5">Süni İntellekt</span>
               </div>
             </button>
 
             <button
               onClick={() => onNavigate('create_test')}
-              className="p-2.5 sm:p-3 rounded-xl bg-slate-950/85 hover:bg-slate-900 border border-cyan-500/30 hover:border-cyan-400 text-white text-left transition-all shadow-sm hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
+              className="p-2.5 sm:p-3 rounded-xl bg-white hover:bg-cyan-50/60 dark:bg-slate-950/85 dark:hover:bg-slate-900 border border-slate-200/90 hover:border-cyan-300 dark:border-cyan-500/30 dark:hover:border-cyan-400 text-slate-900 dark:text-white text-left transition-all shadow-xs hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-lg bg-cyan-950/80 border border-cyan-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <Edit3 className="w-4 h-4 text-cyan-300" />
+              <div className="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-950/80 border border-cyan-200 dark:border-cyan-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Edit3 className="w-4 h-4 text-cyan-600 dark:text-cyan-300" />
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-xs font-black block truncate leading-tight group-hover:text-cyan-200">{t.fastActionInteractive}</span>
-                <span className="text-[10px] text-cyan-300/70 font-semibold block truncate mt-0.5">Online Konstruktor</span>
+                <span className="text-xs font-black block truncate leading-tight text-slate-900 dark:text-white group-hover:text-cyan-700 dark:group-hover:text-cyan-200">{t.fastActionInteractive}</span>
+                <span className="text-[10px] text-cyan-600 dark:text-cyan-300/70 font-semibold block truncate mt-0.5">Online Konstruktor</span>
               </div>
             </button>
 
             <button
               onClick={() => onNavigate('omr_test')}
-              className="p-2.5 sm:p-3 rounded-xl bg-slate-950/85 hover:bg-slate-900 border border-emerald-500/30 hover:border-emerald-400 text-white text-left transition-all shadow-sm hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
+              className="p-2.5 sm:p-3 rounded-xl bg-white hover:bg-emerald-50/60 dark:bg-slate-950/85 dark:hover:bg-slate-900 border border-slate-200/90 hover:border-emerald-300 dark:border-emerald-500/30 dark:hover:border-emerald-400 text-slate-900 dark:text-white text-left transition-all shadow-xs hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-lg bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <Printer className="w-4 h-4 text-emerald-300" />
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Printer className="w-4 h-4 text-emerald-600 dark:text-emerald-300" />
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-xs font-black block truncate leading-tight group-hover:text-emerald-200">{t.fastActionOmr}</span>
-                <span className="text-[10px] text-emerald-300/70 font-semibold block truncate mt-0.5">PDF & Cavab Kartı</span>
+                <span className="text-xs font-black block truncate leading-tight text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-200">{t.fastActionOmr}</span>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-300/70 font-semibold block truncate mt-0.5">PDF & Cavab Kartı</span>
               </div>
             </button>
 
             <button
               onClick={() => onNavigate('regional_stats')}
-              className="p-2.5 sm:p-3 rounded-xl bg-slate-950/85 hover:bg-slate-900 border border-amber-500/30 hover:border-amber-400 text-white text-left transition-all shadow-sm hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
+              className="p-2.5 sm:p-3 rounded-xl bg-white hover:bg-amber-50/60 dark:bg-slate-950/85 dark:hover:bg-slate-900 border border-slate-200/90 hover:border-amber-300 dark:border-amber-500/30 dark:hover:border-amber-400 text-slate-900 dark:text-white text-left transition-all shadow-xs hover:shadow-md flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-lg bg-amber-950/80 border border-amber-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <Award className="w-4 h-4 text-amber-300" />
+              <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/80 border border-amber-200 dark:border-amber-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Award className="w-4 h-4 text-amber-600 dark:text-amber-300" />
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-xs font-black block truncate leading-tight group-hover:text-amber-200">{t.fastActionRegional}</span>
-                <span className="text-[10px] text-amber-300/70 font-semibold block truncate mt-0.5">Naxçıvan MR Reytinqi</span>
+                <span className="text-xs font-black block truncate leading-tight text-slate-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-200">{t.fastActionRegional}</span>
+                <span className="text-[10px] text-amber-600 dark:text-amber-300/70 font-semibold block truncate mt-0.5">Naxçıvan MR Reytinqi</span>
               </div>
             </button>
           </div>
@@ -347,8 +347,8 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             className="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
           >
             <div>
-              <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-                <Cpu className="w-5 h-5 text-sky-400" />
+              <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-slate-800 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                <Cpu className="w-5 h-5" />
               </div>
               <h3 className="font-black text-sm text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                 {t.hubAboutTitle}

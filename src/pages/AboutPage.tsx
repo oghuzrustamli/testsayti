@@ -140,12 +140,12 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
   const [showVideoModal, setShowVideoModal] = useState<boolean>(false);
 
   return (
-    <div className="min-h-full bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
       {/* Background Decorative Tech Grids */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b0a_1px,transparent_1px),linear-gradient(to_bottom,#1e293b0a_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
       {/* Subtle Glow Orb */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[220px] bg-gradient-to-tr from-indigo-600/15 via-sky-500/10 to-transparent blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[220px] bg-gradient-to-tr from-indigo-500/10 via-sky-500/5 to-transparent dark:from-indigo-600/15 dark:via-sky-500/10 dark:to-transparent blur-3xl pointer-events-none" />
 
       {/* Yığcam və Mütənasib Konteyner */}
       <div className="max-w-3xl sm:max-w-4xl mx-auto w-full px-3 sm:px-6 py-5 relative z-10 flex flex-col gap-5 sm:gap-6">
@@ -155,43 +155,43 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
            ========================================================================= */}
         <section className="text-center flex flex-col items-center">
           {/* Status Pill */}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-indigo-950/80 via-slate-900/90 to-sky-950/80 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold tracking-wide shadow-md shadow-indigo-950/40 mb-2.5 backdrop-blur-md">
-            <Sparkles className="w-3 h-3 text-sky-400 animate-pulse" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-gradient-to-r dark:from-indigo-950/80 dark:via-slate-900/90 dark:to-sky-950/80 border border-indigo-200 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold tracking-wide shadow-xs dark:shadow-md mb-2.5 backdrop-blur-md">
+            <Sparkles className="w-3 h-3 text-indigo-600 dark:text-sky-400 animate-pulse" />
             <span>RƏQƏMSAL TƏHSİL EKOSİSTEMİ</span>
-            <span className="w-1 h-1 rounded-full bg-sky-400" />
-            <span className="text-[9px] font-mono text-sky-300 font-black">v2.5 PRO</span>
+            <span className="w-1 h-1 rounded-full bg-indigo-600 dark:bg-sky-400" />
+            <span className="text-[9px] font-mono text-indigo-700 dark:text-sky-300 font-black">v2.5 PRO</span>
           </div>
 
           {/* Logo & Title */}
           <div className="flex items-center justify-center gap-2.5 mb-1.5">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-sky-500 to-blue-700 p-0.5 shadow-lg shadow-indigo-500/20 flex items-center justify-center">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <Cpu className="w-5 h-5 text-sky-400" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-sky-500 to-blue-700 p-0.5 shadow-md flex items-center justify-center">
+              <div className="w-full h-full bg-white dark:bg-slate-950 rounded-[10px] flex items-center justify-center">
+                <Cpu className="w-5 h-5 text-indigo-600 dark:text-sky-400" />
               </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-sky-300">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:via-slate-100 dark:to-sky-300">
               ATROQ Education
             </h1>
           </div>
 
           {/* Motto */}
-          <p className="text-xs sm:text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-indigo-200 to-blue-200 max-w-xl tracking-tight mb-2.5">
+          <p className="text-xs sm:text-sm font-bold text-indigo-700 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-sky-300 dark:via-indigo-200 dark:to-blue-200 max-w-xl tracking-tight mb-2.5">
             Təhsilin rəqəmsal inkişaf platforması
           </p>
 
           {/* Quick Technology Chips */}
           <div className="flex flex-wrap items-center justify-center gap-1.5 max-w-xl">
-            <span className="px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-800 text-slate-300 text-[10px] font-medium flex items-center gap-1">
-              <Brain className="w-3 h-3 text-indigo-400" /> Süni İntellekt
+            <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-medium flex items-center gap-1 shadow-2xs">
+              <Brain className="w-3 h-3 text-indigo-500 dark:text-indigo-400" /> Süni İntellekt
             </span>
-            <span className="px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-800 text-slate-300 text-[10px] font-medium flex items-center gap-1">
-              <FileCheck className="w-3 h-3 text-sky-400" /> OMR Optik Kart
+            <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-medium flex items-center gap-1 shadow-2xs">
+              <FileCheck className="w-3 h-3 text-sky-500 dark:text-sky-400" /> OMR Optik Kart
             </span>
-            <span className="px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-800 text-slate-300 text-[10px] font-medium flex items-center gap-1">
-              <Award className="w-3 h-3 text-emerald-400" /> 3 Pilləli Reytinq
+            <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-medium flex items-center gap-1 shadow-2xs">
+              <Award className="w-3 h-3 text-emerald-500 dark:text-emerald-400" /> 3 Pilləli Reytinq
             </span>
-            <span className="px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-800 text-slate-300 text-[10px] font-medium flex items-center gap-1">
-              <Printer className="w-3 h-3 text-amber-400" /> Standart A4 Çap
+            <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-medium flex items-center gap-1 shadow-2xs">
+              <Printer className="w-3 h-3 text-amber-500 dark:text-amber-400" /> Standart A4 Çap
             </span>
           </div>
         </section>
@@ -199,34 +199,34 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
         {/* =========================================================================
             2. ATROQ EDUCATION HAQQINDA TƏQDİMAT (Yığcam Rəsmi Mətn Bloku)
            ========================================================================= */}
-        <section className="relative rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-900/50 border border-slate-800/80 p-3.5 sm:p-5 shadow-xl backdrop-blur-lg overflow-hidden">
+        <section className="relative rounded-2xl bg-white dark:bg-gradient-to-b dark:from-slate-900/90 dark:to-slate-900/50 border border-slate-200 dark:border-slate-800/80 p-3.5 sm:p-5 shadow-xs dark:shadow-xl backdrop-blur-lg overflow-hidden">
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+              <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
                 <Compass className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="text-xs sm:text-sm font-black text-white tracking-tight">
+                <h2 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white tracking-tight">
                   ATROQ Education — Təhsilin rəqəmsal inkişaf platforması
                 </h2>
-                <span className="text-[10px] text-sky-400 font-semibold uppercase tracking-wider block">
+                <span className="text-[10px] text-indigo-600 dark:text-sky-400 font-semibold uppercase tracking-wider block">
                   Platformanın Yaradılma Məqsədi və Fəlsəfəsi
                 </span>
               </div>
             </div>
 
-            <div className="space-y-2 text-slate-300 text-xs sm:text-[13px] leading-relaxed">
-              <p className="bg-slate-950/60 p-3 sm:p-3.5 rounded-xl border border-slate-800/60 text-slate-200">
-                <strong className="text-white font-bold">ATROQ Education</strong> təhsil prosesinin rəqəmsallaşdırılması, qiymətləndirmə imkanlarının genişləndirilməsi, test və imtahanların hazırlanması, şagird nəticələrinin təhlili və tədris prosesinə müasir texnologiyaların tətbiqi məqsədilə yaradılmış platformadır.
+            <div className="space-y-2 text-slate-600 dark:text-slate-300 text-xs sm:text-[13px] leading-relaxed">
+              <p className="bg-slate-50 dark:bg-slate-950/60 p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-slate-800/60 text-slate-800 dark:text-slate-200">
+                <strong className="text-slate-900 dark:text-white font-bold">ATROQ Education</strong> təhsil prosesinin rəqəmsallaşdırılması, qiymətləndirmə imkanlarının genişləndirilməsi, test və imtahanların hazırlanması, şagird nəticələrinin təhlili və tədris prosesinə müasir texnologiyaların tətbiqi məqsədilə yaradılmış platformadır.
               </p>
-              <p className="text-slate-300 px-1">
+              <p className="text-slate-600 dark:text-slate-300 px-1">
                 Platforma müəllim və şagirdlərə biliklərin yoxlanılması, müxtəlif formatlarda tapşırıqların hazırlanması, avtomatlaşdırılmış qiymətləndirmə və regional təhsil statistikasının aparılması üçün geniş imkanlar təqdim edir.
               </p>
             </div>
 
             {/* Quick Navigation Buttons */}
             {onNavigateTab && (
-              <div className="pt-2 flex flex-wrap items-center gap-2 border-t border-slate-800/80">
+              <div className="pt-2 flex flex-wrap items-center gap-2 border-t border-slate-100 dark:border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => onNavigateTab('ai_test')}
@@ -238,7 +238,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
                 <button
                   type="button"
                   onClick={() => onNavigateTab('regional_stats')}
-                  className="px-3 py-1.5 rounded-lg bg-emerald-600/90 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
                 >
                   <Award className="w-3 h-3" />
                   Regional Statistika (NMR)
@@ -246,9 +246,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
                 <button
                   type="button"
                   onClick={() => onNavigateTab('exams_hub')}
-                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer"
                 >
-                  <Layers className="w-3 h-3 text-indigo-400" />
+                  <Layers className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                   Sınaq İmtahanları
                 </button>
               </div>
@@ -262,17 +262,17 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
         <section className="flex flex-col gap-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-sky-400 text-[10px] font-black uppercase tracking-wider mb-0.5">
+              <div className="inline-flex items-center gap-1.5 text-indigo-600 dark:text-sky-400 text-[10px] font-black uppercase tracking-wider mb-0.5">
                 <Sparkles className="w-3 h-3" />
                 <span>MULTİMEDİA TƏQDİMATI</span>
               </div>
-              <h2 className="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                 <span>ATROQ Education-ı tanı</span>
-                <span className="text-[9px] px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono font-bold border border-sky-500/30">
+                <span className="text-[9px] px-2 py-0.5 rounded bg-sky-50 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 font-mono font-bold border border-sky-200 dark:border-sky-500/30">
                   48 SANİYƏ • VİRTUAL APARICI
                 </span>
               </h2>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
                 Virtual qadın aparıcının təqdimatında ATROQ Education-ın real proqram görüntüləri, canlı lip-sync və səs müşayiəti.
               </p>
             </div>
@@ -281,7 +281,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
               <button
                 type="button"
                 onClick={() => setShowVideoModal(true)}
-                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-[11px] font-black flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-[11px] font-black flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>Pəncərədə Aç</span>
@@ -290,7 +290,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
           </div>
 
           {/* Embedded Video Showcase Player - Kompakt 16:9 çərçivə */}
-          <div className="max-w-2xl mx-auto w-full rounded-2xl border border-slate-800 bg-slate-900/50 p-1 sm:p-1.5 shadow-xl">
+          <div className="max-w-2xl mx-auto w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-1 sm:p-1.5 shadow-sm dark:shadow-xl">
             <AboutVideoShowcase />
           </div>
         </section>
@@ -300,63 +300,63 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
            ========================================================================= */}
         <section className="flex flex-col gap-3">
           <div className="text-center max-w-xl mx-auto flex flex-col items-center">
-            <div className="inline-flex items-center gap-1.5 text-indigo-400 text-[10px] font-black uppercase tracking-wider mb-0.5">
+            <div className="inline-flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-wider mb-0.5">
               <Cpu className="w-3 h-3" />
               <span>FUNKSİONAL ARXİTEKTURA</span>
             </div>
-            <h2 className="text-base sm:text-xl font-black text-white tracking-tight">
+            <h2 className="text-base sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
               ATROQ Education-ın 10 Əsas İmkanı
             </h2>
-            <p className="text-[11px] sm:text-xs text-slate-400">
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
               Müəllim, şagird və təhsil idarələri üçün vahid rəqəmsal ekosistemdə birləşdirilmiş ən müasir texnoloji həllər.
             </p>
           </div>
 
-          {/* Yığcam 10 Kartlıq Grid */}
+          {/* Yığcam 10 Kartlıq Grid (İşıqlı rejimdə tam ağ fon, qaranlıq rejimdə tünd) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {ATROQ_CAPABILITIES.map((cap) => {
               const IconComp = cap.icon;
               return (
                 <div
                   key={cap.id}
-                  className="group relative rounded-xl bg-gradient-to-b from-slate-900/80 to-slate-950/90 border border-slate-800/80 hover:border-indigo-500/50 p-3 sm:p-3.5 transition-all duration-150 flex flex-col justify-between"
+                  className="group relative rounded-xl bg-white dark:bg-gradient-to-b dark:from-slate-900/80 dark:to-slate-950/90 border border-slate-200/90 dark:border-slate-800/80 hover:border-indigo-300 dark:hover:border-indigo-500/50 p-3 sm:p-3.5 transition-all duration-150 flex flex-col justify-between shadow-xs hover:shadow-md"
                 >
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${cap.color} p-0.5 shadow flex items-center justify-center shrink-0`}>
-                          <div className="w-full h-full bg-slate-950 rounded-[6px] flex items-center justify-center text-white">
-                            <IconComp className="w-3.5 h-3.5 text-indigo-400" />
+                          <div className="w-full h-full bg-white dark:bg-slate-950 rounded-[6px] flex items-center justify-center text-slate-900 dark:text-white">
+                            <IconComp className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                           </div>
                         </div>
-                        <span className="text-[9px] font-mono font-black px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                        <span className="text-[9px] font-mono font-black px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                           № {cap.id < 10 ? `0${cap.id}` : cap.id}
                         </span>
                       </div>
 
-                      <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-700/50 tracking-wide">
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700/50 tracking-wide">
                         {cap.badge}
                       </span>
                     </div>
 
                     <div>
-                      <h3 className="text-xs sm:text-[13px] font-bold text-white group-hover:text-sky-300 transition-colors">
+                      <h3 className="text-xs sm:text-[13px] font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-sky-300 transition-colors">
                         {cap.title}
                       </h3>
-                      <p className="text-[11px] text-slate-300 leading-snug mt-1 font-normal">
+                      <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug mt-1 font-normal">
                         {cap.desc}
                       </p>
                     </div>
                   </div>
 
                   {/* Highlights mini-chips */}
-                  <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex flex-wrap gap-1">
+                  <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap gap-1">
                     {cap.highlights.map((h, i) => (
                       <span
                         key={i}
-                        className="text-[9px] font-medium text-slate-300 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800/90 flex items-center gap-1"
+                        className="text-[9px] font-medium text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-800/90 flex items-center gap-1"
                       >
-                        <Check className="w-2.5 h-2.5 text-sky-400 shrink-0" />
+                        <Check className="w-2.5 h-2.5 text-emerald-600 dark:text-sky-400 shrink-0" />
                         <span>{h}</span>
                       </span>
                     ))}
@@ -370,64 +370,64 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
         {/* =========================================================================
             5. PROQRAMIN MÜƏLLİFİ BÖLMƏSİ (RƏŞAD KİRMANOĞLU - Yığcam və Zərif)
            ========================================================================= */}
-        <section className="relative rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-950 border border-indigo-500/40 p-4 sm:p-6 shadow-xl shadow-indigo-950/50 overflow-hidden">
+        <section className="relative rounded-2xl bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:via-indigo-950/40 dark:to-slate-950 border border-slate-200 dark:border-indigo-500/40 p-4 sm:p-6 shadow-xs dark:shadow-xl dark:shadow-indigo-950/50 overflow-hidden">
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6">
 
             {/* Left: Author Credentials & Bio */}
             <div className="flex-1 flex flex-col gap-2.5 text-center md:text-left">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-bold uppercase tracking-wider mx-auto md:mx-0 w-fit">
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 text-amber-800 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wider mx-auto md:mx-0 w-fit">
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                 <span>MÜƏLLİFLİK VƏ YARADICI HEYƏT</span>
               </div>
 
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold">
                   ATROQ Education — Proqramın ideya müəllifi, tərtibatçısı və dizayneri:
                 </p>
-                <h3 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-sky-200 to-indigo-100 tracking-tight font-serif mt-0.5">
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-amber-200 dark:via-sky-200 dark:to-indigo-100 tracking-tight font-serif mt-0.5">
                   Rəşad Kirmanoğlu
                 </h3>
               </div>
 
-              <p className="text-xs sm:text-[13px] text-slate-300 leading-relaxed max-w-md">
+              <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed max-w-md">
                 Təhsilin rəqəmsallaşdırılması, müasir qiymətləndirmə texnologiyaları və süni intellektin tədris prosesinə inteqrasiyası istiqamətində hazırlanmış milli ATROQ Education platforması müəllimlərin iş yükünü yüngülləşdirmək və regional təhsil keyfiyyətini yüksəltmək məqsədi daşıyır.
               </p>
 
-              <div className="pt-1 flex flex-wrap items-center justify-center md:justify-start gap-2 text-[10px] text-slate-400">
-                <div className="flex items-center gap-1 bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-800">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+              <div className="pt-1 flex flex-wrap items-center justify-center md:justify-start gap-2 text-[10px] text-slate-600 dark:text-slate-400">
+                <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-800">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                   <span>İdeya Müəllifi</span>
                 </div>
-                <div className="flex items-center gap-1 bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-800">
-                  <CheckCircle2 className="w-3 h-3 text-sky-400" />
+                <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-800">
+                  <CheckCircle2 className="w-3 h-3 text-sky-600 dark:text-sky-400" />
                   <span>Sistem Tərtibatçısı</span>
                 </div>
-                <div className="flex items-center gap-1 bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-800">
-                  <CheckCircle2 className="w-3 h-3 text-indigo-400" />
+                <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-800">
+                  <CheckCircle2 className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                   <span>UI/UX Dizayneri</span>
                 </div>
               </div>
             </div>
 
             {/* Right: Digital Signature & Verification Seal */}
-            <div className="flex flex-col items-center justify-center gap-3 p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/90 shadow-lg shrink-0">
+            <div className="flex flex-col items-center justify-center gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/90 shadow-sm dark:shadow-lg shrink-0">
 
               {/* Official Seal Graphic */}
               <div className="relative w-20 h-20 flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full border border-dashed border-sky-400/40 animate-spin" style={{ animationDuration: '24s' }} />
-                <div className="absolute inset-1.5 rounded-full border border-indigo-400/30 bg-gradient-to-tr from-indigo-950 via-slate-950 to-sky-950" />
+                <div className="absolute inset-0 rounded-full border border-dashed border-indigo-400/40 dark:border-sky-400/40 animate-spin" style={{ animationDuration: '24s' }} />
+                <div className="absolute inset-1.5 rounded-full border border-indigo-200 dark:border-indigo-400/30 bg-indigo-50/80 dark:bg-gradient-to-tr dark:from-indigo-950 dark:via-slate-950 dark:to-sky-950" />
 
                 <div className="relative z-10 flex flex-col items-center justify-center text-center p-1">
-                  <ShieldCheck className="w-4 h-4 text-amber-300 mb-0.5" />
-                  <span className="text-[7px] font-black tracking-widest text-sky-300 uppercase">ATROQ</span>
-                  <span className="text-[6px] font-mono font-bold text-slate-400 uppercase tracking-tighter">ARCHITECT</span>
-                  <span className="text-[7px] font-black text-amber-300 font-mono">2026</span>
+                  <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-300 mb-0.5" />
+                  <span className="text-[7px] font-black tracking-widest text-indigo-700 dark:text-sky-300 uppercase">ATROQ</span>
+                  <span className="text-[6px] font-mono font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tighter">ARCHITECT</span>
+                  <span className="text-[7px] font-black text-amber-600 dark:text-amber-300 font-mono">2026</span>
                 </div>
               </div>
 
               {/* Artistic Digital Calligraphic Signature (SVG) */}
-              <div className="w-full flex flex-col items-center gap-0.5 pt-1.5 border-t border-slate-800/80">
-                <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">
+              <div className="w-full flex flex-col items-center gap-0.5 pt-1.5 border-t border-slate-200 dark:border-slate-800/80">
+                <span className="text-[8px] font-mono text-slate-400 uppercase tracking-widest">
                   RƏQƏMSAL TƏSDİQ İMZASI
                 </span>
 
@@ -436,7 +436,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
                     viewBox="0 0 240 70"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="w-full h-full text-sky-300"
+                    className="w-full h-full text-indigo-600 dark:text-sky-300"
                   >
                     <path
                       d="M20,48 C28,18 42,12 50,28 C55,38 45,55 35,52 C26,50 38,32 60,35 C72,37 80,48 95,44 C108,40 115,22 125,28 C135,34 140,48 155,42 C170,36 180,24 195,30 C205,34 215,48 225,45"
