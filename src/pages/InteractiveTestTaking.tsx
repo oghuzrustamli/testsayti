@@ -226,6 +226,28 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
     };
   }, [isExamStarted, examResult]);
 
+  // Keyboard arrow keys navigation for Interactive Test Taking (← Əvvəlki, → Növbəti)
+  useEffect(() => {
+    if (!isExamStarted || !!examResult) return;
+    const testMode = (test?.test_mode as any) || '';
+    const isOmr = testMode === 'answered' || testMode === 'omr' || (test as any)?.is_omr || !!test?.pdf_url;
+    if (isOmr) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+        return;
+      }
+      if (e.key === 'ArrowRight' || e.key === 'Right') {
+        setCurrentIndex(prev => Math.min(questions.length - 1, prev + 1));
+      } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
+        setCurrentIndex(prev => Math.max(0, prev - 1));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isExamStarted, examResult, test, questions.length]);
+
   // Load test details by share code or testId
   useEffect(() => {
     async function fetchTest() {
@@ -1501,207 +1523,226 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
       ) : (
         /* ==================================================================== */
         /* INTERACTIVE TEST MODE: Question Matrix, MathRenderer, Single Cards   */
+        /* (Səlis şaquli sürüşmə və həmişə görünən aşağı naviqasiya paneli)     */
         /* ==================================================================== */
-        <main className="max-w-5xl mx-auto w-full p-4 sm:p-6 flex flex-col gap-5 flex-1">
-          {/* Navigation Matrix Tabs */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-3 shadow-xs flex items-center justify-between gap-3 overflow-x-auto scrollbar-thin">
-            <div className="flex items-center gap-1.5 min-w-max">
-              {questions.map((q, idx) => {
-                const isAnswered = !!answers[q.id];
-                const isCurrent = idx === currentIndex;
+        <main className="flex-1 min-h-0 w-full overflow-y-auto overscroll-contain scrollbar-thin flex flex-col justify-between bg-[#eef6fc] dark:bg-[#090e17]">
+          <div className="max-w-5xl mx-auto w-full p-3 sm:p-6 flex flex-col gap-4 sm:gap-5 flex-1">
+            {/* Navigation Matrix Tabs */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 shadow-xs flex items-center justify-between gap-3 overflow-x-auto scrollbar-thin shrink-0">
+              <div className="flex items-center gap-1.5 min-w-max">
+                {questions.map((q, idx) => {
+                  const isAnswered = !!answers[q.id];
+                  const isCurrent = idx === currentIndex;
 
-                return (
-                  <button
-                    key={q.id || idx}
-                    onClick={() => setCurrentIndex(idx)}
-                    className={`w-9 h-8 rounded-lg font-bold text-xs flex items-center justify-center transition-all border ${isCurrent
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-200'
-                      : isAnswered
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                  return (
+                    <button
+                      key={q.id || idx}
+                      onClick={() => setCurrentIndex(idx)}
+                      className={`w-9 h-8 rounded-lg font-bold text-xs flex items-center justify-center transition-all border cursor-pointer ${
+                        isCurrent
+                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-200 dark:shadow-none'
+                          : isAnswered
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700 font-bold'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-750'
                       }`}
-                  >
-                    {idx + 1}
-                  </button>
-                );
-              })}
+                    >
+                      {idx + 1}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="text-[11px] text-slate-400 dark:text-slate-400 font-semibold shrink-0 pl-2">
+                Cavablandırılıb: <strong className="text-emerald-600 dark:text-emerald-400">{answeredCount}</strong> / {questions.length}
+              </div>
             </div>
 
-            <div className="text-[11px] text-slate-400 font-semibold shrink-0 pl-2">
-              Cavablandırılıb: <strong className="text-emerald-600">{answeredCount}</strong> / {questions.length}
-            </div>
+            {/* Question Card */}
+            {questions.length === 0 ? (
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center text-slate-500 dark:text-slate-400">
+                Bu testdə suallar hazırlanır.
+              </div>
+            ) : questions[currentIndex] ? (
+              (() => {
+                const currentQ = questions[currentIndex];
+                return (
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-8 shadow-xs flex flex-col gap-5 text-slate-900 dark:text-white">
+                    {/* Question Header & Points */}
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-2">
+                        <span className="font-extrabold text-sm text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5">
+                          <span className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-xs">
+                            {currentIndex + 1}
+                          </span>
+                          Sual №{currentIndex + 1}
+                        </span>
+                        {currentQ.subject && (
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300">
+                            {currentQ.subject}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs font-bold text-slate-400 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full">
+                        {currentQ.points} bal
+                      </span>
+                    </div>
+
+                    {/* Situation Text / Scenario Passage if present */}
+                    {currentQ.situation_text && (
+                      <div className="p-4 bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/80 rounded-2xl">
+                        <div className="flex items-center gap-2 mb-2 text-indigo-900 dark:text-indigo-300 font-bold text-xs uppercase tracking-wider">
+                          <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                          <span>Situasiya Mətni</span>
+                        </div>
+                        <div className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
+                          <MathRenderer content={currentQ.situation_text} />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Vertically compact, horizontally wide question text */}
+                    <div className="text-sm sm:text-base font-medium text-slate-900 dark:text-slate-100 leading-relaxed py-1">
+                      <MathRenderer content={currentQ.question_text || `Sual №${currentIndex + 1}`} />
+                    </div>
+
+                    {/* Attached Image if present */}
+                    {currentQ.image_url && (
+                      <div className="my-2 flex justify-center p-3 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <img
+                          src={currentQ.image_url}
+                          alt="Sual Şəkli"
+                          className="max-h-60 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs object-contain"
+                        />
+                      </div>
+                    )}
+
+                    {/* Embedded Graph if present */}
+                    {currentQ.graph_data?.imageDataUrl && (
+                      <div className="my-2 flex justify-center p-3 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <img
+                          src={currentQ.graph_data.imageDataUrl}
+                          alt="Sual Qrafiki"
+                          className="max-h-56 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs"
+                        />
+                      </div>
+                    )}
+
+                    {/* Situation Question Written Input (Tələb 2, 4) */}
+                    {currentQ.question_type === 'situation' && (
+                      <div className="pt-2 flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                            <Edit3 className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                            <span>Yazılı Cavab Sahəsi:</span>
+                          </label>
+                          <span className="text-[11px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-full">
+                            {currentQ.situation_grading_mode === 'dim_tiered' ? 'DİM Modeli' : '10 Açar Sözlə'} • {currentQ.points || 6} bal
+                          </span>
+                        </div>
+                        <textarea
+                          rows={5}
+                          value={answers[currentQ.id] || ''}
+                          onChange={(e) => handleSelectAnswer(currentQ.id, e.target.value)}
+                          placeholder="Situasiya üzrə cavabınızı, elmi izahatınızı və əsaslandıran arqumentlərinizi ətraflı şəkildə buraya yazın..."
+                          className="w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-850 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-800 dark:text-slate-100 leading-relaxed font-sans"
+                        />
+                      </div>
+                    )}
+
+                    {/* Open-Ended / Numeric Input */}
+                    {(currentQ.question_type === 'open_ended' || currentQ.question_type === 'numeric') ? (
+                      <div className="pt-2">
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                          Cavabınızı daxil edin (ədədi və ya riyazi ifadə):
+                        </label>
+                        <input
+                          type="text"
+                          value={answers[currentQ.id] || ''}
+                          onChange={(e) => handleSelectAnswer(currentQ.id, e.target.value)}
+                          placeholder="Cavabı buraya yazın (Məs: 15 və ya 3/4)"
+                          className="w-full px-4 py-3 text-sm font-bold bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-850 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-mono text-slate-800 dark:text-slate-100"
+                        />
+                      </div>
+                    ) : (
+                      /* Horizontally wide options for Closed Questions */
+                      <div className="flex flex-col gap-2.5 pt-2">
+                        {currentQ.options && currentQ.options.map((opt) => {
+                          const isSelected = answers[currentQ.id] === opt.id;
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => handleSelectAnswer(currentQ.id, opt.id)}
+                              className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-xl border text-left transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-indigo-50/90 dark:bg-indigo-950/80 border-indigo-600 dark:border-indigo-500 ring-1 ring-indigo-600 dark:ring-indigo-500 text-indigo-950 dark:text-white font-bold shadow-xs'
+                                  : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50/70 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 font-medium'
+                              }`}
+                            >
+                              <span className={`w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 transition-colors ${
+                                isSelected
+                                  ? 'bg-indigo-600 text-white shadow-xs'
+                                  : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                              }`}>
+                                {opt.id}
+                              </span>
+
+                              <span className="flex-1 text-xs sm:text-sm leading-snug">
+                                <MathRenderer content={opt.text} />
+                              </span>
+
+                              {isSelected && (
+                                <CheckCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()
+            ) : null}
           </div>
 
-          {/* Question Card */}
-          {questions.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-500">
-              Bu testdə suallar hazırlanır.
-            </div>
-          ) : questions[currentIndex] ? (
-            (() => {
-              const currentQ = questions[currentIndex];
-              return (
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs flex flex-col gap-5">
-                  {/* Question Header & Points */}
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                    <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-sm text-indigo-700 flex items-center gap-1.5">
-                        <span className="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs">
-                          {currentIndex + 1}
-                        </span>
-                        Sual №{currentIndex + 1}
-                      </span>
-                      {currentQ.subject && (
-                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700">
-                          {currentQ.subject}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-0.5 rounded-full">
-                      {currentQ.points} bal
-                    </span>
-                  </div>
-
-                  {/* Situation Text / Scenario Passage if present */}
-                  {currentQ.situation_text && (
-                    <div className="p-4 bg-indigo-50/60 border border-indigo-200/80 rounded-2xl">
-                      <div className="flex items-center gap-2 mb-2 text-indigo-900 font-bold text-xs uppercase tracking-wider">
-                        <FileText className="w-4 h-4 text-indigo-600" />
-                        <span>Situasiya Mətni</span>
-                      </div>
-                      <div className="text-xs sm:text-sm text-slate-800 leading-relaxed">
-                        <MathRenderer content={currentQ.situation_text} />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Vertically compact, horizontally wide question text */}
-                  <div className="text-sm sm:text-base font-medium text-slate-900 leading-relaxed py-1">
-                    <MathRenderer content={currentQ.question_text || `Sual №${currentIndex + 1}`} />
-                  </div>
-
-                  {/* Attached Image if present */}
-                  {currentQ.image_url && (
-                    <div className="my-2 flex justify-center p-3 bg-slate-50/50 rounded-xl border border-slate-100">
-                      <img
-                        src={currentQ.image_url}
-                        alt="Sual Şəkli"
-                        className="max-h-60 rounded-lg border border-slate-200 shadow-2xs object-contain"
-                      />
-                    </div>
-                  )}
-
-                  {/* Embedded Graph if present */}
-                  {currentQ.graph_data?.imageDataUrl && (
-                    <div className="my-2 flex justify-center p-3 bg-slate-50/50 rounded-xl border border-slate-100">
-                      <img
-                        src={currentQ.graph_data.imageDataUrl}
-                        alt="Sual Qrafiki"
-                        className="max-h-56 rounded-lg border border-slate-200 shadow-2xs"
-                      />
-                    </div>
-                  )}
-
-                  {/* Situation Question Written Input (Tələb 2, 4) */}
-                  {currentQ.question_type === 'situation' && (
-                    <div className="pt-2 flex flex-col gap-2">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                          <Edit3 className="w-4 h-4 text-amber-600" />
-                          <span>Yazılı Cavab Sahəsi:</span>
-                        </label>
-                        <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">
-                          {currentQ.situation_grading_mode === 'dim_tiered' ? 'DİM Modeli' : '10 Açar Sözlə'} • {currentQ.points || 6} bal
-                        </span>
-                      </div>
-                      <textarea
-                        rows={5}
-                        value={answers[currentQ.id] || ''}
-                        onChange={(e) => handleSelectAnswer(currentQ.id, e.target.value)}
-                        placeholder="Situasiya üzrə cavabınızı, elmi izahatınızı və əsaslandıran arqumentlərinizi ətraflı şəkildə buraya yazın..."
-                        className="w-full px-4 py-3 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-800 leading-relaxed font-sans"
-                      />
-                    </div>
-                  )}
-
-                  {/* Open-Ended / Numeric Input */}
-                  {(currentQ.question_type === 'open_ended' || currentQ.question_type === 'numeric') ? (
-                    <div className="pt-2">
-                      <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                        Cavabınızı daxil edin (ədədi və ya riyazi ifadə):
-                      </label>
-                      <input
-                        type="text"
-                        value={answers[currentQ.id] || ''}
-                        onChange={(e) => handleSelectAnswer(currentQ.id, e.target.value)}
-                        placeholder="Cavabı buraya yazın (Məs: 15 və ya 3/4)"
-                        className="w-full px-4 py-3 text-sm font-bold bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-mono text-slate-800"
-                      />
-                    </div>
-                  ) : (
-                    /* Horizontally wide options for Closed Questions */
-                    <div className="flex flex-col gap-2.5 pt-2">
-                      {currentQ.options && currentQ.options.map((opt) => {
-                        const isSelected = answers[currentQ.id] === opt.id;
-                        return (
-                          <button
-                            key={opt.id}
-                            type="button"
-                            onClick={() => handleSelectAnswer(currentQ.id, opt.id)}
-                            className={`w-full flex items-center gap-3.5 px-4 py-2.5 rounded-xl border text-left transition-all ${isSelected
-                              ? 'bg-indigo-50 border-indigo-600 ring-1 ring-indigo-600 text-indigo-950 font-bold shadow-xs'
-                              : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/60 text-slate-800 font-medium'
-                              }`}
-                          >
-                            <span className={`w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 transition-colors ${isSelected
-                              ? 'bg-indigo-600 text-white shadow-xs'
-                              : 'bg-slate-100 text-slate-700'
-                              }`}>
-                              {opt.id}
-                            </span>
-
-                            <span className="flex-1 text-xs sm:text-sm leading-snug">
-                              <MathRenderer content={opt.text} />
-                            </span>
-
-                            {isSelected && (
-                              <CheckCircle className="w-4 h-4 text-indigo-600 shrink-0" />
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })()
-          ) : null}
-
-          {/* Navigation Buttons */}
-          <div className="flex items-center justify-between gap-3 pt-2">
+          {/* Sticky Bottom Navigation Bar (Həmişə ekranın aşağısında sabit görünən paneli) */}
+          <div className="sticky bottom-0 z-30 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-3 px-4 sm:px-8 shadow-lg flex items-center justify-between gap-3 select-none">
             <button
               disabled={currentIndex === 0}
               onClick={() => setCurrentIndex(currentIndex - 1)}
-              className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors shadow-2xs"
+              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 disabled:opacity-30 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer disabled:cursor-not-allowed"
+              title="Əvvəlki sual (Klaviatura: Sol Ox ←)"
             >
               <ChevronLeft className="w-4 h-4" />
-              Əvvəlki
+              <span>Əvvəlki</span>
             </button>
+
+            {/* Orta hissə: Cari Sual Məlumatı */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200">
+                Sual <strong className="text-indigo-600 dark:text-indigo-400 font-black">{currentIndex + 1}</strong> / {questions.length}
+              </span>
+              <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+              <span className="hidden sm:inline text-xs text-slate-500 dark:text-slate-400">
+                Cavablanan: <strong className="text-emerald-600 dark:text-emerald-400 font-bold">{answeredCount}</strong>
+              </span>
+            </div>
 
             {currentIndex === questions.length - 1 ? (
               <button
                 onClick={() => setShowConfirmSubmit(true)}
-                className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-100 flex items-center gap-2 transition-all"
+                className="px-5 sm:px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-md shadow-emerald-500/20 flex items-center gap-2 transition-all cursor-pointer"
               >
                 <Send className="w-4 h-4" />
-                İmtahanı Tamamla və Təhvil Ver
+                <span>Testi Tamamla və Təhvil Ver</span>
               </button>
             ) : (
               <button
                 onClick={() => setCurrentIndex(currentIndex + 1)}
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-100 flex items-center gap-1.5 transition-all"
+                className="px-5 sm:px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-500/20 flex items-center gap-1.5 transition-all cursor-pointer"
+                title="Növbəti sual (Klaviatura: Sağ Ox →)"
               >
-                Növbəti
+                <span>Növbəti</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             )}
@@ -1712,18 +1753,18 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
       {/* Confirmation Modal before Submit */}
       {showConfirmSubmit && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in-95">
-            <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in-95 text-slate-900 dark:text-white">
+            <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-3">
               <AlertTriangle className="w-6 h-6" />
             </div>
 
-            <h3 className="font-bold text-slate-900 text-base mb-1">
+            <h3 className="font-bold text-slate-900 dark:text-white text-base mb-1">
               İmtahanı təhvil vermək istəyirsiniz?
             </h3>
-            <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
               Ümumi <strong>{questions.length}</strong> sualdan <strong>{answeredCount}</strong> sualı cavablandırmısınız.{' '}
               {questions.length - answeredCount > 0 && (
-                <span className="text-rose-600 font-bold block mt-1">
+                <span className="text-rose-600 dark:text-rose-400 font-bold block mt-1">
                   Diqqət: {questions.length - answeredCount} sual cavabsız qalıb!
                 </span>
               )}
@@ -1733,7 +1774,7 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
               <button
                 type="button"
                 onClick={() => setShowConfirmSubmit(false)}
-                className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors"
+                className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl transition-colors cursor-pointer"
               >
                 Davam Et (Qayıt)
               </button>
@@ -1741,7 +1782,7 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
                 type="button"
                 disabled={submitting}
                 onClick={performFinalSubmit}
-                className="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-100 transition-all flex items-center justify-center gap-2"
+                className="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-100 dark:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {submitting ? 'Göndərilir...' : 'Bəli, Təhvil Ver'}
               </button>
