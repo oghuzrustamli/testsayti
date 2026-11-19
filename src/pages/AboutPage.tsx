@@ -256,40 +256,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
         </section>
 
         {/* =========================================================================
-            3. ATROQ EDUCATION RƏSMİ LOQO VƏ BREND VİTRİNİ (BÖYÜK QUTU FORMATI)
-           ========================================================================= */}
-        <section className="flex flex-col gap-3">
-          <div className="w-full rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-6 sm:p-10 shadow-sm dark:shadow-2xl relative overflow-hidden flex flex-col items-center justify-center text-center">
-            {/* Arxa fon parıltısı və dekorativ qradient */}
-            <div className="absolute inset-0 bg-radial from-indigo-50/70 via-transparent to-transparent dark:from-indigo-600/10 pointer-events-none" />
-
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-sky-300 text-xs font-mono uppercase tracking-widest mb-6 shadow-2xs relative z-10">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-sky-400" />
-              <span>RƏSMİ BREND VƏ MİLLİ EKOSİSTEM LOQOSU</span>
-            </div>
-
-            {/* Böyük Loqo Qutusu (Böyük, Relyefli, Ağ Kontrastlı və Aydın) */}
-            <div className="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-12 shadow-lg border border-slate-200/90 dark:border-slate-300 flex items-center justify-center relative z-10 group transition-all duration-300 hover:shadow-xl">
-              <img
-                src="/assets/atroq-logo.png"
-                alt="ATROQ Education Rəsmi Loqosu"
-                className="w-full max-w-lg sm:max-w-xl h-auto max-h-72 sm:max-h-96 object-contain filter drop-shadow-md group-hover:scale-102 transition-transform duration-300"
-              />
-            </div>
-
-            <div className="mt-6 max-w-xl relative z-10">
-              <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                ATROQ Education
-              </h3>
-              <p className="mt-1.5 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                Təhsilin rəqəmsallaşdırılması, müasir qiymətləndirmə texnologiyaları və süni intellekt əsaslı milli imtahan platformasının rəsmi brend kimliyi.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* =========================================================================
-            4. ATROQ EDUCATION-IN İMKANLARI (10 Əsas Funksiya - Yığcam Şəbəkə)
+            3. ATROQ EDUCATION-IN İMKANLARI (10 Əsas Funksiya - Yığcam Şəbəkə)
            ========================================================================= */}
         <section className="flex flex-col gap-3">
           <div className="text-center max-w-xl mx-auto flex flex-col items-center">
@@ -402,29 +369,25 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
               </div>
             </div>
 
-            {/* Right: Digital Signature & Verification Seal */}
-            <div className="flex flex-col items-center justify-center gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/90 shadow-sm dark:shadow-lg shrink-0">
+            {/* Right: Rəsmi ATROQ Loqosu və Rəqəmsal Təsdiq İmzası Qutusu */}
+            <div className="w-full md:w-80 flex flex-col items-center justify-center gap-3.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/90 border border-slate-200 dark:border-slate-800/90 shadow-sm dark:shadow-xl shrink-0">
 
-              {/* Official Seal Graphic */}
-              <div className="relative w-20 h-20 flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full border border-dashed border-indigo-400/40 dark:border-sky-400/40 animate-spin" style={{ animationDuration: '24s' }} />
-                <div className="absolute inset-1.5 rounded-full border border-indigo-200 dark:border-indigo-400/30 bg-indigo-50/80 dark:bg-gradient-to-tr dark:from-indigo-950 dark:via-slate-950 dark:to-sky-950" />
-
-                <div className="relative z-10 flex flex-col items-center justify-center text-center p-1">
-                  <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-300 mb-0.5" />
-                  <span className="text-[7px] font-black tracking-widest text-indigo-700 dark:text-sky-300 uppercase">ATROQ</span>
-                  <span className="text-[6px] font-mono font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tighter">ARCHITECT</span>
-                  <span className="text-[7px] font-black text-amber-600 dark:text-amber-300 font-mono">2026</span>
-                </div>
+              {/* Rəsmi ATROQ Loqosu - Ağ Fonlu Zərif Kart */}
+              <div className="w-full bg-white rounded-xl p-3 sm:p-4 border border-slate-200/90 dark:border-slate-300 shadow-xs flex items-center justify-center group hover:shadow-md transition-all">
+                <img
+                  src="/assets/atroq-logo.png"
+                  alt="ATROQ Education Rəsmi Loqosu"
+                  className="h-20 sm:h-24 w-auto object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
 
               {/* Artistic Digital Calligraphic Signature (SVG) */}
-              <div className="w-full flex flex-col items-center gap-0.5 pt-1.5 border-t border-slate-200 dark:border-slate-800/80">
-                <span className="text-[8px] font-mono text-slate-400 uppercase tracking-widest">
+              <div className="w-full flex flex-col items-center gap-1 pt-2 border-t border-slate-200 dark:border-slate-800/80">
+                <span className="text-[8.5px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold">
                   RƏQƏMSAL TƏSDİQ İMZASI
                 </span>
 
-                <div className="w-36 h-9 flex items-center justify-center">
+                <div className="w-40 h-10 flex items-center justify-center">
                   <svg
                     viewBox="0 0 240 70"
                     fill="none"
@@ -462,10 +425,10 @@ export const AboutPage: React.FC<AboutPageProps> = ({ user, onNavigateTab }) => 
                   </svg>
                 </div>
 
-                <div className="text-[10px] font-semibold text-slate-300 tracking-wide flex items-center gap-1">
+                <div className="text-[10px] font-semibold text-slate-700 dark:text-slate-300 tracking-wide flex items-center gap-1.5 mt-0.5">
                   <span>Rəşad Kirmanoğlu</span>
                   <span className="w-1 h-1 rounded-full bg-sky-400" />
-                  <span className="text-[9px] text-slate-400 font-mono">Bütün Hüquqlar Qorunur</span>
+                  <span className="text-[9px] text-slate-500 dark:text-slate-400 font-mono">Bütün Hüquqlar Qorunur</span>
                 </div>
               </div>
 
