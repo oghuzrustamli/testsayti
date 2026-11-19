@@ -161,21 +161,24 @@
   outline-offset: 1px;
 }
 
-/* 3-Column OMR Card Container */
+/* 3-Column OMR Card Container (Qapalı Test Cavab Kartı - İşıqlı və Gözə Çarpan Parlaq Kənar Çərçivə) */
 .omr-column-card {
   display: flex;
   flex-direction: column;
   gap: 2px;
   background-color: #ffffff;
-  border: 1px solid #e0f2fe; /* sky-100 */
-  border-radius: 0.5rem;
-  padding: 0.3rem 0.25rem;
+  border: 2px solid #0ea5e9 !important; /* Parlaq mavi (sky-500) */
+  border-radius: 0.65rem;
+  padding: 0.35rem 0.3rem;
   min-width: 145px;
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.22) !important;
+  transition: all 0.2s ease;
 }
 
 .dark .omr-column-card {
   background-color: #0f172a;
-  border-color: #1e293b;
+  border: 2px solid #22d3ee !important; /* Parlaq neon cyan (cyan-400) */
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.35) !important;
 }
 
 .dark .omr-bubble-btn {
@@ -198,7 +201,7 @@
   transform: none !important;
 }
 
-/* 6-Column Numeric Grid (Açıq Sual - Üstdəki A-E variantları ilə eyni yığcam ölçüdə) */
+/* 6-Column Numeric Grid (Açıq Sual Cavab Kartı - İşıqlı və Gözə Çarpan Parlaq Kənar Çərçivə) */
 .omr-numeric-grid {
   display: inline-flex;
   gap: 2.5px; /* Üstdəki omr-bubble-row ilə eyni məsafə */
@@ -206,7 +209,8 @@
   align-items: center;
   padding: 3px 5px;
   background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
+  border: 1.5px solid #0ea5e9 !important;
+  box-shadow: 0 0 8px rgba(14, 165, 233, 0.2) !important;
   border-radius: 0.5rem;
   width: fit-content;
   max-width: fit-content;
@@ -315,7 +319,8 @@
 
 .dark .omr-numeric-grid {
   background-color: #0c1a2e;
-  border-color: #1e293b;
+  border: 1.5px solid #22d3ee !important;
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.3) !important;
 }
 
 .dark .omr-numeric-box {
