@@ -74,16 +74,55 @@
   margin: 0.5em 0 !important;
 }
 
-/* Print Styles for A4 Paper Export */
+/* Print Styles for A4 Paper Export & Clean Result Sheet */
 @media print {
-  body {
-    background: white !important;
-    color: black !important;
-    font-size: 12pt;
+  @page {
+    margin: 10mm;
+    size: A4 portrait;
   }
-  .no-print {
+
+  html, body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Çapa getməyən bütün elementləri (arxa fon, naviqasiya, düymələr) gizlət */
+  .no-print,
+  .no-print * {
     display: none !important;
+    visibility: hidden !important;
   }
+
+  /* Əgər səhifədə .print-clean-area varsa, YALNIZ o hissə çap olunur, qalan hər şey gizlənir */
+  body:has(.print-clean-area) * {
+    visibility: hidden;
+  }
+
+  body:has(.print-clean-area) .print-clean-area,
+  body:has(.print-clean-area) .print-clean-area * {
+    visibility: visible;
+  }
+
+  body:has(.print-clean-area) .print-clean-area {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
   .print-only {
     display: block !important;
   }

@@ -1719,8 +1719,11 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
           PREVIEW MODAL: ŞAGİRD İNTERFEYSİ İLƏ EYNİ GÖRÜNÜŞ
           ============================================================== */}
       {showPreviewModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-6xl w-full h-[90vh] flex flex-col overflow-hidden border border-slate-200">
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setShowPreviewModal(false); }}
+          className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in"
+        >
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-6xl w-full h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800">
             {/* Modal Header */}
             <div className="px-6 py-3.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
@@ -1732,9 +1735,11 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
               <button
                 type="button"
                 onClick={() => setShowPreviewModal(false)}
-                className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-white transition-colors"
+                className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/80 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                title="Pəncərəni bağla (Esc)"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
+                <span>Bağla</span>
               </button>
             </div>
 
@@ -1944,7 +1949,23 @@ export const OmrTestCreatorPage: React.FC<OmrTestCreatorPageProps> = ({
                       )}
                     </div>
                   );
-                })()}              </div>
+                })()}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-2.5 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                Bu pəncərə sınağın şagirdə necə görünəcəyini nümayiş etdirir.
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowPreviewModal(false)}
+                className="px-4 py-1.5 bg-slate-200 hover:bg-rose-600 dark:bg-slate-800 dark:hover:bg-rose-600 text-slate-700 hover:text-white dark:text-slate-200 dark:hover:text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+                <span>Önizləməni Bağla</span>
+              </button>
             </div>
           </div>
         </div>

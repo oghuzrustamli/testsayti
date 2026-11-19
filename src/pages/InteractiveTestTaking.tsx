@@ -29,7 +29,8 @@ import {
   ArrowLeft,
   Sparkles,
   Layers,
-  Edit3
+  Edit3,
+  Printer
 } from 'lucide-react';
 
 // Configure pdfjs worker to local public path
@@ -681,203 +682,174 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
 
   const isOmrMode = (test.test_mode as any) === 'answered' || (test.test_mode as any) === 'omr' || (test as any).is_omr || !!test.pdf_url;
 
-  // 1. Initial State: Name Prompt Screen
+  // 1. Initial State: Name Prompt Screen (Kompakt və Zərif Şagird Qeydiyyatı)
   if (!isExamStarted) {
     return (
-      <div className="min-h-screen bg-[#eef6fc] dark:bg-[#090e17] flex items-center justify-center p-4">
-        <div className="bg-white border border-slate-200 rounded-3xl shadow-xl max-w-lg w-full p-6 sm:p-8 animate-in fade-in zoom-in-95">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-200 mb-5 mx-auto">
-            <GraduationCap className="w-8 h-8" />
-          </div>
-
-          <div className="text-center mb-6">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/60 inline-block">
-                {test.exam_model} • {test.subject}
-              </span>
-              <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${isOmrMode ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+      <div className="min-h-screen bg-[#eef6fc] dark:bg-[#090e17] flex items-center justify-center p-3 sm:p-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl max-w-md w-full p-4 sm:p-5 animate-in fade-in zoom-in-95">
+          {/* Header: Compact Icon + Test Info */}
+          <div className="flex items-start gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-200 dark:shadow-none shrink-0 mt-0.5">
+              <GraduationCap className="w-6 h-6" />
+            </div>
+            <div className="flex-1 min-w-0 text-left">
+              <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800">
+                  {test.exam_model} • {test.subject}
+                </span>
+                <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+                  isOmrMode ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300'
                 }`}>
-                {isOmrMode ? 'OMR Test' : 'İnteraktiv Test'}
-              </span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
-              {test.title}
-            </h1>
-            <p className="text-xs text-slate-500 mt-2">
-              İmtahana başlamaq üçün ad və soyadınızı daxil edin.
-            </p>
-          </div>
-
-          {/* Test Info Badges */}
-          <div className="grid grid-cols-3 gap-2 p-3 bg-slate-50 rounded-2xl border border-slate-100 text-center text-xs mb-6 font-semibold">
-            <div>
-              <span className="text-[10px] text-slate-400 block font-normal">Sual Sayı</span>
-              <strong className="text-slate-800">{questions.length || test.total_questions || 0} sual</strong>
-            </div>
-            <div>
-              <span className="text-[10px] text-slate-400 block font-normal">Müddət</span>
-              <strong className="text-slate-800">{test.duration_minutes} dəqiqə</strong>
-            </div>
-            <div>
-              <span className="text-[10px] text-slate-400 block font-normal">Maks. Bal</span>
-              <strong className="text-indigo-600">{test.total_points || 100} bal</strong>
+                  {isOmrMode ? 'OMR Test' : 'İnteraktiv'}
+                </span>
+              </div>
+              <h1 className="text-sm sm:text-base font-black text-slate-900 dark:text-white truncate" title={test.title}>
+                {test.title}
+              </h1>
+              <div className="flex items-center gap-2 text-[10.5px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
+                <span>{questions.length || test.total_questions || 0} sual</span>
+                <span>•</span>
+                <span>{test.duration_minutes} dəq</span>
+                <span>•</span>
+                <span className="text-indigo-600 dark:text-indigo-400 font-bold">{test.total_points || 100} bal</span>
+              </div>
             </div>
           </div>
 
-          <form onSubmit={handleStartExam} className="flex flex-col gap-4 text-left">
-            {/* Birinci mərhələ – Şəxsi məlumatlar (Tələb 4) */}
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex flex-col gap-2.5">
-              <span className="text-[10px] font-black uppercase text-indigo-700 tracking-wider flex items-center gap-1.5">
-                <span className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[9px]">1</span>
-                Birinci Mərhələ: Şəxsi Məlumatlar
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                    Adınız: <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={studentName}
-                    onChange={(e) => setStudentName(e.target.value)}
-                    placeholder="Məsələn: Əli"
-                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                    Soyadınız: <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={studentSurname}
-                    onChange={(e) => setStudentSurname(e.target.value)}
-                    placeholder="Məsələn: Həsənov"
-                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                  />
-                </div>
-              </div>
+          <form onSubmit={handleStartExam} className="flex flex-col gap-2.5 pt-3 text-left">
+            <div className="text-[10px] font-black uppercase text-indigo-700 dark:text-indigo-400 tracking-wider">
+              Şagird Məlumatları
             </div>
 
-            {/* İkinci mərhələ – Rayon və məktəb məlumatları (Tələb 4) */}
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex flex-col gap-2.5">
-              <span className="text-[10px] font-black uppercase text-indigo-700 tracking-wider flex items-center gap-1.5">
-                <span className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[9px]">2</span>
-                İkinci Mərhələ: Rayon və Məktəb
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                    Rayon / Şəhər: <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    value={selectedDistrict}
-                    onChange={(e) => {
-                      const newDist = e.target.value;
-                      setSelectedDistrict(newDist);
-                      const schools = DISTRICT_SCHOOLS[newDist];
-                      if (schools && schools.length > 0) {
-                        setSelectedSchool(schools[0]);
-                      }
-                    }}
-                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                  >
-                    {NAKHCHIVAN_DISTRICTS.map((d) => (
-                      <option key={d.id} value={d.name}>{d.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                    Təhsil Aldığınız Məktəb: <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    value={selectedSchool}
-                    onChange={(e) => setSelectedSchool(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                  >
-                    {(DISTRICT_SCHOOLS[selectedDistrict] || []).map((sch) => (
-                      <option key={sch} value={sch}>{sch}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Üçüncü mərhələ – Sinif seçimi (Tələb 4 & 12: Yalnız IV, VI, IX, XI) */}
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex flex-col gap-2.5">
-              <span className="text-[10px] font-black uppercase text-indigo-700 tracking-wider flex items-center gap-1.5">
-                <span className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[9px]">3</span>
-                Üçüncü Mərhələ: Sinif Seçimi (Regional Monitorinq)
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                    Monitorinq Sinfi: <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    value={selectedGrade}
-                    onChange={(e) => setSelectedGrade(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                  >
-                    {MONITORING_GRADES.map((g) => (
-                      <option key={g} value={g}>{g}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                    Sinif Qrupu / İndeks (istəyə bağlı):
-                  </label>
-                  <input
-                    type="text"
-                    value={className}
-                    onChange={(e) => setClassName(e.target.value)}
-                    placeholder="Məsələn: 9-A və ya Qrup 1"
-                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-800 focus:outline-none"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Dördüncü mərhələ – UTİS kodu (Tələb 4 & 17: Məcburi və Unikal Yoxlanış) */}
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex flex-col gap-2">
-              <span className="text-[10px] font-black uppercase text-indigo-700 tracking-wider flex items-center gap-1.5">
-                <span className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[9px]">4</span>
-                Dördüncü Mərhələ: Şagirdin UTİS Kodu
-              </span>
+            {/* Ad və Soyad (2 sütun) */}
+            <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                  7 Rəqəmli UTİS Kodu: <span className="text-rose-500">*</span>
+                <label className="text-[10.5px] font-bold text-slate-700 dark:text-slate-300 block mb-0.5">
+                  Adınız <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   required
-                  maxLength={7}
-                  value={utisCode}
-                  onChange={(e) => setUtisCode(e.target.value.replace(/\D/g, ''))}
-                  placeholder="Məsələn: 1048291"
-                  className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-mono font-bold tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
+                  placeholder="Məsələn: Əli"
+                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg font-medium text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-850 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
-                <span className="text-[10px] text-slate-500 mt-1 block">
-                  * Təkrar imtahana icazə verilmir. Nəticələriniz bu kod vasitəsilə məktəbinizin regional reytinqinə əlavə ediləcəkdir.
-                </span>
+              </div>
+              <div>
+                <label className="text-[10.5px] font-bold text-slate-700 dark:text-slate-300 block mb-0.5">
+                  Soyadınız <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={studentSurname}
+                  onChange={(e) => setStudentSurname(e.target.value)}
+                  placeholder="Məsələn: Həsənov"
+                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg font-medium text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-850 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
               </div>
             </div>
 
+            {/* Rayon və Məktəb (2 sütun) */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[10.5px] font-bold text-slate-700 dark:text-slate-300 block mb-0.5">
+                  Rayon / Şəhər <span className="text-rose-500">*</span>
+                </label>
+                <select
+                  value={selectedDistrict}
+                  onChange={(e) => {
+                    const newDist = e.target.value;
+                    setSelectedDistrict(newDist);
+                    const schools = DISTRICT_SCHOOLS[newDist];
+                    if (schools && schools.length > 0) {
+                      setSelectedSchool(schools[0]);
+                    }
+                  }}
+                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg font-medium text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-850 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                >
+                  {NAKHCHIVAN_DISTRICTS.map((d) => (
+                    <option key={d.id} value={d.name}>{d.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-[10.5px] font-bold text-slate-700 dark:text-slate-300 block mb-0.5 truncate">
+                  Məktəb <span className="text-rose-500">*</span>
+                </label>
+                <select
+                  value={selectedSchool}
+                  onChange={(e) => setSelectedSchool(e.target.value)}
+                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg font-medium text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-850 focus:outline-none focus:ring-1 focus:ring-indigo-500 truncate"
+                >
+                  {(DISTRICT_SCHOOLS[selectedDistrict] || []).map((sch) => (
+                    <option key={sch} value={sch}>{sch}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Sinif və Qrup (2 sütun) */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[10.5px] font-bold text-slate-700 dark:text-slate-300 block mb-0.5">
+                  Monitorinq Sinfi <span className="text-rose-500">*</span>
+                </label>
+                <select
+                  value={selectedGrade}
+                  onChange={(e) => setSelectedGrade(e.target.value)}
+                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg font-medium text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-850 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                >
+                  {MONITORING_GRADES.map((g) => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-[10.5px] font-bold text-slate-700 dark:text-slate-300 block mb-0.5">
+                  Sinif Qrupu / İndeks
+                </label>
+                <input
+                  type="text"
+                  value={className}
+                  onChange={(e) => setClassName(e.target.value)}
+                  placeholder="Məs: 9-A və ya Qrup 1"
+                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg font-medium text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-850 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
+              </div>
+            </div>
+
+            {/* UTİS Kodu (Kompakt) */}
+            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <label className="text-[10.5px] font-bold text-slate-800 dark:text-slate-200">
+                  7 Rəqəmli UTİS Kodu <span className="text-rose-500">*</span>
+                </label>
+                <span className="text-[9.5px] text-slate-400">Təkrar imtahana icazə verilmir</span>
+              </div>
+              <input
+                type="text"
+                required
+                maxLength={7}
+                value={utisCode}
+                onChange={(e) => setUtisCode(e.target.value.replace(/\D/g, ''))}
+                placeholder="1048291"
+                className="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg font-mono font-bold tracking-widest text-slate-900 dark:text-white text-center focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+            </div>
+
             {(!questions || questions.length === 0) && (
-              <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl flex items-center gap-2">
+              <div className="p-2.5 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs rounded-xl flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                <span>Bu testdə hələlik sual mövcud deyil. Zəhmət olmasa müəllim kabinetindən testə suallar əlavə edin.</span>
+                <span>Bu testdə hələlik sual mövcud deyil.</span>
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold text-xs shadow-md shadow-indigo-100 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="mt-1 w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold text-xs shadow-md shadow-indigo-100 dark:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
             >
               <span>İmtahana Başla</span>
               <ChevronRight className="w-4 h-4" />
@@ -903,42 +875,79 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
     };
 
     return (
-      <div className="fixed inset-0 z-50 overflow-y-auto bg-[#eef6fc] dark:bg-[#090e17] flex flex-col items-center justify-start p-4 py-6 sm:py-8">
-        {/* Top Header Bar for immediate exit */}
-        <div className="w-full max-w-2xl flex items-center justify-between mb-4 px-1">
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-[#eef6fc] dark:bg-[#090e17] flex flex-col items-center justify-start p-3 sm:p-4 py-5 sm:py-6">
+        {/* Top Header Bar for immediate exit and print */}
+        <div className="w-full max-w-xl flex items-center justify-between mb-3 px-1 no-print">
           <div className="flex items-center gap-2">
             <span className="text-xs font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider">
               {test?.title || 'ATROQ Education'}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={handleExitToHome}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Ana Səhifəyə Qayıt</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+              title="Yalnız nəticə vərəqini çap et"
+            >
+              <Printer className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span>Çap Et</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleExitToHome}
+              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Ana Səhifə</span>
+            </button>
+          </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl max-w-2xl w-full p-6 sm:p-8 text-center animate-in fade-in zoom-in-95 my-2">
-          <div className={`w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4 ${isPassing ? 'bg-emerald-100 text-emerald-600 shadow-emerald-100' : 'bg-amber-100 text-amber-600'
-            } shadow-lg`}>
-            <Award className="w-9 h-9" />
+        {/* ==============================================================
+            PRINTABLE RESULT REPORT CARD (Yalnız Bu Hissə Çapa Gedir)
+            ============================================================== */}
+        <div
+          id="printable-exam-report"
+          className="print-clean-area bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl max-w-xl w-full p-4 sm:p-5 text-center animate-in fade-in zoom-in-95 my-1"
+        >
+          {/* Printable Header */}
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-3 text-left">
+            <div className="flex items-center gap-2.5">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                isPassing ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/70 dark:text-emerald-300' : 'bg-amber-100 text-amber-600 dark:bg-amber-950/70 dark:text-amber-300'
+              } shadow-xs`}>
+                <Award className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 block">
+                  İmtahan Nəticə Hesabatı
+                </span>
+                <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-tight">
+                  {studentName} {studentSurname}
+                </h2>
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5 flex-wrap">
+                  {utisCode && <span>UTİS: <strong className="font-mono text-slate-700 dark:text-slate-200">{utisCode}</strong></span>}
+                  {selectedSchool && <span>• {selectedSchool}</span>}
+                  {selectedGrade && <span>• {selectedGrade}</span>}
+                  {className && <span>({className})</span>}
+                </div>
+              </div>
+            </div>
+
+            {/* Print button inside card for immediate visibility */}
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="no-print p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+              title="Çap et"
+            >
+              <Printer className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            </button>
           </div>
 
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            İmtahan Uğurla Tamamlandı
-          </span>
-          <h2 className="text-2xl font-black text-slate-900 mt-1">
-            {studentName} {studentSurname}
-          </h2>
-          <p className="text-xs text-slate-500 mt-1 mb-6">
-            Nəticələriniz avtomatik hesablandı və sistemdə qeydə alındı.
-          </p>
-
-          {/* Çoxfənli və Fənlər Üzrə Rəsmi Nəticə Cədvəli (Tələb 4) */}
-          <div className="mb-6">
+          {/* Çoxfənli və Fənlər Üzrə Rəsmi Nəticə Cədvəli */}
+          <div className="mb-3.5">
             <MultiSubjectResultsTable
               evaluation={multiSubStats}
               studentName={`${studentName} ${studentSurname}`}
@@ -946,203 +955,185 @@ export const InteractiveTestTaking: React.FC<InteractiveTestTakingProps> = ({
             />
           </div>
 
-          {/* Results Score Box */}
-          <div className="p-6 bg-gradient-to-b from-indigo-50/50 to-white rounded-2xl border border-indigo-100 shadow-sm mb-6">
-            <div className="text-4xl font-black text-indigo-900 mb-1">
-              {examResult.score} <span className="text-base text-slate-500 font-bold">/ {test?.total_points || 100} bal</span>
-            </div>
-            <div className={`inline-block px-3 py-1 rounded-full text-xs font-black ${examResult.percentage >= 80
-              ? 'bg-emerald-100 text-emerald-800'
-              : examResult.percentage >= 50
-                ? 'bg-amber-100 text-amber-800'
-                : 'bg-rose-100 text-rose-800'
-              }`}>
-              Müvəffəqiyyət Faizi: {examResult.percentage}%
-            </div>
-
-            <div className="grid grid-cols-3 gap-3 mt-6 pt-5 border-t border-indigo-100/60 text-xs">
-              <div className="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200/50">
-                <span className="text-[10px] text-emerald-700 font-bold block">Düzgün</span>
-                <strong className="text-emerald-900 text-base">{examResult.correct_count}</strong>
-              </div>
-              <div className="p-2.5 bg-rose-50 rounded-xl border border-rose-200/50">
-                <span className="text-[10px] text-rose-700 font-bold block">Səhv</span>
-                <strong className="text-rose-900 text-base">{examResult.incorrect_count}</strong>
-              </div>
-              <div className="p-2.5 bg-slate-100 rounded-xl border border-slate-200/50">
-                <span className="text-[10px] text-slate-600 font-bold block">Boş</span>
-                <strong className="text-slate-800 text-base">{examResult.blank_count}</strong>
-              </div>
-            </div>
-
-            {/* Açıq və Situasiya Tipli Sualların Xülasə Nəticələri (İstər OMR, istərsə İnteraktiv: Sual mətni göstərilmir, Yalnız cavablar və bal) */}
-            {(() => {
-              const openTypeQuestions = questions.filter(
-                q => q.question_type === 'open_ended' || q.question_type === 'numeric' || q.question_type === 'situation'
-              );
-              if (openTypeQuestions.length === 0) return null;
-
-              const isAnswerCorrect = (studentAns: string, correctAns: string) => {
-                if (!studentAns || !correctAns) return false;
-                const sTrim = studentAns.trim().toUpperCase();
-                const cTrim = correctAns.trim().toUpperCase();
-                if (sTrim === cTrim) return true;
-                const sNorm = sTrim.replace(',', '.').replace(/\s+/g, '');
-                const cNorm = cTrim.replace(',', '.').replace(/\s+/g, '');
-                if (sNorm === cNorm && sNorm !== '') return true;
-                const sNum = parseFloat(sNorm);
-                const cNum = parseFloat(cNorm);
-                if (!isNaN(sNum) && !isNaN(cNum) && Math.abs(sNum - cNum) < 1e-9) return true;
-                return false;
-              };
-
-              return (
-                <div className="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2.5 text-left">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-indigo-950 dark:text-indigo-200 font-extrabold text-xs uppercase tracking-wider">
-                      <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-                      <span>Açıq Tipli Sualların Nəticələri ({openTypeQuestions.length} sual)</span>
-                    </div>
-                    <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
-                      (Yalnız cavablar və bal)
-                    </span>
-                  </div>
-
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900/90 shadow-2xs">
-                    {openTypeQuestions.map((q) => {
-                      const originalIndex = questions.findIndex(item => item.id === q.id);
-                      const qNum = originalIndex >= 0 ? originalIndex + 1 : 1;
-                      const studentAns = (answers[q.id] || '').trim();
-                      const ev = situationEvaluations[q.id];
-                      const isSituation = q.question_type === 'situation';
-                      const qPoints = q.points || (isSituation ? 6 : 4);
-
-                      let isCorrect = false;
-                      let earnedPoints = 0;
-                      if (isSituation && ev) {
-                        earnedPoints = typeof ev.teacher_override_score === 'number' ? ev.teacher_override_score : ev.score;
-                        isCorrect = earnedPoints > 0;
-                      } else if (!isSituation && q.correct_answer) {
-                        isCorrect = isAnswerCorrect(studentAns, q.correct_answer);
-                        earnedPoints = isCorrect ? qPoints : 0;
-                      }
-
-                      return (
-                        <div
-                          key={q.id}
-                          className={`p-3 transition-colors flex flex-col gap-2 ${
-                            isCorrect
-                              ? 'bg-emerald-50/30 dark:bg-emerald-950/20'
-                              : studentAns
-                              ? 'bg-rose-50/30 dark:bg-rose-950/20'
-                              : 'bg-slate-50/50 dark:bg-slate-900/50'
-                          }`}
-                        >
-                          {/* Sual Başlığı: Sual №, Fənn, Açıq/Situasiya və QARŞISINDA Sualın Balı */}
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                              <span className="font-black text-xs text-slate-900 dark:text-white">
-                                Sual №{qNum}
-                              </span>
-                              {q.subject && (
-                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
-                                  {q.subject}
-                                </span>
-                              )}
-                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border border-indigo-200/50">
-                                {isSituation ? 'Situasiya Sualı' : 'Açıq Sual'}
-                              </span>
-                            </div>
-
-                            {/* QARŞISINDA Sualın Balı */}
-                            <div className="flex items-center gap-1.5">
-                              <span className={`px-2.5 py-0.5 rounded-lg font-black text-xs font-mono border ${
-                                isCorrect
-                                  ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
-                                  : studentAns
-                                  ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700'
-                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
-                              }`}>
-                                {isSituation && ev
-                                  ? `${earnedPoints} / ${ev.max_points} bal`
-                                  : `${earnedPoints} / ${qPoints} bal`}
-                              </span>
-                              {isSituation && ev?.tier_label && (
-                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 hidden sm:inline">
-                                  ({ev.tier_label})
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Sual mətni göstərilmir, YALNIZ şagird cavabı və düzgün cavab */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                            <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between">
-                              <span className="text-[10px] font-bold text-slate-400">Şagirdin Cavabı:</span>
-                              <strong className={`font-mono text-xs ${studentAns ? (isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400') : 'text-slate-400 italic'}`}>
-                                {studentAns || 'Cavab yazılmayıb'}
-                              </strong>
-                            </div>
-
-                            <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between">
-                              <span className="text-[10px] font-bold text-slate-400">Düzgün Cavab:</span>
-                              <strong className="font-mono text-xs text-emerald-600 dark:text-emerald-400">
-                                {isSituation
-                                  ? (q.situation_model_answer || 'Standart cavab meyarı')
-                                  : (q.correct_answer || '—')}
-                              </strong>
-                            </div>
-                          </div>
-
-                          {/* Situasiya üçün AI rəyi və açar sözlər (kompakt) */}
-                          {isSituation && ev && (
-                            <div className="flex flex-col gap-1.5 pt-1 border-t border-slate-100 dark:border-slate-800/80">
-                              {ev.ai_feedback && (
-                                <div className="text-[11px] text-amber-900 dark:text-amber-200 bg-amber-50/80 dark:bg-amber-950/40 p-2 rounded-xl border border-amber-200/60 dark:border-amber-800/50">
-                                  <strong>AI Rəyi:</strong> {ev.ai_feedback}
-                                </div>
-                              )}
-                              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                                <span>Açar sözlər ({ev.matched_keywords.length}/10 uyğun)</span>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-slate-400">Balı əl ilə dəyiş:</span>
-                                  <input
-                                    type="number"
-                                    min={0}
-                                    max={ev.max_points}
-                                    step="0.5"
-                                    defaultValue={earnedPoints}
-                                    onChange={(e) => {
-                                      const newScore = parseFloat(e.target.value) || 0;
-                                      setSituationEvaluations(prev => ({
-                                        ...prev,
-                                        [q.id]: { ...prev[q.id], score: newScore, teacher_override_score: newScore }
-                                      }));
-                                    }}
-                                    className="w-14 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded text-center font-bold text-indigo-700 dark:text-indigo-400 text-xs"
-                                  />
-                                  <span className="text-[10px]">bal</span>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+          {/* Results Score Box (Kompakt) */}
+          <div className="p-3.5 bg-gradient-to-b from-indigo-50/40 to-white dark:from-slate-800/40 dark:to-slate-900 rounded-xl border border-indigo-100 dark:border-slate-800 shadow-2xs mb-3.5 text-center">
+            <div className="flex items-center justify-between mb-2 pb-2 border-b border-indigo-100/60 dark:border-slate-800">
+              <div className="text-left">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Toplanan Bal</span>
+                <div className="text-2xl font-black text-indigo-900 dark:text-indigo-300 font-mono">
+                  {examResult.score} <span className="text-xs text-slate-400 font-sans font-bold">/ {test?.total_points || 100} bal</span>
                 </div>
-              );
-            })()}
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Müvəffəqiyyət</span>
+                <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-black ${
+                  examResult.percentage >= 80
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
+                    : examResult.percentage >= 50
+                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300'
+                    : 'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300'
+                }`}>
+                  {examResult.percentage}%
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="p-1.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-lg border border-emerald-200/50 dark:border-emerald-800">
+                <span className="text-[9.5px] text-emerald-700 dark:text-emerald-400 font-bold block">Düzgün</span>
+                <strong className="text-emerald-900 dark:text-emerald-200 text-sm font-mono">{examResult.correct_count}</strong>
+              </div>
+              <div className="p-1.5 bg-rose-50 dark:bg-rose-950/40 rounded-lg border border-rose-200/50 dark:border-rose-800">
+                <span className="text-[9.5px] text-rose-700 dark:text-rose-400 font-bold block">Səhv</span>
+                <strong className="text-rose-900 dark:text-rose-200 text-sm font-mono">{examResult.incorrect_count}</strong>
+              </div>
+              <div className="p-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-lg border border-slate-200/50 dark:border-slate-700">
+                <span className="text-[9.5px] text-slate-600 dark:text-slate-400 font-bold block">Boş</span>
+                <strong className="text-slate-800 dark:text-slate-200 text-sm font-mono">{examResult.blank_count}</strong>
+              </div>
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleExitToHome}
-            className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl font-black text-sm shadow-lg shadow-indigo-200 dark:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 mt-4"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span>Ana Səhifəyə Qayıt</span>
-          </button>
+          {/* Sual-Cavab və Düzgün/Səhv Ətraflı Təhlili (Bütün Suallar Kompakt) */}
+          {(() => {
+            const isAnswerCorrect = (studentAns: string, correctAns: string) => {
+              if (!studentAns || !correctAns) return false;
+              const sTrim = studentAns.trim().toUpperCase();
+              const cTrim = correctAns.trim().toUpperCase();
+              if (sTrim === cTrim) return true;
+              const sNorm = sTrim.replace(',', '.').replace(/\s+/g, '');
+              const cNorm = cTrim.replace(',', '.').replace(/\s+/g, '');
+              if (sNorm === cNorm && sNorm !== '') return true;
+              const sNum = parseFloat(sNorm);
+              const cNum = parseFloat(cNorm);
+              if (!isNaN(sNum) && !isNaN(cNum) && Math.abs(sNum - cNum) < 1e-9) return true;
+              return false;
+            };
+
+            return (
+              <div className="mt-3 text-left">
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-200 dark:border-slate-800 mb-2">
+                  <span className="text-[10px] font-black uppercase text-indigo-700 dark:text-indigo-400 tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Sual-Cavab Nəticələri ({questions.length} sual)</span>
+                  </span>
+                  <span className="text-[9.5px] text-slate-400">
+                    Düzgün / Səhv cavab siyahısı
+                  </span>
+                </div>
+
+                <div className="max-h-[360px] overflow-y-auto overscroll-contain scrollbar-thin divide-y divide-slate-100 dark:divide-slate-800 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90">
+                  {questions.map((q, idx) => {
+                    const studentAns = (answers[q.id] || '').trim();
+                    const isSituation = q.question_type === 'situation';
+                    const isOpen = q.question_type === 'open_ended' || q.question_type === 'numeric';
+                    const ev = situationEvaluations[q.id];
+                    const qPoints = q.points || (isSituation ? 6 : 4);
+
+                    let isCorrect = false;
+                    let earnedPoints = 0;
+
+                    if (isSituation && ev) {
+                      earnedPoints = typeof ev.teacher_override_score === 'number' ? ev.teacher_override_score : ev.score;
+                      isCorrect = earnedPoints > 0;
+                    } else if (isOpen) {
+                      isCorrect = isAnswerCorrect(studentAns, q.correct_answer || '');
+                      earnedPoints = isCorrect ? qPoints : 0;
+                    } else {
+                      // Qapalı sual
+                      const correctChoice = (q.correct_answer || '').trim().toUpperCase();
+                      isCorrect = !!studentAns && studentAns.toUpperCase() === correctChoice;
+                      earnedPoints = isCorrect ? qPoints : 0;
+                    }
+
+                    const isBlank = !studentAns;
+
+                    return (
+                      <div
+                        key={q.id || idx}
+                        className={`p-2 transition-colors flex items-center justify-between gap-2 text-xs ${
+                          isCorrect
+                            ? 'bg-emerald-50/30 dark:bg-emerald-950/20'
+                            : isBlank
+                            ? 'bg-slate-50/50 dark:bg-slate-900/50'
+                            : 'bg-rose-50/30 dark:bg-rose-950/20'
+                        }`}
+                      >
+                        {/* Sol tərəf: Sual nömrəsi və fənn */}
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="w-5 min-w-[20px] font-mono font-black text-slate-900 dark:text-slate-100 text-[11px]">
+                            {idx + 1}.
+                          </span>
+                          {q.subject && (
+                            <span className="px-1 py-0.2 rounded text-[8.5px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 truncate max-w-[80px]">
+                              {q.subject}
+                            </span>
+                          )}
+                          <span className="text-[9px] text-slate-400 font-semibold hidden sm:inline">
+                            {isSituation ? 'Situasiya' : isOpen ? 'Açıq' : 'Qapalı'}
+                          </span>
+                        </div>
+
+                        {/* Orta hissə: Cavablar */}
+                        <div className="flex items-center gap-2 text-[11px] font-mono">
+                          <span className="text-slate-400 text-[9.5px]">Cavabınız:</span>
+                          <span className={`font-bold px-1.5 py-0.2 rounded ${
+                            isCorrect
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                              : isBlank
+                              ? 'bg-slate-100 text-slate-400 dark:bg-slate-800 italic'
+                              : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                          }`}>
+                            {studentAns || 'Boş'}
+                          </span>
+
+                          <span className="text-slate-300 dark:text-slate-700">•</span>
+
+                          <span className="text-slate-400 text-[9.5px]">Düzgün:</span>
+                          <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                            {isSituation ? (q.situation_model_answer || 'Meyar') : (q.correct_answer || '—')}
+                          </span>
+                        </div>
+
+                        {/* Sağ tərəf: Bal və status */}
+                        <div className="flex items-center gap-1 shrink-0 font-mono text-[10.5px]">
+                          <span className={`px-1.5 py-0.5 rounded font-black text-[9.5px] ${
+                            isCorrect
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                              : isBlank
+                              ? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                              : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                          }`}>
+                            {earnedPoints}/{qPoints}b
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Exit Button inside Card (no-print) */}
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 no-print">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="w-1/2 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Printer className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <span>Nəticəni Çap Et</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleExitToHome}
+              className="w-1/2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Ana Səhifə</span>
+            </button>
+          </div>
         </div>
       </div>
     );

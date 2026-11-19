@@ -205,7 +205,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
       {/* Answer Inspection Modal */}
       {selectedSessionId && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white border border-slate-200 rounded-3xl shadow-2xl max-w-3xl w-full p-6 animate-in fade-in zoom-in-95 my-8">
+          <div className="print-clean-area bg-white border border-slate-200 rounded-3xl shadow-2xl max-w-3xl w-full p-6 animate-in fade-in zoom-in-95 my-8">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
               <div>
                 <h3 className="font-bold text-slate-900 text-base">
@@ -217,12 +217,24 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                   </p>
                 )}
               </div>
-              <button
-                onClick={() => { setSelectedSessionId(null); setSessionDetail(null); }}
-                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="no-print px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Çap et"
+                >
+                  <Printer className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Çap Et</span>
+                </button>
+                <button
+                  onClick={() => { setSelectedSessionId(null); setSessionDetail(null); }}
+                  className="no-print p-1.5 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
+                  title="Bağla"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {loadingDetail || !sessionDetail ? (
