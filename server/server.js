@@ -1888,6 +1888,379 @@ app.get('/api/regional-stats', (req, res) => {
   }
 });
 
+// ==========================================
+// 10. NAXÇIVAN MR SINAQ İMTAHANLARI İNTEQRASİYASI
+// ==========================================
+
+function getMinistryUrl() {
+  try {
+    const row = db.prepare("SELECT value FROM MinistryExamSettings WHERE key = 'exam_source_url'").get();
+    return (row && row.value) ? row.value.trim() : 'https://nmr.edu.az/search-live-exam-result';
+  } catch (e) {
+    return 'https://nmr.edu.az/search-live-exam-result';
+  }
+}
+
+// 1. Tənzimləməni əldə et
+app.get('/api/ministry-exams/settings', (req, res) => {
+  try {
+    const url = getMinistryUrl();
+    res.json({ success: true, url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 2. Tənzimləməni yenilə
+app.post('/api/ministry-exams/settings', (req, res) => {
+  try {
+    const { url } = req.body;
+    if (!url || !url.trim().startsWith('http')) {
+      return res.status(400).json({ error: 'Düzgün veb link daxil edilməlidir' });
+    }
+    const cleanUrl = url.trim();
+    db.prepare(`
+      INSERT INTO MinistryExamSettings (key, value, updated_at)
+      VALUES ('exam_source_url', ?, datetime('now'))
+      ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at
+    `).run(cleanUrl);
+    res.json({ success: true, message: 'İmtahan saytının linki yadda saxlanıldı', url: cleanUrl });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 3. Mövcud imtahanların siyahısını əldə et (Saytdan canlı çəkilir)
+app.get('/api/ministry-exams/available-exams', async (req, res) => {
+  try {
+    const targetUrl = getMinistryUrl();
+    const response = await fetch(targetUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      },
+      signal: AbortSignal.timeout(8000)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Sayta qoşulmaq mümkün olmadı (Status: ${response.status})`);
+    }
+
+    const html = await response.text();
+    const exams = [];
+    const optionRegex = /<option\s+value="(\d+)">([^<]+)<\/option>/g;
+    let m;
+    while ((m = optionRegex.exec(html)) !== null) {
+      exams.push({ id: m[1], title: m[2].trim() });
+    }
+
+    res.json({
+      success: true,
+      url: targetUrl,
+      exams,
+      count: exams.length
+    });
+  } catch (err) {
+    res.json({
+      success: false,
+      error: err.message || 'İmtahanlar əldə edilə bilmədi',
+      url: getMinistryUrl(),
+      exams: [
+        { id: '27', title: 'XI sinif (Buraxılış Qiymətləndirmə Monitorinqi-1) (2026-11-01)' },
+        { id: '23', title: 'IX sinif (Buraxılış qiymətləndirmə monitorinqi-3) (2026-04-05)' },
+        { id: '22', title: 'XI sinif (Buraxılış qiymətləndirmə monitorinqi-3) (2026-02-21)' },
+        { id: '21', title: 'IX sinif (Buraxılış qiymətləndirmə monitorinqi-2) (2026-01-25)' },
+        { id: '20', title: 'XI sinif (Buraxılış qiymətləndirmə monitorinqi-2) (2025-12-21)' },
+        { id: '11', title: '11-ci sinif (Buraxılış qiymətləndirmə monitorinqi) (2025-11-02)' },
+        { id: '10', title: '9-cu sinif (Buraxılış qiymətləndirmə monitorinqi) (2025-11-02)' }
+      ]
+    });
+  }
+});
+
+// 4. Şagirdləri siniflər üzrə əldə et (ATROQ şagird bazası)
+app.get('/api/ministry-exams/students', (req, res) => {
+  try {
+    const { grade } = req.query;
+    let query = `
+      SELECT id, full_name, first_name, last_name, father_name, utis_code, fin_code, grade_class, school_name
+      FROM Students
+      WHERE is_archived = 0
+    `;
+    const params = [];
+    if (grade && grade !== 'all') {
+      query += ` AND (grade_class = ? OR grade_class LIKE ?)`;
+      params.push(grade, `${grade}%`);
+    }
+    query += ` ORDER BY grade_class ASC, full_name ASC`;
+    const students = db.prepare(query).all(...params);
+
+    const grades = db.prepare(`
+      SELECT DISTINCT grade_class
+      FROM Students
+      WHERE is_archived = 0 AND grade_class IS NOT NULL AND grade_class != ''
+      ORDER BY grade_class ASC
+    `).all().map(r => r.grade_class);
+
+    res.json({
+      success: true,
+      students,
+      grades,
+      count: students.length
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 5. Tək şagird üçün nəticə sorğusu (İdarə olunan ardıcıllıq və dərhal bazaya yazılma)
+app.post('/api/ministry-exams/query-student', async (req, res) => {
+  try {
+    const {
+      student_id,
+      student_name,
+      student_surname,
+      utis_code,
+      grade,
+      exam_id,
+      exam_title
+    } = req.body;
+
+    if (!student_id || !exam_id) {
+      return res.status(400).json({ error: 'Şagird və imtahan seçilməlidir' });
+    }
+
+    const cleanUtis = (utis_code || '').toString().trim();
+    const now = new Date().toISOString();
+
+    if (!cleanUtis) {
+      return res.json({
+        success: true,
+        result: {
+          id: 'res-no-utis-' + student_id,
+          student_id,
+          student_name,
+          student_surname,
+          utis_code: '',
+          grade: grade || '',
+          exam_id,
+          exam_title,
+          score: null,
+          details_json: null,
+          status: 'no_utis',
+          error_message: 'Şagirdin UTİS kodu daxil edilməyib',
+          fetched_at: now
+        }
+      });
+    }
+
+    const targetUrl = getMinistryUrl();
+
+    // 1. GET page to retrieve CSRF token and cookie
+    const getRes = await fetch(targetUrl, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
+      signal: AbortSignal.timeout(9000)
+    });
+
+    const rawCookies = getRes.headers.getSetCookie ? getRes.headers.getSetCookie() : [getRes.headers.get('set-cookie')];
+    const cookieHeader = (rawCookies || []).filter(Boolean).map(c => c.split(';')[0]).join('; ');
+    const html = await getRes.text();
+
+    const csrfMatch = html.match(/name="csrf_"\s+value="([^"]+)"/) || html.match(/value="([^"]+)"\s+name="csrf_"/);
+    const csrf = csrfMatch ? csrfMatch[1] : '';
+
+    // 2. POST request to query ticket
+    const postBody = new URLSearchParams();
+    postBody.append('csrf_', csrf);
+    postBody.append('live_exam_id', exam_id.toString());
+    postBody.append('ticket_id', cleanUtis);
+    postBody.append('submit', '');
+
+    const postRes = await fetch(targetUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Cookie': cookieHeader,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+      },
+      body: postBody.toString(),
+      signal: AbortSignal.timeout(9000)
+    });
+
+    const resHtml = await postRes.text();
+
+    let status = 'not_found';
+    let score = null;
+    let detailsJson = null;
+    let errorMessage = null;
+
+    const hasToastrError = resHtml.includes('toastr["error"]') || resHtml.includes('tap\\u0131lmad\\u0131') || resHtml.includes('tapılmadı');
+
+    if (hasToastrError) {
+      status = 'not_found';
+      errorMessage = 'Bu iş nömrəsinə (UTİS koduna) uyğun nəticə tapılmadı';
+    } else {
+      const tableMatch = resHtml.match(/<table[\s\S]*?<\/table>/i);
+      const scoreMatch = resHtml.match(/(?:Ümumi\s*bal|Bal|Nəticə|Xal)[\s:–-]*([0-9]+(?:[\.,][0-9]+)?)/i);
+
+      if (scoreMatch) {
+        score = parseFloat(scoreMatch[1].replace(',', '.'));
+      }
+
+      if (tableMatch) {
+        detailsJson = JSON.stringify({
+          rawTableHtml: tableMatch[0],
+          textSummary: tableMatch[0].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+        });
+      }
+
+      if (score === null) {
+        const anyNumber = resHtml.match(/\b([0-9]{2,3}(?:[\.,][0-9]+)?)\s*bal\b/i);
+        if (anyNumber) {
+          score = parseFloat(anyNumber[1].replace(',', '.'));
+        }
+      }
+
+      status = 'found';
+    }
+
+    const resId = 'min-res-' + student_id + '-' + exam_id;
+
+    db.prepare(`
+      INSERT INTO MinistryExamResults (
+        id, student_id, student_name, student_surname, utis_code,
+        grade, exam_id, exam_title, score, details_json,
+        status, error_message, fetched_at, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(student_id, exam_id) DO UPDATE SET
+        score = excluded.score,
+        details_json = excluded.details_json,
+        status = excluded.status,
+        error_message = excluded.error_message,
+        fetched_at = excluded.fetched_at,
+        updated_at = excluded.updated_at
+    `).run(
+      resId,
+      student_id,
+      student_name || '',
+      student_surname || '',
+      cleanUtis,
+      grade || '',
+      exam_id.toString(),
+      exam_title || '',
+      score,
+      detailsJson,
+      status,
+      errorMessage,
+      now,
+      now,
+      now
+    );
+
+    res.json({
+      success: true,
+      result: {
+        id: resId,
+        student_id,
+        student_name,
+        student_surname,
+        utis_code: cleanUtis,
+        grade,
+        exam_id,
+        exam_title,
+        score,
+        details_json: detailsJson,
+        status,
+        error_message: errorMessage,
+        fetched_at: now
+      }
+    });
+  } catch (err) {
+    const { student_id, student_name, student_surname, utis_code, grade, exam_id, exam_title } = req.body;
+    const now = new Date().toISOString();
+    const resId = 'min-res-err-' + (student_id || Math.random().toString(36).substring(2, 7));
+
+    res.json({
+      success: true,
+      result: {
+        id: resId,
+        student_id,
+        student_name,
+        student_surname,
+        utis_code: utis_code || '',
+        grade,
+        exam_id,
+        exam_title,
+        score: null,
+        details_json: null,
+        status: 'error',
+        error_message: 'Sorğu xətası: ' + (err.message || 'Əlaqə kəsildi'),
+        fetched_at: now
+      }
+    });
+  }
+});
+
+// 6. Tarixçə və Nəticələr (Saxlanılmış sınaq imtahanı nəticələri)
+app.get('/api/ministry-exams/results', (req, res) => {
+  try {
+    const { exam_id, grade } = req.query;
+    let query = `
+      SELECT r.*, s.school_name, s.father_name
+      FROM MinistryExamResults r
+      LEFT JOIN Students s ON r.student_id = s.id
+      WHERE 1=1
+    `;
+    const params = [];
+    if (exam_id && exam_id !== 'all') {
+      query += ` AND r.exam_id = ?`;
+      params.push(exam_id.toString());
+    }
+    if (grade && grade !== 'all') {
+      query += ` AND (r.grade = ? OR r.grade LIKE ?)`;
+      params.push(grade, `${grade}%`);
+    }
+    query += ` ORDER BY r.updated_at DESC, r.score DESC`;
+
+    const results = db.prepare(query).all(...params);
+
+    const participated = results.filter(r => r.status === 'found' && r.score !== null);
+    const scores = participated.map(r => r.score);
+    const avgScore = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : 0;
+    const maxScore = scores.length > 0 ? Math.max(...scores) : 0;
+    const minScore = scores.length > 0 ? Math.min(...scores) : 0;
+    const notFoundCount = results.filter(r => r.status === 'not_found').length;
+    const errorCount = results.filter(r => r.status === 'error').length;
+
+    res.json({
+      success: true,
+      results,
+      stats: {
+        total: results.length,
+        participated_count: participated.length,
+        avg_score: Number(avgScore),
+        max_score: maxScore,
+        min_score: minScore,
+        not_found_count: notFoundCount,
+        error_count: errorCount
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 7. Tarixçədən nəticəni sil
+app.delete('/api/ministry-exams/results/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    db.prepare('DELETE FROM MinistryExamResults WHERE id = ?').run(id);
+    res.json({ success: true, message: 'Nəticə qeydi silindi' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Serve frontend build in production
 const distPath = path.join(__dirname, '..', 'dist');
 app.use(express.static(distPath));

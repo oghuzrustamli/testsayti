@@ -29,7 +29,8 @@ import {
   Edit3,
   Printer,
   ChevronRight,
-  HelpCircle
+  HelpCircle,
+  Globe
 } from 'lucide-react';
 
 export type TeacherTab =
@@ -47,6 +48,7 @@ export type TeacherTab =
   | 'results'
   | 'statistics'
   | 'regional_stats'
+  | 'ministry_exams'
   | 'archive'
   | 'about'
   | 'settings';
@@ -59,6 +61,7 @@ export type AdminTab =
   | 'subscriptions'
   | 'stats'
   | 'regional_stats'
+  | 'ministry_exams'
   | 'about'
   | 'settings'
   | 'audit';
@@ -69,6 +72,7 @@ export type StudentTab =
   | 'completed_tests'
   | 'results'
   | 'regional_stats'
+  | 'ministry_exams'
   | 'about'
   | 'profile';
 
@@ -163,6 +167,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       groupTitle: 'Regional Təhsil',
       items: [
         { id: 'regional_stats', label: 'Regional Statistika', icon: Award, badge: 'NMR' },
+        { id: 'ministry_exams', label: 'Sınaq imtahanları', icon: Globe, badge: 'UTİS', highlight: true },
       ]
     },
     {
@@ -192,6 +197,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       items: [
         { id: 'stats', label: 'İstifadə Statistikası', icon: TrendingUp },
         { id: 'regional_stats', label: 'Regional Statistika', icon: Award, badge: 'NMR' },
+        { id: 'ministry_exams', label: 'Sınaq imtahanları', icon: Globe, badge: 'UTİS', highlight: true },
         { id: 'audit', label: 'Audit Jurnalı', icon: History },
       ]
     },

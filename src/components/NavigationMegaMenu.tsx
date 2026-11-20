@@ -31,6 +31,7 @@ import {
   ChevronRight,
   ArrowRight,
   GraduationCap,
+  Globe,
   X
 } from 'lucide-react';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
@@ -148,6 +149,14 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
           description: t.questionBankDesc,
           icon: Database,
         },
+        {
+          id: 'ministry_exams',
+          label: 'Sınaq imtahanları',
+          description: 'Naxçıvan MR TN sınaq imtahanı nəticələri və UTİS üzrə avtomatik çıxarış',
+          icon: Globe,
+          badge: 'UTİS / NMR',
+          badgeColor: 'bg-blue-100 dark:bg-blue-950 dark:text-blue-300 text-blue-800 border border-blue-200 dark:border-blue-800',
+        },
       ],
     },
     {
@@ -201,6 +210,22 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
           icon: Award,
           badge: 'NMR',
           badgeColor: 'bg-emerald-500 text-white',
+        },
+        {
+          id: 'ministry_exams',
+          label: 'Sınaq imtahanları',
+          description: 'Naxçıvan MR TN sınaq nəticələri və UTİS inteqrasiyası',
+          icon: Globe,
+          badge: 'UTİS / NMR',
+          badgeColor: 'bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 text-indigo-800 border border-indigo-200 dark:border-indigo-800',
+        },
+        {
+          id: 'ministry_exams',
+          label: 'Sınaq imtahanları',
+          description: 'Nazirliyin sınaq imtahanı nəticələrinin UTİS ilə əldə edilməsi',
+          icon: Globe,
+          badge: 'UTİS / NMR',
+          badgeColor: 'bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 border border-emerald-200 dark:border-emerald-800',
         },
       ],
     },
@@ -284,6 +309,22 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
           icon: Award,
           badge: 'NMR',
           badgeColor: 'bg-emerald-500 text-white',
+        },
+        {
+          id: 'ministry_exams',
+          label: 'Sınaq imtahanları',
+          description: 'Naxçıvan MR TN sınaq nəticələri və UTİS inteqrasiyası',
+          icon: Globe,
+          badge: 'UTİS / NMR',
+          badgeColor: 'bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 text-indigo-800 border border-indigo-200 dark:border-indigo-800',
+        },
+        {
+          id: 'ministry_exams',
+          label: 'Sınaq imtahanları',
+          description: 'Nazirliyin sınaq imtahanı nəticələrinin UTİS ilə əldə edilməsi',
+          icon: Globe,
+          badge: 'UTİS / NMR',
+          badgeColor: 'bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 border border-emerald-200 dark:border-emerald-800',
         },
       ],
     },
@@ -392,6 +433,14 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
           icon: Award,
           badge: 'NMR',
           badgeColor: 'bg-emerald-500 text-white',
+        },
+        {
+          id: 'ministry_exams',
+          label: 'Sınaq imtahanları',
+          description: 'Naxçıvan MR TN sınaq nəticələri və UTİS inteqrasiyası',
+          icon: Globe,
+          badge: 'UTİS / NMR',
+          badgeColor: 'bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 text-indigo-800 border border-indigo-200 dark:border-indigo-800',
         },
         {
           id: 'about',

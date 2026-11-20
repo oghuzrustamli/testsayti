@@ -243,3 +243,49 @@ export function exportRegionalStatsToExcel(
   const fileName = `Naxcivan_MR_Regional_Statistika_${selectedPeriod.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
   XLSX.writeFile(wb, fileName);
 }
+
+/**
+ * Naxçıvan MR Sınaq İmtahanı Nəticələrinin Excel-ə (.xlsx) İxracı (Tələb 11)
+ */
+export function exportMinistryExamResultsToExcel(
+  results: any[],
+  examTitle: string = 'Sınaq İmtahanı',
+  grade: string = 'Bütün Siniflər'
+) {
+  if (!results || results.length === 0) {
+    alert('İxrac etmək üçün heç bir nəticə mövcud deyil.');
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  const excelRows = results.map((r, idx) => ({
+    '№': idx + 1,
+    'Şagirdin Adı və Soyadı': `${r.student_name || ''} ${r.student_surname || ''}`.trim() || r.full_name || '—',
+    'Sinfi': r.grade || r.grade_class || '—',
+    'UTİS Kodu': r.utis_code || '—',
+    'İmtahanın Adı': r.exam_title || examTitle,
+    'Topladığı Bal': r.score !== null && r.score !== undefined ? r.score : (r.status === 'found' ? 0 : 'Nəticə tapılmadı'),
+    'Nəticənin Əldə Edilmə Tarixi': r.fetched_at ? new Date(r.fetched_at).toLocaleString('az-AZ') : '—',
+    'Status': r.status === 'found' ? 'Nəticə tapıldı' : r.status === 'not_found' ? 'Nəticə tapılmadı' : r.status === 'no_utis' ? 'UTİS yoxdur' : 'Xəta'
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(excelRows);
+
+  ws['!cols'] = [
+    { wch: 6 },   // №
+    { wch: 28 },  // Şagird
+    { wch: 12 },  // Sinfi
+    { wch: 14 },  // UTİS
+    { wch: 45 },  // İmtahan
+    { wch: 16 },  // Bal
+    { wch: 22 },  // Tarix
+    { wch: 18 },  // Status
+  ];
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Sınaq Nəticələri');
+
+  const cleanExamName = (examTitle || 'Sinaq').replace(/[^a-zA-Z0-9_\u00C0-\u024F\u0400-\u04FF]/g, '_').slice(0, 30);
+  const fileName = `Sinaq_Netice_${cleanExamName}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+}

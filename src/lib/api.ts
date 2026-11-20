@@ -676,6 +676,115 @@ export const api = {
     return { success: true, sessions: [], count: 0 };
   },
 
+  // ==========================================
+  // NAXÇIVAN MR SINAQ İMTAHANLARI İNTEQRASİYASI
+  // ==========================================
+  async getMinistrySettings(): Promise<{ success: boolean; url: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/ministry-exams/settings`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return { success: true, url: 'https://nmr.edu.az/search-live-exam-result' };
+  },
+
+  async updateMinistrySettings(url: string): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/ministry-exams/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  async getAvailableMinistryExams(): Promise<{ success: boolean; exams: { id: string; title: string }[]; url: string; error?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/ministry-exams/available-exams`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return {
+      success: false,
+      url: 'https://nmr.edu.az/search-live-exam-result',
+      exams: [
+        { id: '27', title: 'XI sinif (Buraxılış Qiymətləndirmə Monitorinqi-1) (2026-11-01)' },
+        { id: '23', title: 'IX sinif (Buraxılış qiymətləndirmə monitorinqi-3) (2026-04-05)' },
+        { id: '22', title: 'XI sinif (Buraxılış qiymətləndirmə monitorinqi-3) (2026-02-21)' },
+        { id: '21', title: 'IX sinif (Buraxılış qiymətləndirmə monitorinqi-2) (2026-01-25)' },
+        { id: '20', title: 'XI sinif (Buraxılış qiymətləndirmə monitorinqi-2) (2025-12-21)' },
+        { id: '11', title: '11-ci sinif (Buraxılış qiymətləndirmə monitorinqi) (2025-11-02)' },
+        { id: '10', title: '9-cu sinif (Buraxılış qiymətləndirmə monitorinqi) (2025-11-02)' }
+      ]
+    };
+  },
+
+  async getMinistryStudents(grade?: string): Promise<{ success: boolean; students: any[]; grades: string[]; count: number }> {
+    try {
+      const q = grade ? `?grade=${encodeURIComponent(grade)}` : '';
+      const res = await fetch(`${API_BASE}/ministry-exams/students${q}`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return { success: true, students: [], grades: [], count: 0 };
+  },
+
+  async queryMinistryStudent(data: {
+    student_id: string;
+    student_name: string;
+    student_surname?: string;
+    utis_code: string;
+    grade: string;
+    exam_id: string;
+    exam_title: string;
+  }): Promise<{ success: boolean; result: any; error?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/ministry-exams/query-student`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (e: any) {
+      return {
+        success: true,
+        result: {
+          id: 'err-' + data.student_id,
+          student_id: data.student_id,
+          student_name: data.student_name,
+          student_surname: data.student_surname,
+          utis_code: data.utis_code,
+          grade: data.grade,
+          exam_id: data.exam_id,
+          exam_title: data.exam_title,
+          score: null,
+          status: 'error',
+          error_message: 'Şəbəkə xətası: ' + e.message,
+          fetched_at: new Date().toISOString()
+        }
+      };
+    }
+  },
+
+  async getMinistryExamResults(exam_id?: string, grade?: string): Promise<{ success: boolean; results: any[]; stats: any }> {
+    try {
+      const params = new URLSearchParams();
+      if (exam_id) params.append('exam_id', exam_id);
+      if (grade) params.append('grade', grade);
+      const res = await fetch(`${API_BASE}/ministry-exams/results?${params.toString()}`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return { success: true, results: [], stats: { total: 0, participated_count: 0, avg_score: 0, max_score: 0, min_score: 0, not_found_count: 0, error_count: 0 } };
+  },
+
+  async deleteMinistryExamResult(id: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/ministry-exams/results/${id}`, { method: 'DELETE' });
+      if (res.ok) return await res.json();
+    } catch {}
+    return { success: false };
+  },
+
   async saveExamAnswer(session_id: string, question_id: string, selected_answer: string): Promise<any> {
     try {
       const res = await fetch(`${API_BASE}/exam/answer`, {

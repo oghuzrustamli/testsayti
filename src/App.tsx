@@ -27,6 +27,7 @@ import { AiTestCreatorPage } from './pages/AiTestCreatorPage';
 import { RegionalStatsPage } from './pages/RegionalStatsPage';
 import { AboutPage } from './pages/AboutPage';
 import { StudentDatabasePage } from './pages/StudentDatabasePage';
+import { MinistryExamsPage } from './pages/MinistryExamsPage';
 
 const DEFAULT_TEACHER: User = {
   id: 'usr-teacher-1',
@@ -204,6 +205,8 @@ export function App() {
                 <RegionalStatsPage user={currentUser} />
               ) : activeTab === 'student_database' ? (
                 <StudentDatabasePage user={currentUser} />
+              ) : activeTab === 'ministry_exams' ? (
+                <MinistryExamsPage user={currentUser} />
               ) : (
                 <>
                   {/* TEACHER VIEWS */}

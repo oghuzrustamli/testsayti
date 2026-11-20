@@ -270,6 +270,48 @@ export function initDatabase() {
     if (!studentCols.includes('updated_at')) db.exec("ALTER TABLE Students ADD COLUMN updated_at TEXT;");
   } catch (e) {}
 
+  // Sınaq İmtahanları (Naxçıvan MR Təhsil Nazirliyi Sınaq İmtahanı İnteqrasiyası)
+  try {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS MinistryExamSettings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS MinistryExamResults (
+        id TEXT PRIMARY KEY,
+        student_id TEXT NOT NULL,
+        student_name TEXT NOT NULL,
+        student_surname TEXT,
+        utis_code TEXT NOT NULL,
+        grade TEXT NOT NULL,
+        exam_id TEXT NOT NULL,
+        exam_title TEXT NOT NULL,
+        score REAL,
+        details_json TEXT,
+        status TEXT NOT NULL,
+        error_message TEXT,
+        fetched_at TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_ministry_student_exam ON MinistryExamResults(student_id, exam_id);
+    `);
+
+    // İlkin tənzimləmə: https://nmr.edu.az/search-live-exam-result
+    const existingUrl = db.prepare("SELECT value FROM MinistryExamSettings WHERE key = 'exam_source_url'").get();
+    if (!existingUrl) {
+      db.prepare(`
+        INSERT INTO MinistryExamSettings (key, value, updated_at)
+        VALUES ('exam_source_url', 'https://nmr.edu.az/search-live-exam-result', datetime('now'))
+      `).run();
+    }
+  } catch (e) {
+    console.error('Error initializing MinistryExam tables:', e);
+  }
+
   seedInitialData();
   repairExistingTests();
 }
