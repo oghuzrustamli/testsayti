@@ -926,8 +926,8 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                       </div>
                     </div>
 
-                    {/* Sütunlu Diaqram (Hər 8 rayon fərdi rənglə) */}
-                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 sm:gap-3 items-end min-h-[175px] sm:min-h-[190px] relative z-10">
+                    {/* Sütunlu Diaqram (Diaqramlar bir-birinə yaxın, müasir dizaynla) */}
+                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 sm:gap-2.5 items-end min-h-[190px] sm:min-h-[210px] relative z-10">
                       {districts.map((d) => {
                         const isSelected = d.name === selectedDistrictName;
                         const theme = DISTRICT_THEMES[d.name] || DISTRICT_THEMES['Naxçıvan şəhəri'];
@@ -955,7 +955,9 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                           <div
                             key={d.id}
                             onClick={() => setSelectedDistrictName(d.name)}
-                            className="flex flex-col items-center gap-1.5 h-full justify-end cursor-pointer group select-none"
+                            className={`flex flex-col items-center gap-1 h-full justify-end cursor-pointer group select-none p-1 rounded-xl transition-all ${
+                              isSelected ? 'bg-slate-100/70 dark:bg-slate-800/80 ring-1 ring-blue-500/30' : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                            }`}
                           >
                             {/* Üst Dəyər Göstəricisi */}
                             <span className={`text-[10px] sm:text-[11px] transition-all ${
@@ -966,8 +968,8 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                               {label}
                             </span>
 
-                            {/* Sütun Zolağı (Kompakt və Zərif Track) */}
-                            <div className={`w-full max-w-[38px] sm:max-w-[48px] h-28 sm:h-32 bg-slate-100/80 dark:bg-slate-800/60 rounded-t-xl p-1 flex items-end justify-center relative transition-all group-hover:bg-slate-200/60 ${
+                            {/* Sütun Zolağı (Kompakt və Zərif Track, Bir-birinə yaxın) */}
+                            <div className={`w-full max-w-[36px] sm:max-w-[44px] h-24 sm:h-28 bg-slate-100/80 dark:bg-slate-800/60 rounded-t-xl p-0.5 flex items-end justify-center relative transition-all group-hover:bg-slate-200/60 ${
                               isSelected ? 'bg-slate-200/70 dark:bg-slate-800' : ''
                             }`}>
                               {/* Rəngli Qradiyent Sütun */}
@@ -985,8 +987,8 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                             </div>
 
                             {/* Alt Rayon Adı və Reytinq */}
-                            <div className="flex flex-col items-center gap-0.5 w-full">
-                              <span className={`text-[9px] font-black px-1 rounded-sm ${
+                            <div className="flex flex-col items-center gap-0.5 w-full mt-0.5">
+                              <span className={`text-[8.5px] font-black px-1 rounded-sm ${
                                 d.nmrRank === 1 && d.studentsCount > 0
                                   ? 'bg-amber-400 text-amber-950 font-black'
                                   : d.nmrRank === 2 && d.studentsCount > 0
@@ -1002,6 +1004,26 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
                               }`}>
                                 {d.name.replace(' rayonu', '').replace(' şəhəri', '')}
                               </span>
+                            </div>
+
+                            {/* TƏLƏB 3: Diaqramın altında şagird sayı, məktəb sayı, orta bal və müvəffəqiyyət faizi kompakt şəkildə */}
+                            <div className="w-full bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800/80 rounded-lg p-1 text-[8.5px] leading-tight flex flex-col gap-0.5 mt-0.5">
+                              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                                <span>Şagird:</span>
+                                <span className="font-bold text-slate-800 dark:text-slate-200">{d.studentsCount}</span>
+                              </div>
+                              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                                <span>Məktəb:</span>
+                                <span className="font-bold text-slate-800 dark:text-slate-200">{d.schoolsCount}</span>
+                              </div>
+                              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                                <span>Orta:</span>
+                                <span className="font-bold text-emerald-600 dark:text-emerald-400">{d.studentsCount > 0 ? `${d.overallScore}%` : '—'}</span>
+                              </div>
+                              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                                <span>Müvəff.:</span>
+                                <span className="font-bold text-indigo-600 dark:text-indigo-400">{d.studentsCount > 0 ? `${d.successRate}%` : '—'}</span>
+                              </div>
                             </div>
                           </div>
                         );

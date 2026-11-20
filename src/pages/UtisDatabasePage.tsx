@@ -1346,22 +1346,22 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                 </button>
               </div>
 
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto max-h-[580px] overflow-y-auto scrollbar-thin">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[11px]">
-                      <th className="py-3 px-3 w-12 text-center">№</th>
-                      <th className="py-3 px-4">Şagirdin Adı, Soyadı</th>
-                      <th className="py-3 px-3">Ata Adı</th>
-                      <th className="py-3 px-3">Sinfi</th>
-                      <th className="py-3 px-3">FİN Kodu</th>
-                      <th className="py-3 px-4">UTİS Kodu</th>
-                      <th className="py-3 px-4">Məktəb</th>
-                      <th className="py-3 px-4">Rayon / Şəhər</th>
-                      <th className="py-3 px-3 text-right">Əməliyyat</th>
+                  <thead className="sticky top-0 z-10 bg-slate-950 border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[11px]">
+                    <tr>
+                      <th className="py-2 px-2.5 w-10 text-center font-mono">№</th>
+                      <th className="py-2 px-3">Şagirdin Adı, Soyadı</th>
+                      <th className="py-2 px-3">Ata Adı</th>
+                      <th className="py-2 px-2.5">Sinfi</th>
+                      <th className="py-2 px-2.5 font-mono">FİN Kodu</th>
+                      <th className="py-2 px-3 font-mono">UTİS Kodu</th>
+                      <th className="py-2 px-3">Məktəb</th>
+                      <th className="py-2 px-3">Rayon / Şəhər</th>
+                      <th className="py-2 px-2.5 text-right">Əməliyyat</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60">
+                  <tbody className="divide-y divide-slate-800/60 font-normal">
                     {loading ? (
                       <tr>
                         <td colSpan={9} className="py-8 text-center text-slate-500">
@@ -1377,17 +1377,17 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                       </tr>
                     ) : (
                       students.map((st, idx) => (
-                        <tr key={st.id} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="py-3 px-3 text-center text-slate-500 font-mono">{idx + 1}</td>
-                          <td className="py-3 px-4 font-medium text-white">{st.full_name}</td>
+                        <tr key={st.id} className="hover:bg-slate-800/40 transition-colors select-none text-[12px]">
+                          <td className="py-1.5 px-2.5 text-center text-slate-500 font-mono text-[11px]">{idx + 1}</td>
+                          <td className="py-1.5 px-3 font-medium text-white whitespace-nowrap">{st.full_name}</td>
                           {/* TƏLƏB 5: Ata adı solğun və ya boz deyil, ad-soyad ilə eyni şriftdə və eyni rəngdə (font-medium text-white) */}
-                          <td className="py-3 px-3 font-medium text-white">{st.father_name || '—'}</td>
-                          <td className="py-3 px-3">
-                            <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-950 text-blue-300 border border-blue-800">
+                          <td className="py-1.5 px-3 font-medium text-white whitespace-nowrap">{st.father_name || '—'}</td>
+                          <td className="py-1.5 px-2.5 whitespace-nowrap">
+                            <span className="px-1.5 py-0.5 rounded text-[11px] font-semibold bg-blue-950 text-blue-300 border border-blue-800">
                               {st.grade_class || '—'}
                             </span>
                           </td>
-                          <td className="py-3 px-3 font-mono text-slate-300">
+                          <td className="py-1.5 px-2.5 font-mono text-slate-300 whitespace-nowrap">
                             {st.fin_code ? (
                               <span className="bg-slate-800/80 text-slate-200 px-1.5 py-0.5 rounded border border-slate-700 font-bold text-[11px]">
                                 {st.fin_code}
@@ -1396,9 +1396,9 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                               <span className="text-slate-500 text-[11px]">—</span>
                             )}
                           </td>
-                          <td className="py-3 px-4 font-mono font-medium">
+                          <td className="py-1.5 px-3 font-mono font-medium whitespace-nowrap">
                             {st.utis_code ? (
-                              <span className="text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/50">
+                              <span className="text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-800/50 text-[11px]">
                                 {st.utis_code}
                               </span>
                             ) : (
@@ -1407,14 +1407,14 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                               </span>
                             )}
                           </td>
-                          <td className="py-3 px-4 text-slate-300 max-w-xs truncate" title={st.school_name}>
+                          <td className="py-1.5 px-3 text-slate-300 max-w-xs truncate" title={st.school_name}>
                             {st.school_name || '—'}
                           </td>
-                          <td className="py-3 px-4 text-slate-300 text-[11px]">
+                          <td className="py-1.5 px-3 text-slate-300 text-[11px] whitespace-nowrap">
                             <div>{st.district || '—'}</div>
-                            <div className="text-slate-400 text-[10px]">{st.settlement || ''}</div>
+                            {st.settlement && <div className="text-slate-400 text-[10px]">{st.settlement}</div>}
                           </td>
-                          <td className="py-3 px-3 text-right">
+                          <td className="py-1.5 px-2.5 text-right whitespace-nowrap">
                             <div className="flex items-center justify-end gap-1.5">
                               <button
                                 onClick={() => {
@@ -2857,68 +2857,68 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
               </div>
             </div>
 
-            {/* Şagirdlərin Təsdiq Cədvəli */}
-            <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
+            {/* Şagirdlərin Təsdiq Cədvəli (Excel Sıx Cədvəl Formatında) */}
+            <div className="flex-1 overflow-y-auto p-3 scrollbar-thin">
               {utisCandidateStudents.length === 0 ? (
                 <div className="p-8 text-center text-xs text-slate-400">
                   Bu məktəb üzrə UTİS-də aktiv şagird siyahısı aşkar edilmədi.
                 </div>
               ) : (
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[11px]">
-                      <th className="py-2.5 px-3 w-10 text-center">Seç</th>
-                      <th className="py-2.5 px-3 w-10 text-center">№</th>
-                      <th className="py-2.5 px-3">Adı və Soyadı</th>
-                      <th className="py-2.5 px-3">Ata Adı</th>
-                      <th className="py-2.5 px-3">FİN Kodu</th>
-                      <th className="py-2.5 px-3">UTİS Kodu</th>
-                      <th className="py-2.5 px-3">Sinfi</th>
-                      <th className="py-2.5 px-3 text-right">Status</th>
+                  <thead className="sticky top-0 z-10 bg-slate-950 border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[11px]">
+                    <tr>
+                      <th className="py-2 px-2.5 w-10 text-center">Seç</th>
+                      <th className="py-2 px-2 w-10 text-center font-mono">№</th>
+                      <th className="py-2 px-3">Adı və Soyadı</th>
+                      <th className="py-2 px-3">Ata Adı</th>
+                      <th className="py-2 px-2.5 font-mono">FİN Kodu</th>
+                      <th className="py-2 px-3 font-mono">UTİS Kodu</th>
+                      <th className="py-2 px-2.5">Sinfi</th>
+                      <th className="py-2 px-2.5 text-right">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60">
+                  <tbody className="divide-y divide-slate-800/60 font-normal">
                     {utisCandidateStudents.map((st, idx) => {
                       const isChecked = selectedUtisCandidateCodes.has(st.utis_code);
                       return (
                         <tr
                           key={st.utis_code || idx}
                           onClick={() => toggleUtisCandidateSelection(st.utis_code)}
-                          className={`hover:bg-slate-800/40 transition-colors cursor-pointer ${
+                          className={`hover:bg-slate-800/40 transition-colors cursor-pointer select-none text-[12px] ${
                             st.already_exists ? 'opacity-70 bg-slate-950/20' : ''
                           }`}
                         >
-                          <td className="py-2.5 px-3 text-center" onClick={(e) => e.stopPropagation()}>
+                          <td className="py-1.5 px-2.5 text-center" onClick={(e) => e.stopPropagation()}>
                             <input
                               type="checkbox"
                               checked={isChecked}
                               onChange={() => toggleUtisCandidateSelection(st.utis_code)}
-                              className="w-4 h-4 rounded text-blue-600 focus:ring-0 focus:outline-none cursor-pointer"
+                              className="w-3.5 h-3.5 rounded text-blue-600 cursor-pointer"
                             />
                           </td>
-                          <td className="py-2.5 px-3 text-center text-slate-500 font-mono">{idx + 1}</td>
-                          <td className="py-2.5 px-3 font-medium text-white">
+                          <td className="py-1.5 px-2 text-center text-slate-500 font-mono text-[11px]">{idx + 1}</td>
+                          <td className="py-1.5 px-3 font-medium text-white whitespace-nowrap">
                             {st.full_name || `${st.first_name || ''} ${st.last_name || ''}`.trim()}
                           </td>
-                          <td className="py-2.5 px-3 font-medium text-white">{st.father_name || '—'}</td>
-                          <td className="py-2.5 px-3 font-mono font-bold text-sky-300">
+                          <td className="py-1.5 px-3 font-medium text-white whitespace-nowrap">{st.father_name || '—'}</td>
+                          <td className="py-1.5 px-2.5 font-mono font-bold text-sky-300 text-[11px] whitespace-nowrap">
                             {st.fin_code || '—'}
                           </td>
-                          <td className="py-2.5 px-3 font-mono font-bold text-emerald-400">
+                          <td className="py-1.5 px-3 font-mono font-bold text-emerald-400 text-[11px] whitespace-nowrap">
                             {st.utis_code}
                           </td>
-                          <td className="py-2.5 px-3">
-                            <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-950 text-blue-300 border border-blue-800">
+                          <td className="py-1.5 px-2.5 whitespace-nowrap">
+                            <span className="px-1.5 py-0.5 rounded text-[11px] font-semibold bg-blue-950 text-blue-300 border border-blue-800">
                               {st.grade_class}
                             </span>
                           </td>
-                          <td className="py-2.5 px-3 text-right">
+                          <td className="py-1.5 px-2.5 text-right whitespace-nowrap">
                             {st.already_exists ? (
-                              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
                                 Artıq Bazadadır
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">
                                 Yeni Şagird
                               </span>
                             )}
