@@ -720,13 +720,249 @@ export const api = {
     };
   },
 
-  async getMinistryStudents(grade?: string): Promise<{ success: boolean; students: any[]; grades: string[]; count: number }> {
+  async getMinistryStudents(grade?: string, district?: string, school?: string): Promise<{
+    success: boolean;
+    students: any[];
+    grades: string[];
+    districts?: string[];
+    schools?: string[];
+    count: number;
+  }> {
     try {
-      const q = grade ? `?grade=${encodeURIComponent(grade)}` : '';
-      const res = await fetch(`${API_BASE}/ministry-exams/students${q}`);
+      const params = new URLSearchParams();
+      if (grade && grade !== 'all') params.append('grade', grade);
+      if (district && district !== 'all') params.append('district', district);
+      if (school && school !== 'all') params.append('school', school);
+
+      const qs = params.toString() ? `?${params.toString()}` : '';
+      const res = await fetch(`${API_BASE}/ministry-exams/students${qs}`);
       if (res.ok) return await res.json();
     } catch {}
     return { success: true, students: [], grades: [], count: 0 };
+  },
+
+  // ==========================================
+  // UTİS İNTEQRASİYASI VƏ MƏKTƏB BAZASI API-LƏRİ
+  // ==========================================
+  async getUtisDistricts(): Promise<{ success: boolean; districts: any[] }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/districts`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return { success: true, districts: [] };
+  },
+
+  async addUtisDistrict(data: { name: string; region_type?: string; parent_region?: string }): Promise<{ success: boolean; message?: string; error?: string; district?: any }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/districts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  async deleteUtisDistrict(id: string): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/districts/${id}`, { method: 'DELETE' });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  async getUtisSettlements(district_id?: string, district_name?: string): Promise<{ success: boolean; settlements: any[] }> {
+    try {
+      const p = new URLSearchParams();
+      if (district_id && district_id !== 'all') p.append('district_id', district_id);
+      if (district_name && district_name !== 'all') p.append('district_name', district_name);
+      const qs = p.toString() ? `?${p.toString()}` : '';
+      const res = await fetch(`${API_BASE}/utis/settlements${qs}`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return { success: true, settlements: [] };
+  },
+
+  async addUtisSettlement(data: { district_id?: string; district_name?: string; name: string; settlement_type?: string }): Promise<{ success: boolean; message?: string; error?: string; settlement?: any }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/settlements`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  async getUtisSchools(district?: string, settlement?: string): Promise<{ success: boolean; schools: any[] }> {
+    try {
+      const p = new URLSearchParams();
+      if (district && district !== 'all') p.append('district', district);
+      if (settlement && settlement !== 'all') p.append('settlement', settlement);
+      const qs = p.toString() ? `?${p.toString()}` : '';
+      const res = await fetch(`${API_BASE}/utis/schools${qs}`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return { success: true, schools: [] };
+  },
+
+  async addUtisSchool(data: { name: string; district: string; settlement?: string; utis_code?: string; school_type?: string }): Promise<{ success: boolean; message?: string; error?: string; school?: any }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/schools`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  async deleteUtisSchool(id: string): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/schools/${id}`, { method: 'DELETE' });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  async getUtisStudents(filters?: {
+    district?: string;
+    settlement?: string;
+    school?: string;
+    grade?: string;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ success: boolean; total: number; with_utis_count: number; without_utis_count: number; students: any[] }> {
+    try {
+      const p = new URLSearchParams();
+      if (filters?.district && filters.district !== 'all') p.append('district', filters.district);
+      if (filters?.settlement && filters.settlement !== 'all') p.append('settlement', filters.settlement);
+      if (filters?.school && filters.school !== 'all') p.append('school', filters.school);
+      if (filters?.grade && filters.grade !== 'all') p.append('grade', filters.grade);
+      if (filters?.search && filters.search.trim()) p.append('search', filters.search.trim());
+      if (filters?.limit) p.append('limit', String(filters.limit));
+      if (filters?.offset) p.append('offset', String(filters.offset));
+
+      const qs = p.toString() ? `?${p.toString()}` : '';
+      const res = await fetch(`${API_BASE}/utis/students${qs}`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return { success: true, total: 0, with_utis_count: 0, without_utis_count: 0, students: [] };
+  },
+
+  async addUtisStudent(data: {
+    first_name: string;
+    last_name: string;
+    father_name?: string;
+    utis_code: string;
+    grade_class: string;
+    school_name: string;
+    district: string;
+    settlement?: string;
+  }): Promise<{ success: boolean; message?: string; error?: string; student?: any }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/students`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  async updateUtisStudent(id: string, data: any): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/students/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  async deleteUtisStudent(id: string): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/students/${id}`, { method: 'DELETE' });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  async getUtisSettings(): Promise<{ success: boolean; settings: Record<string, string> }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/settings`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return { success: true, settings: {} };
+  },
+
+  async updateUtisSettings(data: Record<string, string>): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  async syncUtis(): Promise<{ success: boolean; message?: string; last_sync_at?: string; stats?: any; error?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/sync`, { method: 'POST' });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  async getUtisSyncHistory(): Promise<{ success: boolean; history: any[] }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/sync-history`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return { success: true, history: [] };
+  },
+
+  async getUtisStats(): Promise<{
+    success: boolean;
+    overview: {
+      total_students: number;
+      total_schools: number;
+      total_districts: number;
+      with_utis_count: number;
+      without_utis_count: number;
+    };
+    districts: any[];
+    schools: any[];
+  }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/stats`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return {
+      success: true,
+      overview: { total_students: 0, total_schools: 0, total_districts: 0, with_utis_count: 0, without_utis_count: 0 },
+      districts: [],
+      schools: []
+    };
   },
 
   async queryMinistryStudent(data: {

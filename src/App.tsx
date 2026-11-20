@@ -28,6 +28,7 @@ import { RegionalStatsPage } from './pages/RegionalStatsPage';
 import { AboutPage } from './pages/AboutPage';
 import { StudentDatabasePage } from './pages/StudentDatabasePage';
 import { MinistryExamsPage } from './pages/MinistryExamsPage';
+import { UtisDatabasePage } from './pages/UtisDatabasePage';
 
 const DEFAULT_TEACHER: User = {
   id: 'usr-teacher-1',
@@ -204,9 +205,9 @@ export function App() {
               ) : activeTab === 'regional_stats' ? (
                 <RegionalStatsPage user={currentUser} />
               ) : activeTab === 'student_database' ? (
-                <StudentDatabasePage user={currentUser} />
+                <UtisDatabasePage user={currentUser} />
               ) : activeTab === 'ministry_exams' ? (
-                <MinistryExamsPage user={currentUser} />
+                <UtisDatabasePage user={currentUser} />
               ) : (
                 <>
                   {/* TEACHER VIEWS */}

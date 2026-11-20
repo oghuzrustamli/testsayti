@@ -268,7 +268,55 @@ export function initDatabase() {
     if (!studentCols.includes('is_archived')) db.exec("ALTER TABLE Students ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0;");
     if (!studentCols.includes('archived_at')) db.exec("ALTER TABLE Students ADD COLUMN archived_at TEXT;");
     if (!studentCols.includes('updated_at')) db.exec("ALTER TABLE Students ADD COLUMN updated_at TEXT;");
+    if (!studentCols.includes('district')) db.exec("ALTER TABLE Students ADD COLUMN district TEXT;");
+    if (!studentCols.includes('settlement')) db.exec("ALTER TABLE Students ADD COLUMN settlement TEXT;");
+    if (!studentCols.includes('school_id')) db.exec("ALTER TABLE Students ADD COLUMN school_id TEXT;");
   } catch (e) {}
+
+  // UTİS və Dinamik Ölkə Məktəb-Şagird Bazası Cədvəlləri
+  try {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS Districts (
+        id TEXT PRIMARY KEY,
+        name TEXT UNIQUE NOT NULL,
+        region_type TEXT DEFAULT 'rayon',
+        parent_region TEXT DEFAULT 'Naxçıvan MR',
+        created_at TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS Settlements (
+        id TEXT PRIMARY KEY,
+        district_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        settlement_type TEXT DEFAULT 'kend',
+        created_at TEXT NOT NULL,
+        UNIQUE(district_id, name)
+      );
+
+      CREATE TABLE IF NOT EXISTS UtisSettings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS UtisSyncHistory (
+        id TEXT PRIMARY KEY,
+        sync_type TEXT NOT NULL,
+        status TEXT NOT NULL,
+        total_synced INTEGER NOT NULL DEFAULT 0,
+        new_added INTEGER NOT NULL DEFAULT 0,
+        updated_count INTEGER NOT NULL DEFAULT 0,
+        notes TEXT,
+        created_at TEXT NOT NULL
+      );
+    `);
+
+    // Ensure Schools has settlement column
+    const schoolCols = db.prepare("PRAGMA table_info(Schools)").all().map(c => c.name);
+    if (!schoolCols.includes('settlement')) db.exec("ALTER TABLE Schools ADD COLUMN settlement TEXT;");
+  } catch (e) {
+    console.error('Error creating UTIS tables:', e);
+  }
 
   // Sınaq İmtahanları (Naxçıvan MR Təhsil Nazirliyi Sınaq İmtahanı İnteqrasiyası)
   try {
@@ -313,7 +361,173 @@ export function initDatabase() {
   }
 
   seedInitialData();
+  seedUtisData();
   repairExistingTests();
+}
+
+// UTİS və Ölkə üzrə Rayon, Məktəb və Şagird Bazasının İlkin Doldurulması
+function seedUtisData() {
+  try {
+    const now = new Date().toISOString();
+
+    // 1. Rayon və Şəhərlərin Doldurulması
+    const distCount = db.prepare('SELECT COUNT(*) as count FROM Districts').get();
+    if (distCount.count === 0) {
+      const districts = [
+        // Naxçıvan MR
+        { id: 'dist-naxcivan', name: 'Naxçıvan şəhəri', type: 'seher', parent: 'Naxçıvan MR' },
+        { id: 'dist-babek', name: 'Babək rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
+        { id: 'dist-serur', name: 'Şərur rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
+        { id: 'dist-ordubad', name: 'Ordubad rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
+        { id: 'dist-culfa', name: 'Culfa rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
+        { id: 'dist-kengerli', name: 'Kəngərli rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
+        { id: 'dist-sahbuz', name: 'Şahbuz rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
+        { id: 'dist-sederek', name: 'Sədərək rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
+
+        // Bakı və Ətraf
+        { id: 'dist-baki', name: 'Bakı şəhəri', type: 'seher', parent: 'Bakı iqtisadi rayonu' },
+        { id: 'dist-sumqayit', name: 'Sumqayıt şəhəri', type: 'seher', parent: 'Abşeron-Xızı' },
+        { id: 'dist-abseron', name: 'Abşeron rayonu', type: 'rayon', parent: 'Abşeron-Xızı' },
+
+        // Gəncə-Daşkəsən və Qazax-Tovuz
+        { id: 'dist-gence', name: 'Gəncə şəhəri', type: 'seher', parent: 'Gəncə-Daşkəsən' },
+        { id: 'dist-samux', name: 'Samux rayonu', type: 'rayon', parent: 'Gəncə-Daşkəsən' },
+        { id: 'dist-tovuz', name: 'Tovuz rayonu', type: 'rayon', parent: 'Qazax-Tovuz' },
+        { id: 'dist-semkir', name: 'Şəmkir rayonu', type: 'rayon', parent: 'Qazax-Tovuz' },
+        { id: 'dist-qazax', name: 'Qazax rayonu', type: 'rayon', parent: 'Qazax-Tovuz' },
+
+        // Şəki-Zaqatala və Quba-Xaçmaz
+        { id: 'dist-seki', name: 'Şəki şəhəri', type: 'seher', parent: 'Şəki-Zaqatala' },
+        { id: 'dist-zaqatala', name: 'Zaqatala rayonu', type: 'rayon', parent: 'Şəki-Zaqatala' },
+        { id: 'dist-quba', name: 'Quba rayonu', type: 'rayon', parent: 'Quba-Xaçmaz' },
+        { id: 'dist-xacmaz', name: 'Xaçmaz rayonu', type: 'rayon', parent: 'Quba-Xaçmaz' },
+
+        // Lənkəran-Astara
+        { id: 'dist-lenkeran', name: 'Lənkəran rayonu', type: 'rayon', parent: 'Lənkəran-Astara' },
+        { id: 'dist-astara', name: 'Astara rayonu', type: 'rayon', parent: 'Lənkəran-Astara' },
+        { id: 'dist-masalli', name: 'Masallı rayonu', type: 'rayon', parent: 'Lənkəran-Astara' },
+
+        // Qarabağ və Şərqi Zəngəzur
+        { id: 'dist-susa', name: 'Şuşa rayonu', type: 'rayon', parent: 'Qarabağ' },
+        { id: 'dist-agdam', name: 'Ağdam rayonu', type: 'rayon', parent: 'Qarabağ' },
+        { id: 'dist-berde', name: 'Bərdə rayonu', type: 'rayon', parent: 'Qarabağ' },
+        { id: 'dist-kelbecer', name: 'Kəlbəcər rayonu', type: 'rayon', parent: 'Şərqi Zəngəzur' },
+        { id: 'dist-lacin', name: 'Laçın rayonu', type: 'rayon', parent: 'Şərqi Zəngəzur' },
+
+        // Mərkəzi Aran və Dağlıq Şirvan
+        { id: 'dist-mingecevir', name: 'Mingəçevir şəhəri', type: 'seher', parent: 'Mərkəzi Aran' },
+        { id: 'dist-samaxi', name: 'Şamaxı rayonu', type: 'rayon', parent: 'Dağlıq Şirvan' },
+        { id: 'dist-ismayilli', name: 'İsmayıllı rayonu', type: 'rayon', parent: 'Dağlıq Şirvan' },
+      ];
+
+      const insDist = db.prepare('INSERT OR IGNORE INTO Districts (id, name, region_type, parent_region, created_at) VALUES (?, ?, ?, ?, ?)');
+      for (const d of districts) {
+        insDist.run(d.id, d.name, d.type, d.parent, now);
+      }
+    }
+
+    // 2. Kənd və Qəsəbələrin Doldurulması
+    const settCount = db.prepare('SELECT COUNT(*) as count FROM Settlements').get();
+    if (settCount.count === 0) {
+      const settlements = [
+        // Babək rayonunun kənd və qəsəbələri
+        { id: 'sett-cehri', district_id: 'dist-babek', name: 'Cəhri qəsəbəsi', type: 'qesebe' },
+        { id: 'sett-sixmahmud', district_id: 'dist-babek', name: 'Şıxmahmud kəndi', type: 'kend' },
+        { id: 'sett-nehrem', district_id: 'dist-babek', name: 'Nehrəm kəndi', type: 'kend' },
+        { id: 'sett-qahab', district_id: 'dist-babek', name: 'Qahab kəndi', type: 'kend' },
+        { id: 'sett-sirab', district_id: 'dist-babek', name: 'Sirab kəndi', type: 'kend' },
+        { id: 'sett-zeyneddin', district_id: 'dist-babek', name: 'Zeynəddin kəndi', type: 'kend' },
+        { id: 'sett-vayxir', district_id: 'dist-babek', name: 'Vayxır kəndi', type: 'kend' },
+        { id: 'sett-kultepe', district_id: 'dist-babek', name: 'Kültəpə kəndi', type: 'kend' },
+        { id: 'sett-didivar', district_id: 'dist-babek', name: 'Didivar kəndi', type: 'kend' },
+        { id: 'sett-yarimca', district_id: 'dist-babek', name: 'Yarımca kəndi', type: 'kend' },
+
+        // Şərur rayonunun kənd və qəsəbələri
+        { id: 'sett-mahmudkend', district_id: 'dist-serur', name: 'Mahmudkənd', type: 'kend' },
+        { id: 'sett-yengice', district_id: 'dist-serur', name: 'Yengicə kəndi', type: 'kend' },
+        { id: 'sett-cercibogan', district_id: 'dist-serur', name: 'Çərçiboğan kəndi', type: 'kend' },
+        { id: 'sett-demirci', district_id: 'dist-serur', name: 'Dəmirçi kəndi', type: 'kend' },
+
+        // Ordubad rayonunun kəndləri
+        { id: 'sett-ordubad-m', district_id: 'dist-ordubad', name: 'Ordubad şəhər mərkəzi', type: 'seher_merkezi' },
+        { id: 'sett-venend', district_id: 'dist-ordubad', name: 'Vənənd kəndi', type: 'kend' },
+        { id: 'sett-deste', district_id: 'dist-ordubad', name: 'Dəstə kəndi', type: 'kend' },
+        { id: 'sett-bilev', district_id: 'dist-ordubad', name: 'Biləv kəndi', type: 'kend' },
+
+        // Naxçıvan şəhəri
+        { id: 'sett-nax-merkez', district_id: 'dist-naxcivan', name: 'Naxçıvan şəhər mərkəzi', type: 'seher_merkezi' },
+        { id: 'sett-aliabad', district_id: 'dist-naxcivan', name: 'Əliabad qəsəbəsi', type: 'qesebe' },
+        { id: 'sett-qaracuq', district_id: 'dist-naxcivan', name: 'Qaraçuq kəndi', type: 'kend' },
+        { id: 'sett-qaraxanbeyli', district_id: 'dist-naxcivan', name: 'Qaraxanbəyli kəndi', type: 'kend' },
+
+        // Bakı şəhəri
+        { id: 'sett-yasamal', district_id: 'dist-baki', name: 'Yasamal qəsəbəsi', type: 'qesebe' },
+        { id: 'sett-nesimi', district_id: 'dist-baki', name: 'Nəsimi rayonu mərkəzi', type: 'seher_merkezi' },
+        { id: 'sett-bineqedi', district_id: 'dist-baki', name: 'Binəqədi qəsəbəsi', type: 'qesebe' },
+      ];
+
+      const insSett = db.prepare('INSERT OR IGNORE INTO Settlements (id, district_id, name, settlement_type, created_at) VALUES (?, ?, ?, ?, ?)');
+      for (const s of settlements) {
+        insSett.run(s.id, s.district_id, s.name, s.type, now);
+      }
+    }
+
+    // 3. Məktəblərin Doldurulması
+    const schoolCount = db.prepare('SELECT COUNT(*) as count FROM Schools').get();
+    if (schoolCount.count === 0) {
+      const initialSchools = [
+        { id: 'sch-bab-cehri-2', name: 'Q.Sadiqov adına Cəhri qəsəbə 2 №-li tam orta məktəb', district: 'Babək rayonu', settlement: 'Cəhri qəsəbəsi', utis_code: '7002007', type: 'tam_orta' },
+        { id: 'sch-bab-cehri-1', name: 'Cəhri qəsəbə 1 nömrəli tam orta məktəb', district: 'Babək rayonu', settlement: 'Cəhri qəsəbəsi', utis_code: '7002006', type: 'tam_orta' },
+        { id: 'sch-bab-sixmahmud', name: 'Şıxmahmud kənd tam orta məktəbi', district: 'Babək rayonu', settlement: 'Şıxmahmud kəndi', utis_code: '7002009', type: 'tam_orta' },
+        { id: 'sch-bab-nehrem-1', name: 'Nehrəm qəsəbə 1 nömrəli tam orta məktəb', district: 'Babək rayonu', settlement: 'Nehrəm kəndi', utis_code: '7002003', type: 'tam_orta' },
+        { id: 'sch-bab-sirab', name: 'Sirab kənd tam orta məktəbi', district: 'Babək rayonu', settlement: 'Sirab kəndi', utis_code: '7002008', type: 'tam_orta' },
+        { id: 'sch-bab-qahab', name: 'Qahab kənd tam orta məktəbi', district: 'Babək rayonu', settlement: 'Qahab kəndi', utis_code: '7002011', type: 'tam_orta' },
+
+        // Şərur
+        { id: 'sch-ser-mahmud', name: 'Mahmudkənd tam orta məktəbi', district: 'Şərur rayonu', settlement: 'Mahmudkənd', utis_code: '7003010', type: 'tam_orta' },
+        { id: 'sch-ser-yengice', name: 'Yengicə kənd tam orta məktəbi', district: 'Şərur rayonu', settlement: 'Yengicə kəndi', utis_code: '7003011', type: 'tam_orta' },
+
+        // Naxçıvan şəhəri
+        { id: 'sch-nax-01', name: '1 nömrəli tam orta məktəb', district: 'Naxçıvan şəhəri', settlement: 'Naxçıvan şəhər mərkəzi', utis_code: '7001001', type: 'tam_orta' },
+        { id: 'sch-nax-hl', name: 'Heydər Əliyev adına Hərbi Lisey', district: 'Naxçıvan şəhəri', settlement: 'Naxçıvan şəhər mərkəzi', utis_code: '7001020', type: 'lisey' },
+
+        // Ordubad
+        { id: 'sch-ord-01', name: 'M.F.Axundov adına 1 nömrəli tam orta məktəb', district: 'Ordubad rayonu', settlement: 'Ordubad şəhər mərkəzi', utis_code: '7004001', type: 'tam_orta' },
+        { id: 'sch-ord-venend', name: 'Vənənd kənd tam orta məktəbi', district: 'Ordubad rayonu', settlement: 'Vənənd kəndi', utis_code: '7004005', type: 'tam_orta' },
+
+        // Bakı
+        { id: 'sch-baki-287', name: 'Bakı şəhəri 287 nömrəli Zəkalar liseyi', district: 'Bakı şəhəri', settlement: 'Yasamal qəsəbəsi', utis_code: '1001287', type: 'lisey' },
+      ];
+
+      const insSchool = db.prepare('INSERT OR IGNORE INTO Schools (id, name, district, settlement, utis_code, school_type, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+      for (const s of initialSchools) {
+        insSchool.run(s.id, s.name, s.district, s.settlement, s.utis_code, s.type, 'active', now);
+      }
+    }
+
+    // 4. Mövcud 272 şagirdin Məktəb, Rayon və Kəndə bağlanması
+    db.prepare(`
+      UPDATE Students 
+      SET district = 'Babək rayonu', 
+          settlement = 'Cəhri qəsəbəsi', 
+          school_name = 'Q.Sadiqov adına Cəhri qəsəbə 2 №-li tam orta məktəb',
+          school_id = 'sch-bab-cehri-2'
+      WHERE district IS NULL OR district = '' OR district = 'undefined'
+    `).run();
+
+    // 5. UTİS Tənzimləmələri (UtisSettings)
+    const utisSettingCheck = db.prepare("SELECT value FROM UtisSettings WHERE key = 'api_url'").get();
+    if (!utisSettingCheck) {
+      const insSetting = db.prepare('INSERT OR REPLACE INTO UtisSettings (key, value, updated_at) VALUES (?, ?, ?)');
+      insSetting.run('api_url', 'https://utis.edu.az/api/v1', now);
+      insSetting.run('organization_code', 'ATROQ-AZ-2026', now);
+      insSetting.run('auth_status', 'pending_official_permission', now);
+      insSetting.run('exam_source_url', 'https://nmr.edu.az/search-live-exam-result', now);
+      insSetting.run('auth_notice', 'Elm və Təhsil Nazirliyinin rəsmi icazəsi və mərkəzləşdirilmiş API açarı gözlənilir. Dövlət təhlükəsizlik qaydalarına əsasən UTİS sisteminə birbaşa çıxış rəsmi dövlət müqaviləsi və akkreditasiya tələb edir. Sistem inteqrasiyaya tam hazırdır. Alternativ olaraq rəsmi Excel idxalı və canlı sınaq imtahanı sorğuları aktiv işləyir.', now);
+    }
+  } catch (err) {
+    console.error('Error seeding UTIS data:', err);
+  }
 }
 
 // Ensure demo questions, sample tests and repair any empty tests

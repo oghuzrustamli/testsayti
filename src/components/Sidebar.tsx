@@ -30,7 +30,8 @@ import {
   Printer,
   ChevronRight,
   HelpCircle,
-  Globe
+  Globe,
+  Building2
 } from 'lucide-react';
 
 export type TeacherTab =
@@ -167,7 +168,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       groupTitle: 'Regional Təhsil',
       items: [
         { id: 'regional_stats', label: 'Regional Statistika', icon: Award, badge: 'NMR' },
-        { id: 'ministry_exams', label: 'Sınaq imtahanları', icon: Globe, badge: 'UTİS', highlight: true },
+        { id: 'ministry_exams', label: 'UTİS & Məktəb Bazası', icon: Building2, badge: 'UTİS', highlight: true },
       ]
     },
     {
@@ -197,7 +198,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       items: [
         { id: 'stats', label: 'İstifadə Statistikası', icon: TrendingUp },
         { id: 'regional_stats', label: 'Regional Statistika', icon: Award, badge: 'NMR' },
-        { id: 'ministry_exams', label: 'Sınaq imtahanları', icon: Globe, badge: 'UTİS', highlight: true },
+        { id: 'ministry_exams', label: 'UTİS & Məktəb Bazası', icon: Building2, badge: 'UTİS', highlight: true },
         { id: 'audit', label: 'Audit Jurnalı', icon: History },
       ]
     },
