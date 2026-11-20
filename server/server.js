@@ -1862,12 +1862,12 @@ app.post('/api/schools', (req, res) => {
 
 app.get('/api/regional-stats', (req, res) => {
   try {
-    // Strictly monitoring grades: IV, VI, IX, XI
+    // 1. Sistem daxili tamamlanmış test sessiyaları (IV, VI, IX, XI siniflər)
     const completedSessions = db.prepare(`
       SELECT ts.id, ts.student_name, ts.student_surname, ts.district, ts.school, ts.grade, ts.utis_code,
              ts.percentage, ts.score, ts.correct_count, ts.incorrect_count, ts.blank_count,
              ts.monitoring_period, ts.completed_at,
-             t.subject, t.title as test_title
+             t.subject, t.title as test_title, 'internal' as source_type
       FROM TestSessions ts
       JOIN Tests t ON ts.test_id = t.id
       WHERE ts.status = 'completed'
@@ -1878,10 +1878,61 @@ app.get('/api/regional-stats', (req, res) => {
       ORDER BY ts.completed_at DESC
     `).all();
 
+    // 2. Rəsmi Naxçıvan Təhsil Nazirliyinin Sınaq İmtahanı Nəticələri (MinistryExamResults)
+    const ministryRows = db.prepare(`
+      SELECT mer.id, mer.student_name, mer.student_surname, mer.utis_code, mer.grade, mer.score,
+             mer.exam_title as test_title, mer.fetched_at as completed_at, mer.details_json,
+             COALESCE(st.district, 'Babək rayonu') as district,
+             COALESCE(st.school_name, 'Q.Sadiqov adına Cəhri qəsəbə 2 №-li tam orta məktəb') as school
+      FROM MinistryExamResults mer
+      LEFT JOIN Students st ON mer.student_id = st.id
+      WHERE mer.status = 'found' AND mer.score IS NOT NULL
+      ORDER BY mer.fetched_at DESC
+    `).all();
+
+    // Nazirlik nəticələrini regional analitika formatına tam uyğunlaşdırırıq
+    const ministrySessions = ministryRows.map(m => {
+      let totalNet = null;
+      try {
+        if (m.details_json) {
+          const det = JSON.parse(m.details_json);
+          totalNet = det.total_net;
+        }
+      } catch {}
+
+      // Buraxılış sınağı (XI və IX sinif) üçün 300 bal üzərindən faiz hesablanır (məs: 234.58 bal = 78.2%)
+      const maxPossibleScore = (m.grade && (m.grade.includes('XI') || m.grade.includes('IX'))) ? 300 : 100;
+      const percentage = Math.min(100, Math.round(((m.score || 0) / maxPossibleScore) * 1000) / 10);
+
+      return {
+        id: m.id,
+        student_name: m.student_name || '',
+        student_surname: m.student_surname || '',
+        district: m.district,
+        school: m.school,
+        grade: m.grade || 'XI sinif',
+        utis_code: m.utis_code,
+        score: m.score,
+        percentage,
+        correct_count: totalNet || 0,
+        incorrect_count: 0,
+        blank_count: 0,
+        monitoring_period: 'I Monitorinq (Nazirlik)',
+        completed_at: m.completed_at,
+        subject: 'Buraxılış İmtahanı (Ümumi)',
+        test_title: m.test_title,
+        source_type: 'ministry' // Mənbə: Rəsmi Təhsil Nazirliyi Sınağı
+      };
+    });
+
+    const allSessions = [...completedSessions, ...ministrySessions];
+
     res.json({
       success: true,
-      sessions: completedSessions,
-      count: completedSessions.length
+      sessions: allSessions,
+      count: allSessions.length,
+      internal_count: completedSessions.length,
+      ministry_count: ministrySessions.length
     });
   } catch (err) {
     res.status(500).json({ error: err.message || 'Regional statistika yüklənə bilmədi' });
