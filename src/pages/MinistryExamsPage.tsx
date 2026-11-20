@@ -674,7 +674,7 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
               </div>
 
               {/* Şagirdlərin Çekboks Qridi */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto p-1 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-950/50 scrollbar-thin">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-72 overflow-y-auto p-2.5 pt-2.5 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-950/50 scrollbar-thin">
                 {filteredStudents.length === 0 ? (
                   <div className="col-span-full p-6 text-center text-xs text-slate-400">
                     Bu sinif üzrə şagird tapılmadı

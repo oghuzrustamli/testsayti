@@ -4,6 +4,7 @@ import { DatabaseSync } from 'node:sqlite';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { ALL_AZERBAIJAN_DISTRICTS, INITIAL_AZERBAIJAN_SCHOOLS } from './azerbaijanSchoolsSeed.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -370,60 +371,10 @@ function seedUtisData() {
   try {
     const now = new Date().toISOString();
 
-    // 1. Rayon və Şəhərlərin Doldurulması
-    const distCount = db.prepare('SELECT COUNT(*) as count FROM Districts').get();
-    if (distCount.count === 0) {
-      const districts = [
-        // Naxçıvan MR
-        { id: 'dist-naxcivan', name: 'Naxçıvan şəhəri', type: 'seher', parent: 'Naxçıvan MR' },
-        { id: 'dist-babek', name: 'Babək rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
-        { id: 'dist-serur', name: 'Şərur rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
-        { id: 'dist-ordubad', name: 'Ordubad rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
-        { id: 'dist-culfa', name: 'Culfa rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
-        { id: 'dist-kengerli', name: 'Kəngərli rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
-        { id: 'dist-sahbuz', name: 'Şahbuz rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
-        { id: 'dist-sederek', name: 'Sədərək rayonu', type: 'rayon', parent: 'Naxçıvan MR' },
-
-        // Bakı və Ətraf
-        { id: 'dist-baki', name: 'Bakı şəhəri', type: 'seher', parent: 'Bakı iqtisadi rayonu' },
-        { id: 'dist-sumqayit', name: 'Sumqayıt şəhəri', type: 'seher', parent: 'Abşeron-Xızı' },
-        { id: 'dist-abseron', name: 'Abşeron rayonu', type: 'rayon', parent: 'Abşeron-Xızı' },
-
-        // Gəncə-Daşkəsən və Qazax-Tovuz
-        { id: 'dist-gence', name: 'Gəncə şəhəri', type: 'seher', parent: 'Gəncə-Daşkəsən' },
-        { id: 'dist-samux', name: 'Samux rayonu', type: 'rayon', parent: 'Gəncə-Daşkəsən' },
-        { id: 'dist-tovuz', name: 'Tovuz rayonu', type: 'rayon', parent: 'Qazax-Tovuz' },
-        { id: 'dist-semkir', name: 'Şəmkir rayonu', type: 'rayon', parent: 'Qazax-Tovuz' },
-        { id: 'dist-qazax', name: 'Qazax rayonu', type: 'rayon', parent: 'Qazax-Tovuz' },
-
-        // Şəki-Zaqatala və Quba-Xaçmaz
-        { id: 'dist-seki', name: 'Şəki şəhəri', type: 'seher', parent: 'Şəki-Zaqatala' },
-        { id: 'dist-zaqatala', name: 'Zaqatala rayonu', type: 'rayon', parent: 'Şəki-Zaqatala' },
-        { id: 'dist-quba', name: 'Quba rayonu', type: 'rayon', parent: 'Quba-Xaçmaz' },
-        { id: 'dist-xacmaz', name: 'Xaçmaz rayonu', type: 'rayon', parent: 'Quba-Xaçmaz' },
-
-        // Lənkəran-Astara
-        { id: 'dist-lenkeran', name: 'Lənkəran rayonu', type: 'rayon', parent: 'Lənkəran-Astara' },
-        { id: 'dist-astara', name: 'Astara rayonu', type: 'rayon', parent: 'Lənkəran-Astara' },
-        { id: 'dist-masalli', name: 'Masallı rayonu', type: 'rayon', parent: 'Lənkəran-Astara' },
-
-        // Qarabağ və Şərqi Zəngəzur
-        { id: 'dist-susa', name: 'Şuşa rayonu', type: 'rayon', parent: 'Qarabağ' },
-        { id: 'dist-agdam', name: 'Ağdam rayonu', type: 'rayon', parent: 'Qarabağ' },
-        { id: 'dist-berde', name: 'Bərdə rayonu', type: 'rayon', parent: 'Qarabağ' },
-        { id: 'dist-kelbecer', name: 'Kəlbəcər rayonu', type: 'rayon', parent: 'Şərqi Zəngəzur' },
-        { id: 'dist-lacin', name: 'Laçın rayonu', type: 'rayon', parent: 'Şərqi Zəngəzur' },
-
-        // Mərkəzi Aran və Dağlıq Şirvan
-        { id: 'dist-mingecevir', name: 'Mingəçevir şəhəri', type: 'seher', parent: 'Mərkəzi Aran' },
-        { id: 'dist-samaxi', name: 'Şamaxı rayonu', type: 'rayon', parent: 'Dağlıq Şirvan' },
-        { id: 'dist-ismayilli', name: 'İsmayıllı rayonu', type: 'rayon', parent: 'Dağlıq Şirvan' },
-      ];
-
-      const insDist = db.prepare('INSERT OR IGNORE INTO Districts (id, name, region_type, parent_region, created_at) VALUES (?, ?, ?, ?, ?)');
-      for (const d of districts) {
-        insDist.run(d.id, d.name, d.type, d.parent, now);
-      }
+    // 1. Azərbaycanın Bütün 14 İqtisadi Zonası və 70+ Rayon/Şəhərinin Doldurulması
+    const insDist = db.prepare('INSERT OR IGNORE INTO Districts (id, name, region_type, parent_region, created_at) VALUES (?, ?, ?, ?, ?)');
+    for (const d of ALL_AZERBAIJAN_DISTRICTS) {
+      insDist.run(d.id, d.name, d.type, d.parent, now);
     }
 
     // 2. Kənd və Qəsəbələrin Doldurulması
@@ -461,9 +412,13 @@ function seedUtisData() {
         { id: 'sett-qaraxanbeyli', district_id: 'dist-naxcivan', name: 'Qaraxanbəyli kəndi', type: 'kend' },
 
         // Bakı şəhəri
-        { id: 'sett-yasamal', district_id: 'dist-baki', name: 'Yasamal qəsəbəsi', type: 'qesebe' },
-        { id: 'sett-nesimi', district_id: 'dist-baki', name: 'Nəsimi rayonu mərkəzi', type: 'seher_merkezi' },
-        { id: 'sett-bineqedi', district_id: 'dist-baki', name: 'Binəqədi qəsəbəsi', type: 'qesebe' },
+        { id: 'sett-yasamal', district_id: 'dist-baki-yasamal', name: 'Yasamal qəsəbəsi', type: 'qesebe' },
+        { id: 'sett-nesimi', district_id: 'dist-baki-nesimi', name: 'Nəsimi mərkəz', type: 'seher_merkezi' },
+        { id: 'sett-bineqedi', district_id: 'dist-baki-bineqedi', name: 'Binəqədi qəsəbəsi', type: 'qesebe' },
+        { id: 'sett-ehmedli', district_id: 'dist-baki-xetai', name: 'Əhmədli qəsəbəsi', type: 'qesebe' },
+        { id: 'sett-xirdalan', district_id: 'dist-abseron', name: 'Xırdalan şəhəri', type: 'seher_merkezi' },
+        { id: 'sett-saray', district_id: 'dist-abseron', name: 'Saray qəsəbəsi', type: 'qesebe' },
+        { id: 'sett-masazir', district_id: 'dist-abseron', name: 'Masazır kəndi', type: 'kend' },
       ];
 
       const insSett = db.prepare('INSERT OR IGNORE INTO Settlements (id, district_id, name, settlement_type, created_at) VALUES (?, ?, ?, ?, ?)');
@@ -472,37 +427,10 @@ function seedUtisData() {
       }
     }
 
-    // 3. Məktəblərin Doldurulması
-    const schoolCount = db.prepare('SELECT COUNT(*) as count FROM Schools').get();
-    if (schoolCount.count === 0) {
-      const initialSchools = [
-        { id: 'sch-bab-cehri-2', name: 'Q.Sadiqov adına Cəhri qəsəbə 2 №-li tam orta məktəb', district: 'Babək rayonu', settlement: 'Cəhri qəsəbəsi', utis_code: '7002007', type: 'tam_orta' },
-        { id: 'sch-bab-cehri-1', name: 'Cəhri qəsəbə 1 nömrəli tam orta məktəb', district: 'Babək rayonu', settlement: 'Cəhri qəsəbəsi', utis_code: '7002006', type: 'tam_orta' },
-        { id: 'sch-bab-sixmahmud', name: 'Şıxmahmud kənd tam orta məktəbi', district: 'Babək rayonu', settlement: 'Şıxmahmud kəndi', utis_code: '7002009', type: 'tam_orta' },
-        { id: 'sch-bab-nehrem-1', name: 'Nehrəm qəsəbə 1 nömrəli tam orta məktəb', district: 'Babək rayonu', settlement: 'Nehrəm kəndi', utis_code: '7002003', type: 'tam_orta' },
-        { id: 'sch-bab-sirab', name: 'Sirab kənd tam orta məktəbi', district: 'Babək rayonu', settlement: 'Sirab kəndi', utis_code: '7002008', type: 'tam_orta' },
-        { id: 'sch-bab-qahab', name: 'Qahab kənd tam orta məktəbi', district: 'Babək rayonu', settlement: 'Qahab kəndi', utis_code: '7002011', type: 'tam_orta' },
-
-        // Şərur
-        { id: 'sch-ser-mahmud', name: 'Mahmudkənd tam orta məktəbi', district: 'Şərur rayonu', settlement: 'Mahmudkənd', utis_code: '7003010', type: 'tam_orta' },
-        { id: 'sch-ser-yengice', name: 'Yengicə kənd tam orta məktəbi', district: 'Şərur rayonu', settlement: 'Yengicə kəndi', utis_code: '7003011', type: 'tam_orta' },
-
-        // Naxçıvan şəhəri
-        { id: 'sch-nax-01', name: '1 nömrəli tam orta məktəb', district: 'Naxçıvan şəhəri', settlement: 'Naxçıvan şəhər mərkəzi', utis_code: '7001001', type: 'tam_orta' },
-        { id: 'sch-nax-hl', name: 'Heydər Əliyev adına Hərbi Lisey', district: 'Naxçıvan şəhəri', settlement: 'Naxçıvan şəhər mərkəzi', utis_code: '7001020', type: 'lisey' },
-
-        // Ordubad
-        { id: 'sch-ord-01', name: 'M.F.Axundov adına 1 nömrəli tam orta məktəb', district: 'Ordubad rayonu', settlement: 'Ordubad şəhər mərkəzi', utis_code: '7004001', type: 'tam_orta' },
-        { id: 'sch-ord-venend', name: 'Vənənd kənd tam orta məktəbi', district: 'Ordubad rayonu', settlement: 'Vənənd kəndi', utis_code: '7004005', type: 'tam_orta' },
-
-        // Bakı
-        { id: 'sch-baki-287', name: 'Bakı şəhəri 287 nömrəli Zəkalar liseyi', district: 'Bakı şəhəri', settlement: 'Yasamal qəsəbəsi', utis_code: '1001287', type: 'lisey' },
-      ];
-
-      const insSchool = db.prepare('INSERT OR IGNORE INTO Schools (id, name, district, settlement, utis_code, school_type, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-      for (const s of initialSchools) {
-        insSchool.run(s.id, s.name, s.district, s.settlement, s.utis_code, s.type, 'active', now);
-      }
+    // 3. Məktəblərin Doldurulması (Azərbaycanın Bütün Əsas Məktəbləri)
+    const insSchool = db.prepare('INSERT OR IGNORE INTO Schools (id, name, district, settlement, utis_code, school_type, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+    for (const s of INITIAL_AZERBAIJAN_SCHOOLS) {
+      insSchool.run(s.id, s.name, s.district, s.settlement, s.utis_code, s.type, 'active', now);
     }
 
     // 4. Mövcud 272 şagirdin Məktəb, Rayon və Kəndə bağlanması

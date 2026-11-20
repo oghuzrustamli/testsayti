@@ -833,6 +833,19 @@ export const api = {
     }
   },
 
+  async importUtisSchools(schools: any[]): Promise<{ success: boolean; message?: string; added_count?: number; updated_count?: number; skipped_count?: number; error?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/schools/import-excel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ schools }),
+      });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
   async getUtisStudents(filters?: {
     district?: string;
     settlement?: string;

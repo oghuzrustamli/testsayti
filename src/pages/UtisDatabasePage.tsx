@@ -44,8 +44,15 @@ interface UtisDatabasePageProps {
 }
 
 export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
-  // Əsas Tablar
-  const [activeMainTab, setActiveMainTab] = useState<'registry' | 'exams' | 'stats' | 'excel' | 'gateway'>('registry');
+  // Əsas Tablar (Məktəblər Bazası ayrıca xüsusi bölmə kimi əlavə olundu)
+  const [activeMainTab, setActiveMainTab] = useState<'registry' | 'schools' | 'exams' | 'stats' | 'excel' | 'gateway'>('registry');
+
+  // Məktəblər Bazası Filtrləri (Bütün Azərbaycan üzrə)
+  const [schoolSearchQuery, setSchoolSearchQuery] = useState<string>('');
+  const [schoolRegionFilter, setSchoolRegionFilter] = useState<string>('all');
+  const [schoolDistrictFilter, setSchoolDistrictFilter] = useState<string>('all');
+  const [schoolTypeFilter, setSchoolTypeFilter] = useState<string>('all');
+  const schoolFileInputRef = useRef<HTMLInputElement>(null);
 
   // Rayon, Kənd və Məktəb bazası
   const [districts, setDistricts] = useState<any[]>([]);
@@ -374,6 +381,130 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
     } else {
       setAlertBanner({ type: 'error', message: res.error || 'Xəta baş verdi' });
     }
+  };
+
+  const handleDeleteSchool = async (id: string, name: string) => {
+    if (!window.confirm(`«${name}» məktəbini bazadan silmək istədiyinizə əminsiniz?`)) return;
+    const res = await api.deleteUtisSchool(id);
+    if (res.success) {
+      setAlertBanner({ type: 'success', message: res.message || 'Məktəb silindi' });
+      loadSchools();
+    } else {
+      setAlertBanner({ type: 'error', message: res.error || 'Silinmə xətası' });
+    }
+  };
+
+  // İqtisadi / Regional Zonaların Siyahısı
+  const economicRegions = useMemo(() => {
+    const set = new Set<string>();
+    districts.forEach(d => {
+      if (d.parent_region) set.add(d.parent_region);
+    });
+    return Array.from(set).sort();
+  }, [districts]);
+
+  // Filtrlənmiş Məktəblər Siyahısı (Bütün Azərbaycan üzrə)
+  const filteredSchools = useMemo(() => {
+    return schools.filter(s => {
+      if (schoolRegionFilter !== 'all') {
+        const dist = districts.find(d => d.name === s.district);
+        if (dist && dist.parent_region !== schoolRegionFilter) return false;
+      }
+      if (schoolDistrictFilter !== 'all' && s.district !== schoolDistrictFilter) return false;
+      if (schoolTypeFilter !== 'all' && s.school_type !== schoolTypeFilter) return false;
+      if (schoolSearchQuery.trim()) {
+        const q = schoolSearchQuery.toLowerCase().trim();
+        const matchName = (s.name || '').toLowerCase().includes(q);
+        const matchUtis = (s.utis_code || '').toLowerCase().includes(q);
+        const matchSettlement = (s.settlement || '').toLowerCase().includes(q);
+        const matchDistrict = (s.district || '').toLowerCase().includes(q);
+        if (!matchName && !matchUtis && !matchSettlement && !matchDistrict) return false;
+      }
+      return true;
+    });
+  }, [schools, districts, schoolRegionFilter, schoolDistrictFilter, schoolTypeFilter, schoolSearchQuery]);
+
+  // Məktəblərin Excel İxracı
+  const handleExportSchoolsExcel = () => {
+    if (filteredSchools.length === 0) {
+      setAlertBanner({ type: 'info', message: 'İxrac ediləcək məktəb məlumatı tapılmadı' });
+      return;
+    }
+
+    const exportData = filteredSchools.map((s, idx) => ({
+      'Sıra №': idx + 1,
+      'Məktəbin adı': s.name,
+      'Rayon / Şəhər': s.district,
+      'Kənd / Qəsəbə': s.settlement || '',
+      'UTİS kodu': s.utis_code || '',
+      'Məktəb tipi': s.school_type || 'tam_orta',
+      'Şagird sayı': s.student_count || 0
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Məktəblər');
+    const fileName = `ATROQ_Azərbaycan_Məktəbləri_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    setAlertBanner({ type: 'success', message: `Məktəblər ${fileName} faylına ixrac edildi` });
+  };
+
+  // Məktəblər Şablonu
+  const handleDownloadSchoolTemplate = () => {
+    const sample = [
+      {
+        'Məktəbin adı': 'Şuşa şəhər 1 nömrəli tam orta məktəb',
+        'Rayon / Şəhər': 'Şuşa rayonu',
+        'Kənd / Qəsəbə': 'Şuşa şəhər mərkəzi',
+        'UTİS kodu': '8001001',
+        'Məktəb tipi': 'tam_orta'
+      },
+      {
+        'Məktəbin adı': 'Bakı şəhəri 287 nömrəli Zəkalar liseyi',
+        'Rayon / Şəhər': 'Bakı şəhəri - Yasamal',
+        'Kənd / Qəsəbə': 'Yasamal qəsəbəsi',
+        'UTİS kodu': '1001287',
+        'Məktəb tipi': 'lisey'
+      }
+    ];
+    const ws = XLSX.utils.json_to_sheet(sample);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Məktəblər Şablon');
+    XLSX.writeFile(wb, 'ATROQ_Məktəblər_İdxal_Sablon.xlsx');
+  };
+
+  // Məktəblərin Excel-lə İdxalı
+  const handleSchoolsExcelUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target?.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data: any[] = XLSX.utils.sheet_to_json(ws);
+
+        if (!data || data.length === 0) {
+          setAlertBanner({ type: 'error', message: 'Faylda heç bir məktəb məlumatı tapılmadı' });
+          return;
+        }
+
+        const res = await api.importUtisSchools(data);
+        if (res.success) {
+          setAlertBanner({ type: 'success', message: res.message || 'Məktəblər uğurla bazaya əlavə edildi' });
+          loadSchools();
+        } else {
+          setAlertBanner({ type: 'error', message: res.error || 'İdxal zamanı xəta baş verdi' });
+        }
+      } catch (err: any) {
+        setAlertBanner({ type: 'error', message: 'Excel faylının oxunmasında xəta: ' + err.message });
+      }
+    };
+    reader.readAsBinaryString(file);
+    if (e.target) e.target.value = '';
   };
 
   const handleSaveDistrict = async (e: React.FormEvent) => {
@@ -784,9 +915,24 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
               }`}
             >
               <Users2 className="w-4 h-4" />
-              <span>Məktəb və Şagird Bazası</span>
+              <span>Şagird Bazası (UTİS Reyestri)</span>
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-950/60 text-slate-300 font-mono">
                 {totalStudentsCount}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveMainTab('schools')}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                activeMainTab === 'schools'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 border border-blue-500'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              }`}
+            >
+              <Building2 className="w-4 h-4" />
+              <span>Məktəblər Bazası (Ölkə Reyestri)</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-950/60 text-emerald-400 font-mono">
+                {schools.length}
               </span>
             </button>
 
@@ -1139,6 +1285,266 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
         )}
 
         {/* ========================================================================= */}
+        {/* TAB: MƏKTƏBLƏR BAZASI (BÜTÜN AZƏRBAYCAN MƏKTƏB REYESTRİ)                   */}
+        {/* ========================================================================= */}
+        {activeMainTab === 'schools' && (
+          <div className="space-y-6">
+
+            {/* MƏKTƏB STATİSTİKA KARTLARI */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <span className="text-xs text-slate-400">Ümumi Məktəblər</span>
+                <p className="text-xl sm:text-2xl font-bold text-white mt-1">{schools.length}</p>
+                <span className="text-[10px] text-blue-400">Bütün Azərbaycan üzrə</span>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <span className="text-xs text-slate-400">Əhatə Olunan Rayonlar</span>
+                <p className="text-xl sm:text-2xl font-bold text-emerald-400 mt-1">
+                  {new Set(schools.map(s => s.district).filter(Boolean)).size} / {districts.length}
+                </p>
+                <span className="text-[10px] text-emerald-400">14 İqtisadi Zona</span>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <span className="text-xs text-slate-400">Lisey və Gimnaziyalar</span>
+                <p className="text-xl sm:text-2xl font-bold text-indigo-400 mt-1">
+                  {schools.filter(s => s.school_type === 'lisey' || s.school_type === 'gimnaziya').length}
+                </p>
+                <span className="text-[10px] text-indigo-300">Xüsusi tipli müəssisələr</span>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <span className="text-xs text-slate-400">Filtrə Uyğun Məktəblər</span>
+                <p className="text-xl sm:text-2xl font-bold text-amber-400 mt-1">{filteredSchools.length}</p>
+                <span className="text-[10px] text-slate-400">Cari seçim üzrə</span>
+              </div>
+            </div>
+
+            {/* FİLTR VƏ ƏMƏLİYYATLAR PANELİ */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-4 shadow-lg">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-emerald-400" />
+                  <h3 className="text-sm font-semibold text-white">Azərbaycan Məktəblər Reyestri və Axtarış</h3>
+                </div>
+
+                {/* Əməliyyat Düymələri: Əlavə et, Excel idxal, Excel ixrac, Şablon */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    type="file"
+                    ref={schoolFileInputRef}
+                    onChange={handleSchoolsExcelUpload}
+                    accept=".xlsx,.xls,.csv"
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => setShowAddSchoolModal(true)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/30 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>+ Yeni Məktəb</span>
+                  </button>
+                  <button
+                    onClick={() => schoolFileInputRef.current?.click()}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Upload className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Excel ilə İdxal</span>
+                  </button>
+                  <button
+                    onClick={handleDownloadSchoolTemplate}
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                    title="Excel şablonunu endir"
+                  >
+                    <Download className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Şablon Endir</span>
+                  </button>
+                  <button
+                    onClick={handleExportSchoolsExcel}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Excel İxrac ({filteredSchools.length})</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* FİLTR SEÇİMLƏRİ */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {/* 1. Regional / İqtisadi Zona */}
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">İqtisadi / Regional Zona:</label>
+                  <select
+                    value={schoolRegionFilter}
+                    onChange={(e) => {
+                      setSchoolRegionFilter(e.target.value);
+                      setSchoolDistrictFilter('all');
+                    }}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="all">Bütün Regionlar (AR)</option>
+                    {economicRegions.map(reg => (
+                      <option key={reg} value={reg}>{reg}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 2. Rayon / Şəhər */}
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Rayon / Şəhər:</label>
+                  <select
+                    value={schoolDistrictFilter}
+                    onChange={(e) => setSchoolDistrictFilter(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="all">Bütün Rayon və Şəhərlər ({districts.length})</option>
+                    {districts
+                      .filter(d => schoolRegionFilter === 'all' || d.parent_region === schoolRegionFilter)
+                      .map(d => (
+                        <option key={d.id} value={d.name}>{d.name}</option>
+                      ))}
+                  </select>
+                </div>
+
+                {/* 3. Məktəb Tipi */}
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Məktəb Tipi:</label>
+                  <select
+                    value={schoolTypeFilter}
+                    onChange={(e) => setSchoolTypeFilter(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="all">Bütün Tiplər</option>
+                    <option value="tam_orta">Tam orta məktəb</option>
+                    <option value="umumi_orta">Ümumi orta məktəb</option>
+                    <option value="ibtidai">İbtidai məktəb</option>
+                    <option value="lisey">Lisey</option>
+                    <option value="gimnaziya">Gimnaziya</option>
+                    <option value="ozel">Özəl təhsil müəssisəsi</option>
+                  </select>
+                </div>
+
+                {/* 4. Axtarış */}
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Axtarış (Ad, UTİS və ya Kənd):</label>
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={schoolSearchQuery}
+                      onChange={(e) => setSchoolSearchQuery(e.target.value)}
+                      placeholder="Məktəb adı, kodu və ya kənd..."
+                      className="w-full pl-8 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* MƏKTƏBLƏR CƏDVƏLİ */}
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
+              <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <h4 className="text-sm font-semibold text-white">Məktəblərin Siyahısı</h4>
+                  <span className="px-2 py-0.5 rounded-full text-[11px] bg-slate-800 text-slate-300 font-mono">
+                    {filteredSchools.length} məktəb
+                  </span>
+                </div>
+                {(schoolRegionFilter !== 'all' || schoolDistrictFilter !== 'all' || schoolTypeFilter !== 'all' || schoolSearchQuery) && (
+                  <button
+                    onClick={() => {
+                      setSchoolRegionFilter('all');
+                      setSchoolDistrictFilter('all');
+                      setSchoolTypeFilter('all');
+                      setSchoolSearchQuery('');
+                    }}
+                    className="text-xs text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                  >
+                    Filtrləri sıfırla
+                  </button>
+                )}
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-950/70 border-b border-slate-800 text-slate-400">
+                      <th className="py-3 px-3 w-10 text-center font-semibold">№</th>
+                      <th className="py-3 px-4 font-semibold">Məktəbin Rəsmi Adı</th>
+                      <th className="py-3 px-3 font-semibold">Rayon / Şəhər</th>
+                      <th className="py-3 px-3 font-semibold">Kənd / Qəsəbə / Ünvan</th>
+                      <th className="py-3 px-3 font-semibold text-center">UTİS Kodu</th>
+                      <th className="py-3 px-3 font-semibold text-center">Tipi</th>
+                      <th className="py-3 px-3 font-semibold text-center">Şagird Sayı</th>
+                      <th className="py-3 px-3 text-center font-semibold">Əməliyyat</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {filteredSchools.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="py-8 text-center text-slate-500">
+                          Seçilmiş filtrlərə uyğun heç bir məktəb tapılmadı
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredSchools.map((school, idx) => (
+                        <tr key={school.id} className="hover:bg-slate-800/40 transition-colors">
+                          <td className="py-3 px-3 text-center text-slate-400 font-mono">{idx + 1}</td>
+                          <td className="py-3 px-4">
+                            <div className="font-medium text-white flex items-center gap-1.5">
+                              <Building2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                              <span>{school.name}</span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-3 text-slate-300">
+                            <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-200 text-[11px]">
+                              {school.district || '—'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-slate-400">
+                            {school.settlement || 'Mərkəz / Qəsəbə'}
+                          </td>
+                          <td className="py-3 px-3 text-center font-mono font-bold text-emerald-400">
+                            {school.utis_code ? school.utis_code : <span className="text-slate-600">—</span>}
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-medium ${
+                              school.school_type === 'lisey' || school.school_type === 'gimnaziya'
+                                ? 'bg-indigo-950 text-indigo-300 border border-indigo-800'
+                                : 'bg-slate-800 text-slate-300'
+                            }`}>
+                              {school.school_type === 'tam_orta' ? 'Tam orta' :
+                               school.school_type === 'umumi_orta' ? 'Ümumi orta' :
+                               school.school_type === 'ibtidai' ? 'İbtidai' :
+                               school.school_type === 'lisey' ? 'Lisey' :
+                               school.school_type === 'gimnaziya' ? 'Gimnaziya' :
+                               school.school_type === 'ozel' ? 'Özəl' : (school.school_type || 'Tam orta')}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            <span className="px-2 py-0.5 rounded-full text-xs font-mono bg-blue-950 text-blue-300 border border-blue-900/60">
+                              {school.student_count || 0}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            <button
+                              onClick={() => handleDeleteSchool(school.id, school.name)}
+                              className="p-1.5 hover:bg-red-950 text-slate-500 hover:text-red-400 rounded-lg transition-colors cursor-pointer"
+                              title="Məktəbi sil"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ========================================================================= */}
         {/* TAB 2: SINAQ İMTAHANLARI VƏ CANLI UTİS SORĞUSU                              */}
         {/* ========================================================================= */}
         {activeMainTab === 'exams' && (
@@ -1279,7 +1685,7 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
               </div>
 
               {/* Şagird Seçim Qutuları (Grid) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-72 overflow-y-auto p-1 bg-slate-950/40 rounded-xl border border-slate-800/60">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-72 overflow-y-auto p-2.5 pt-2.5 bg-slate-950/40 rounded-xl border border-slate-800/60">
                 {examStudentsList.map(st => {
                   const isSelected = selectedStudentIds.has(st.id);
                   const hasUtis = st.utis_code && st.utis_code.trim().length >= 5;
@@ -1621,19 +2027,41 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                 </button>
               </div>
 
-              {/* BAZANI İXRAC ET */}
-              <div className="flex items-center justify-between p-4 bg-slate-950/70 border border-slate-800 rounded-xl">
-                <div>
-                  <h4 className="text-xs font-semibold text-white">Mövcud Şagird Bazasını İxrac Edin</h4>
-                  <p className="text-[11px] text-slate-400">Bütün rayonlar, məktəblər və siniflər üzrə şagirdlərin siyahısını Excel faylına çıxarın</p>
+              {/* BAZANI İXRAC ET (ŞAGİRDLƏR VƏ MƏKTƏBLƏR) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col justify-between p-4 bg-slate-950/70 border border-slate-800 rounded-xl gap-3">
+                  <div>
+                    <h4 className="text-xs font-semibold text-white flex items-center gap-2">
+                      <Users2 className="w-4 h-4 text-blue-400" />
+                      <span>Şagirdlər Bazasını İxrac Edin</span>
+                    </h4>
+                    <p className="text-[11px] text-slate-400 mt-1">Bütün rayonlar, məktəblər və siniflər üzrə aktiv şagirdlərin siyahısını çıxarın</p>
+                  </div>
+                  <button
+                    onClick={handleExportDatabaseExcel}
+                    className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Şagird Bazası (.xlsx) ({totalStudentsCount} şagird)</span>
+                  </button>
                 </div>
-                <button
-                  onClick={handleExportDatabaseExcel}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Tam Bazanı Yüklə ({totalStudentsCount} şagird)</span>
-                </button>
+
+                <div className="flex flex-col justify-between p-4 bg-slate-950/70 border border-slate-800 rounded-xl gap-3">
+                  <div>
+                    <h4 className="text-xs font-semibold text-white flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-emerald-400" />
+                      <span>Məktəblər Bazasını İxrac Edin</span>
+                    </h4>
+                    <p className="text-[11px] text-slate-400 mt-1">Azərbaycan Respublikası üzrə qeydiyyatdakı bütün dövlət və özəl məktəbləri çıxarın</p>
+                  </div>
+                  <button
+                    onClick={handleExportSchoolsExcel}
+                    className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Məktəb Bazası (.xlsx) ({schools.length} məktəb)</span>
+                  </button>
+                </div>
               </div>
             </div>
 

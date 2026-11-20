@@ -2511,6 +2511,72 @@ app.post('/api/utis/schools', (req, res) => {
   }
 });
 
+// Məktəblərin Kütləvi İdxalı (Excel və ya UTİS Rəsmi Məlumatı əsasında)
+app.post('/api/utis/schools/import-excel', (req, res) => {
+  try {
+    const { schools } = req.body;
+    if (!Array.isArray(schools) || schools.length === 0) {
+      return res.status(400).json({ error: 'İdxal ediləcək məktəb siyahısı boşdur' });
+    }
+
+    const now = new Date().toISOString();
+    let added = 0;
+    let updated = 0;
+    let skipped = 0;
+
+    const ins = db.prepare(`
+      INSERT INTO Schools (id, name, district, settlement, utis_code, school_type, status, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, 'active', ?)
+    `);
+
+    const updateUtis = db.prepare(`
+      UPDATE Schools SET utis_code = ?, settlement = ?, school_type = ? WHERE id = ?
+    `);
+
+    for (const item of schools) {
+      const name = (item.name || item['Məktəbin adı'] || item['Məktəb'] || '').trim();
+      const district = (item.district || item['Rayon / Şəhər'] || item['Rayon'] || '').trim();
+      const settlement = (item.settlement || item['Kənd / Qəsəbə'] || item['Kənd'] || '').trim();
+      const utisCode = (item.utis_code || item['UTİS kodu'] || item['UTIS'] || '').toString().trim() || null;
+      const type = (item.school_type || item['Məktəb tipi'] || 'tam_orta').toString().trim();
+
+      if (!name || !district) {
+        skipped++;
+        continue;
+      }
+
+      // Check existing by name & district
+      const existing = db.prepare('SELECT id, utis_code FROM Schools WHERE name = ? AND district = ?').get(name, district);
+      if (existing) {
+        if (utisCode && !existing.utis_code) {
+          updateUtis.run(utisCode, settlement, type, existing.id);
+          updated++;
+        } else {
+          skipped++;
+        }
+      } else {
+        const id = 'sch-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        try {
+          ins.run(id, name, district, settlement, utisCode, type, now);
+          added++;
+        } catch (e) {
+          skipped++;
+        }
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Məktəblər bazaya işləndi: ${added} yeni məktəb əlavə edildi, ${updated} yeniləndi, ${skipped} təkrar/keçildi.`,
+      added_count: added,
+      updated_count: updated,
+      skipped_count: skipped
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.delete('/api/utis/schools/:id', (req, res) => {
   try {
     const { id } = req.params;
