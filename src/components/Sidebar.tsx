@@ -167,8 +167,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       groupTitle: 'Regional Təhsil',
       items: [
-        { id: 'regional_stats', label: 'Regional Statistika', icon: Award, badge: 'NMR' },
-        { id: 'ministry_exams', label: 'UTİS & Məktəb Bazası', icon: Building2, badge: 'UTİS', highlight: true },
+        { id: 'regional_stats', label: 'Regional Reytinq & Statistika', icon: Award, badge: 'Reytinq' },
+        { id: 'ministry_exams', label: 'Nazirlik Monitorinqləri', icon: Globe, badge: 'Rəsmi Sınaq', highlight: true },
+        { id: 'student_database', label: 'UTİS & Məktəb Bazası', icon: Building2, badge: 'AR / UTİS' },
       ]
     },
     {
@@ -197,8 +198,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       groupTitle: 'Təhlil və Monitorinq',
       items: [
         { id: 'stats', label: 'İstifadə Statistikası', icon: TrendingUp },
-        { id: 'regional_stats', label: 'Regional Statistika', icon: Award, badge: 'NMR' },
-        { id: 'ministry_exams', label: 'UTİS & Məktəb Bazası', icon: Building2, badge: 'UTİS', highlight: true },
+        { id: 'regional_stats', label: 'Regional Reytinq & Statistika', icon: Award, badge: 'Reytinq' },
+        { id: 'ministry_exams', label: 'Nazirlik Monitorinqləri', icon: Globe, badge: 'Rəsmi Sınaq', highlight: true },
+        { id: 'student_database', label: 'UTİS & Məktəb Bazası', icon: Building2, badge: 'AR / UTİS' },
         { id: 'audit', label: 'Audit Jurnalı', icon: History },
       ]
     },

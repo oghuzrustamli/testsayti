@@ -152,11 +152,11 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
         },
         {
           id: 'ministry_exams',
-          label: 'UTİS inteqrasiyası və məktəb bazası',
-          description: 'Azərbaycan üzrə məktəblər, şagirdlər, UTİS inteqrasiyası və sınaq imtahanları',
-          icon: Building2,
-          badge: 'UTİS / AR',
-          badgeColor: 'bg-blue-100 dark:bg-blue-950 dark:text-blue-300 text-blue-800 border border-blue-200 dark:border-blue-800',
+          label: 'Nazirlik Monitorinqləri',
+          description: 'Rəsmi 9-cu və 11-ci sinif monitorinq nəticələri və canlı UTİS sorğusu',
+          icon: Globe,
+          badge: 'Rəsmi Sınaq',
+          badgeColor: 'bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 border border-emerald-200 dark:border-emerald-800',
         },
       ],
     },
@@ -169,11 +169,11 @@ export const NavigationMegaMenu: React.FC<NavigationMegaMenuProps> = ({
       subItems: [
         {
           id: 'student_database',
-          label: 'Şagird bazası',
-          description: 'Məktəbin vahid UTİS şagird bazası və Excel idxalı',
-          icon: Users2,
-          badge: 'UTİS',
-          badgeColor: 'bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 text-indigo-800 border border-indigo-200 dark:border-indigo-800',
+          label: 'UTİS & Məktəb Bazası',
+          description: 'Bütün Azərbaycan məktəbləri, vahid UTİS şagird bazası və Excel idxalı',
+          icon: Building2,
+          badge: 'AR / UTİS',
+          badgeColor: 'bg-blue-100 dark:bg-blue-950 dark:text-blue-300 text-blue-800 border border-blue-200 dark:border-blue-800',
         },
         {
           id: 'classes',

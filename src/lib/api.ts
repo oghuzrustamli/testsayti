@@ -876,6 +876,7 @@ export const api = {
     first_name: string;
     last_name: string;
     father_name?: string;
+    fin_code?: string;
     utis_code: string;
     grade_class: string;
     school_name: string;
@@ -887,6 +888,63 @@ export const api = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  async fetchUtisSchoolStudents(params: {
+    school_id?: string;
+    utis_code?: string;
+    school_name?: string;
+    district?: string;
+  }): Promise<{
+    success: boolean;
+    official_gateway_connected: boolean;
+    school: { id?: string; name?: string; district?: string; utis_code?: string };
+    students: any[];
+    total_found: number;
+    new_count: number;
+    exists_count: number;
+    error?: string;
+  }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/fetch-school-students`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+      });
+      return await res.json();
+    } catch (e: any) {
+      return {
+        success: false,
+        official_gateway_connected: false,
+        school: { name: params.school_name, utis_code: params.utis_code },
+        students: [],
+        total_found: 0,
+        new_count: 0,
+        exists_count: 0,
+        error: e.message
+      };
+    }
+  },
+
+  async commitUtisStudents(students: any[]): Promise<{
+    success: boolean;
+    message?: string;
+    added_count?: number;
+    updated_count?: number;
+    skipped_count?: number;
+    total_processed?: number;
+    error?: string;
+  }> {
+    try {
+      const res = await fetch(`${API_BASE}/utis/commit-students`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ students }),
       });
       return await res.json();
     } catch (e: any) {

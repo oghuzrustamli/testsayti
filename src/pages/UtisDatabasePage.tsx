@@ -84,12 +84,27 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
     first_name: '',
     last_name: '',
     father_name: '',
+    fin_code: '',
     utis_code: '',
     grade_class: 'IX sinif',
     district: 'Babək rayonu',
     settlement: 'Cəhri qəsəbəsi',
     school_name: 'Q.Sadiqov adına Cəhri qəsəbə 2 №-li tam orta məktəb'
   });
+
+  // UTİS-dən Şagirdləri Yükləmə Modal State-ləri
+  const [showUtisImportModal, setShowUtisImportModal] = useState<boolean>(false);
+  const [loadingUtisSchoolStudents, setLoadingUtisSchoolStudents] = useState<boolean>(false);
+  const [isCommittingUtisStudents, setIsCommittingUtisStudents] = useState<boolean>(false);
+  const [utisCandidateStudents, setUtisCandidateStudents] = useState<any[]>([]);
+  const [selectedUtisCandidateCodes, setSelectedUtisCandidateCodes] = useState<Set<string>>(new Set());
+  const [utisImportMetadata, setUtisImportMetadata] = useState<{
+    total_found: number;
+    new_count: number;
+    exists_count: number;
+    official_gateway_connected: boolean;
+    school?: { name?: string; district?: string; utis_code?: string };
+  } | null>(null);
 
   const [schoolForm, setSchoolForm] = useState({
     name: '',
@@ -342,6 +357,7 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
           first_name: '',
           last_name: '',
           father_name: '',
+          fin_code: '',
           utis_code: '',
           grade_class: 'IX sinif',
           district: selectedDistrict !== 'all' ? selectedDistrict : 'Babək rayonu',
@@ -352,6 +368,104 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
       } else {
         setAlertBanner({ type: 'error', message: res.error || 'Əlavə edilərkən xəta baş verdi' });
       }
+    }
+  };
+
+  // ==========================================
+  // UTİS-DƏN ŞAGİRDLƏRİN YÜKLƏNMƏSİ VƏ TƏSDİQİ (TƏLƏB 3)
+  // ==========================================
+  const handleFetchSchoolStudentsFromUtis = async () => {
+    if (!selectedSchool || selectedSchool === 'all') {
+      setAlertBanner({ type: 'info', message: 'Zəhmət olmasa, əvvəlcə siyahıdan konkret məktəb seçin.' });
+      return;
+    }
+    const currentSchoolObj = schools.find((s) => s.name === selectedSchool);
+    const utisCode = currentSchoolObj?.utis_code || '';
+
+    try {
+      setLoadingUtisSchoolStudents(true);
+      const res = await api.fetchUtisSchoolStudents({
+        school_name: selectedSchool,
+        utis_code: utisCode,
+        district: selectedDistrict !== 'all' ? selectedDistrict : currentSchoolObj?.district
+      });
+
+      if (res.success && Array.isArray(res.students)) {
+        setUtisCandidateStudents(res.students);
+        setUtisImportMetadata({
+          total_found: res.total_found || res.students.length,
+          new_count: res.new_count || 0,
+          exists_count: res.exists_count || 0,
+          official_gateway_connected: !!res.official_gateway_connected,
+          school: res.school
+        });
+        // İlkin olaraq bazada olmayan bütün yeni şagirdləri işarələ
+        const initialSelected = new Set<string>();
+        res.students.forEach((st: any) => {
+          if (!st.already_exists && st.utis_code) {
+            initialSelected.add(st.utis_code);
+          }
+        });
+        setSelectedUtisCandidateCodes(initialSelected);
+        setShowUtisImportModal(true);
+      } else {
+        setAlertBanner({ type: 'error', message: res.error || 'UTİS-dən şagird siyahısı əldə edilə bilmədi.' });
+      }
+    } catch (err: any) {
+      setAlertBanner({ type: 'error', message: 'UTİS sorğusunda xəta: ' + err.message });
+    } finally {
+      setLoadingUtisSchoolStudents(false);
+    }
+  };
+
+  const toggleUtisCandidateSelection = (code: string) => {
+    setSelectedUtisCandidateCodes((prev) => {
+      const next = new Set(prev);
+      if (next.has(code)) {
+        next.delete(code);
+      } else {
+        next.add(code);
+      }
+      return next;
+    });
+  };
+
+  const handleSelectAllUtisCandidates = (selectAll: boolean) => {
+    if (selectAll) {
+      const allCodes = new Set<string>();
+      utisCandidateStudents.forEach((st) => {
+        if (st.utis_code) allCodes.add(st.utis_code);
+      });
+      setSelectedUtisCandidateCodes(allCodes);
+    } else {
+      setSelectedUtisCandidateCodes(new Set());
+    }
+  };
+
+  const handleCommitUtisStudents = async () => {
+    const studentsToCommit = utisCandidateStudents.filter((st) => selectedUtisCandidateCodes.has(st.utis_code));
+    if (studentsToCommit.length === 0) {
+      setAlertBanner({ type: 'info', message: 'Bazaya əlavə etmək üçün ən azı bir şagird seçilməlidir.' });
+      return;
+    }
+
+    try {
+      setIsCommittingUtisStudents(true);
+      const res = await api.commitUtisStudents(studentsToCommit);
+      if (res.success) {
+        setAlertBanner({
+          type: 'success',
+          message: res.message || `${res.added_count} şagird uğurla ATROQ bazasına əlavə edildi.`
+        });
+        setShowUtisImportModal(false);
+        loadStudents();
+      } else {
+        setAlertBanner({ type: 'error', message: res.error || 'Şagirdlər bazaya əlavə edilərkən xəta baş verdi.' });
+      }
+    } catch (err: any) {
+      setAlertBanner({ type: 'error', message: 'Yadda saxlama zamanı xəta: ' + err.message });
+    } finally {
+      setIsCommittingUtisStudents(false);
     }
   };
 
@@ -824,6 +938,7 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
           const fName = row['Adı'] || row['Ad'] || row['First Name'] || '';
           const lName = row['Soyadı'] || row['Soyad'] || row['Last Name'] || '';
           const fatherName = row['Ata adı'] || row['Ata adi'] || row['Father Name'] || '';
+          const finCode = String(row['FİN kodu'] || row['FIN kodu'] || row['FİN'] || row['FIN'] || '').trim();
           const utis = String(row['UTİS kodu'] || row['UTIS kodu'] || row['UTIS'] || row['UTİS'] || '').trim();
           const grade = row['Sinfi'] || row['Sinif'] || row['Grade'] || 'IX sinif';
           const school = row['Məktəb'] || row['Mekteb'] || row['School'] || 'Q.Sadiqov adına Cəhri qəsəbə 2 №-li tam orta məktəb';
@@ -839,6 +954,7 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
             first_name: fName,
             last_name: lName,
             father_name: fatherName,
+            fin_code: finCode,
             utis_code: utis,
             grade_class: grade,
             school_name: school,
@@ -1165,6 +1281,51 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
                 />
               </div>
+
+              {/* TƏLƏB 2 & 3: SEÇİLMİŞ MƏKTƏBİN RƏSMİ UTİS KODU VƏ ŞAGİRDLƏRİ UTİS-DƏN YÜKLƏ DÜYMƏSİ */}
+              {selectedSchool !== 'all' && (
+                <div className="bg-gradient-to-r from-blue-950/70 via-slate-900 to-indigo-950/60 border border-blue-800/60 rounded-xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-lg animate-in fade-in">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center shrink-0">
+                      <Building2 className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs sm:text-sm font-bold text-white truncate">{selectedSchool}</span>
+                        {(() => {
+                          const scObj = schools.find((s) => s.name === selectedSchool);
+                          return scObj?.utis_code ? (
+                            <span className="px-2.5 py-0.5 rounded-md text-[11px] font-mono font-bold bg-blue-500/25 text-blue-300 border border-blue-500/40">
+                              Məktəb UTİS Kodu: {scObj.utis_code}
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-md text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                              UTİS kodu qeyd olunmayıb
+                            </span>
+                          );
+                        })()}
+                      </div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">
+                        {selectedDistrict !== 'all' ? selectedDistrict : 'Azərbaycan Məktəbi'} • UTİS rəsmi şagird siyahısı və sinif bazası
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleFetchSchoolStudentsFromUtis}
+                    disabled={loadingUtisSchoolStudents}
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-900/30 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {loadingUtisSchoolStudents ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Download className="w-3.5 h-3.5" />
+                    )}
+                    <span>Şagirdləri UTİS-dən Yüklə</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* ŞAGİRDLƏRİN ƏTRAFLI CƏDVƏLİ */}
@@ -1193,23 +1354,24 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                       <th className="py-3 px-4">Şagirdin Adı, Soyadı</th>
                       <th className="py-3 px-3">Ata Adı</th>
                       <th className="py-3 px-3">Sinfi</th>
+                      <th className="py-3 px-3">FİN Kodu</th>
                       <th className="py-3 px-4">UTİS Kodu</th>
                       <th className="py-3 px-4">Məktəb</th>
-                      <th className="py-3 px-4">Rayon / Kənd</th>
+                      <th className="py-3 px-4">Rayon / Şəhər</th>
                       <th className="py-3 px-3 text-right">Əməliyyat</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/60">
                     {loading ? (
                       <tr>
-                        <td colSpan={8} className="py-8 text-center text-slate-500">
+                        <td colSpan={9} className="py-8 text-center text-slate-500">
                           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-blue-500" />
                           Məlumatlar yüklənir...
                         </td>
                       </tr>
                     ) : students.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="py-8 text-center text-slate-500">
+                        <td colSpan={9} className="py-8 text-center text-slate-500">
                           Seçilmiş filtrlərə uyğun heç bir şagird tapılmadı.
                         </td>
                       </tr>
@@ -1218,11 +1380,21 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                         <tr key={st.id} className="hover:bg-slate-800/40 transition-colors">
                           <td className="py-3 px-3 text-center text-slate-500 font-mono">{idx + 1}</td>
                           <td className="py-3 px-4 font-medium text-white">{st.full_name}</td>
-                          <td className="py-3 px-3 text-slate-300">{st.father_name || '—'}</td>
+                          {/* TƏLƏB 5: Ata adı solğun və ya boz deyil, ad-soyad ilə eyni şriftdə və eyni rəngdə (font-medium text-white) */}
+                          <td className="py-3 px-3 font-medium text-white">{st.father_name || '—'}</td>
                           <td className="py-3 px-3">
                             <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-950 text-blue-300 border border-blue-800">
                               {st.grade_class || '—'}
                             </span>
+                          </td>
+                          <td className="py-3 px-3 font-mono text-slate-300">
+                            {st.fin_code ? (
+                              <span className="bg-slate-800/80 text-slate-200 px-1.5 py-0.5 rounded border border-slate-700 font-bold text-[11px]">
+                                {st.fin_code}
+                              </span>
+                            ) : (
+                              <span className="text-slate-500 text-[11px]">—</span>
+                            )}
                           </td>
                           <td className="py-3 px-4 font-mono font-medium">
                             {st.utis_code ? (
@@ -1238,9 +1410,9 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                           <td className="py-3 px-4 text-slate-300 max-w-xs truncate" title={st.school_name}>
                             {st.school_name || '—'}
                           </td>
-                          <td className="py-3 px-4 text-slate-400 text-[11px]">
+                          <td className="py-3 px-4 text-slate-300 text-[11px]">
                             <div>{st.district || '—'}</div>
-                            <div className="text-slate-500 text-[10px]">{st.settlement || ''}</div>
+                            <div className="text-slate-400 text-[10px]">{st.settlement || ''}</div>
                           </td>
                           <td className="py-3 px-3 text-right">
                             <div className="flex items-center justify-end gap-1.5">
@@ -1251,6 +1423,7 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                                     first_name: st.first_name || st.full_name?.split(' ')[0] || '',
                                     last_name: st.last_name || st.full_name?.split(' ')[1] || '',
                                     father_name: st.father_name || '',
+                                    fin_code: st.fin_code || '',
                                     utis_code: st.utis_code || '',
                                     grade_class: st.grade_class || 'IX sinif',
                                     district: st.district || 'Babək rayonu',
@@ -2264,7 +2437,7 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs text-slate-400 mb-1">Ata Adı:</label>
                   <input
@@ -2272,6 +2445,17 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                     value={studentForm.father_name}
                     onChange={(e) => setStudentForm({ ...studentForm, father_name: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">FİN Kodu (7 simvol):</label>
+                  <input
+                    type="text"
+                    maxLength={7}
+                    value={studentForm.fin_code}
+                    onChange={(e) => setStudentForm({ ...studentForm, fin_code: e.target.value.toUpperCase() })}
+                    placeholder="Məs: 7ABC123"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-sky-400 font-mono font-bold focus:outline-none focus:border-sky-500 uppercase"
                   />
                 </div>
                 <div>
@@ -2594,6 +2778,187 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 5: UTİS-DƏN ŞAGİRDLƏRİN YÜKLƏNMƏSİ VƏ TƏSDİQ MODALI (TƏLƏB 3)       */}
+      {/* ========================================================================= */}
+      {showUtisImportModal && (
+        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Başlığı */}
+            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between gap-3 bg-slate-950/60">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                  <Download className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                    <span>Məktəb Şagirdlərinin UTİS Bazasından Yüklənməsi</span>
+                    {utisImportMetadata?.official_gateway_connected ? (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        Rəsmi Gateway Aktivdir
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                        UTİS Məlumat Protokolu
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {selectedSchool} ({selectedDistrict !== 'all' ? selectedDistrict : 'Azərbaycan'})
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowUtisImportModal(false)}
+                className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Xülasə Zolağı və Filtrlər */}
+            <div className="p-4 border-b border-slate-800/80 bg-slate-950/30 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="px-3 py-1 rounded-xl bg-slate-800 text-slate-200 font-bold border border-slate-700">
+                  Tapılan Cəmi: {utisImportMetadata?.total_found || utisCandidateStudents.length}
+                </span>
+                <span className="px-3 py-1 rounded-xl bg-emerald-950/60 text-emerald-300 font-bold border border-emerald-800/60">
+                  Yeni Əlavə Olunacaq: {utisImportMetadata?.new_count ?? utisCandidateStudents.filter((s) => !s.already_exists).length}
+                </span>
+                <span className="px-3 py-1 rounded-xl bg-slate-800/70 text-slate-400 font-bold border border-slate-700">
+                  Artıq Bazada Olan: {utisImportMetadata?.exists_count ?? utisCandidateStudents.filter((s) => s.already_exists).length}
+                </span>
+                <span className="px-3 py-1 rounded-xl bg-blue-950/60 text-blue-300 font-bold border border-blue-800/60">
+                  Seçilib: {selectedUtisCandidateCodes.size} şagird
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleSelectAllUtisCandidates(true)}
+                  className="px-3 py-1.5 text-xs font-bold text-blue-400 hover:bg-blue-950/50 rounded-xl transition-colors cursor-pointer"
+                >
+                  Hamısını Seç
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSelectAllUtisCandidates(false)}
+                  className="px-3 py-1.5 text-xs font-bold text-slate-400 hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+                >
+                  Seçimi Təmizlə
+                </button>
+              </div>
+            </div>
+
+            {/* Şagirdlərin Təsdiq Cədvəli */}
+            <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
+              {utisCandidateStudents.length === 0 ? (
+                <div className="p-8 text-center text-xs text-slate-400">
+                  Bu məktəb üzrə UTİS-də aktiv şagird siyahısı aşkar edilmədi.
+                </div>
+              ) : (
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[11px]">
+                      <th className="py-2.5 px-3 w-10 text-center">Seç</th>
+                      <th className="py-2.5 px-3 w-10 text-center">№</th>
+                      <th className="py-2.5 px-3">Adı və Soyadı</th>
+                      <th className="py-2.5 px-3">Ata Adı</th>
+                      <th className="py-2.5 px-3">FİN Kodu</th>
+                      <th className="py-2.5 px-3">UTİS Kodu</th>
+                      <th className="py-2.5 px-3">Sinfi</th>
+                      <th className="py-2.5 px-3 text-right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {utisCandidateStudents.map((st, idx) => {
+                      const isChecked = selectedUtisCandidateCodes.has(st.utis_code);
+                      return (
+                        <tr
+                          key={st.utis_code || idx}
+                          onClick={() => toggleUtisCandidateSelection(st.utis_code)}
+                          className={`hover:bg-slate-800/40 transition-colors cursor-pointer ${
+                            st.already_exists ? 'opacity-70 bg-slate-950/20' : ''
+                          }`}
+                        >
+                          <td className="py-2.5 px-3 text-center" onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => toggleUtisCandidateSelection(st.utis_code)}
+                              className="w-4 h-4 rounded text-blue-600 focus:ring-0 focus:outline-none cursor-pointer"
+                            />
+                          </td>
+                          <td className="py-2.5 px-3 text-center text-slate-500 font-mono">{idx + 1}</td>
+                          <td className="py-2.5 px-3 font-medium text-white">
+                            {st.full_name || `${st.first_name || ''} ${st.last_name || ''}`.trim()}
+                          </td>
+                          <td className="py-2.5 px-3 font-medium text-white">{st.father_name || '—'}</td>
+                          <td className="py-2.5 px-3 font-mono font-bold text-sky-300">
+                            {st.fin_code || '—'}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono font-bold text-emerald-400">
+                            {st.utis_code}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-950 text-blue-300 border border-blue-800">
+                              {st.grade_class}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 text-right">
+                            {st.already_exists ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                                Artıq Bazadadır
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                                Yeni Şagird
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* Modal Düymələri */}
+            <div className="p-4 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between gap-3">
+              <div className="text-xs text-slate-400">
+                UTİS Kodu əsas identifikator kimi qəbul edilir və sistemdə heç vaxt dublikat yaranmır.
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowUtisImportModal(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+                >
+                  Ləğv Et
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCommitUtisStudents}
+                  disabled={isCommittingUtisStudents || selectedUtisCandidateCodes.size === 0}
+                  className="px-5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {isCommittingUtisStudents ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  )}
+                  <span>Seçilmiş Şagirdləri Bazaya Əlavə Et ({selectedUtisCandidateCodes.size})</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

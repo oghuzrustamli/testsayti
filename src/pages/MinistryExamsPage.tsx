@@ -616,8 +616,8 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
               </div>
 
               {/* Filtirlər: Sinif və Axtarış */}
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-                <div className="sm:col-span-5 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none flex-1">
                   <button
                     type="button"
                     onClick={() => setSelectedGradeFilter('all')}
@@ -645,29 +645,29 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
                   ))}
                 </div>
 
-                <div className="sm:col-span-4 relative">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={studentSearchQuery}
-                    onChange={(e) => setStudentSearchQuery(e.target.value)}
-                    placeholder="Şagird adı, soyadı və ya UTİS kodu ilə axtar..."
-                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
-                  />
-                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <div className="relative w-64 sm:w-72">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={studentSearchQuery}
+                      onChange={(e) => setStudentSearchQuery(e.target.value)}
+                      placeholder="Şagird adı, soyadı və ya UTİS..."
+                      className="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
+                    />
+                  </div>
 
-                <div className="sm:col-span-3 flex items-center justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => handleSelectAllFiltered(true)}
-                    className="px-2.5 py-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/60 rounded-lg transition-colors cursor-pointer"
+                    className="px-2.5 py-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/60 rounded-lg transition-colors cursor-pointer shrink-0"
                   >
                     Hamısını seç
                   </button>
                   <button
                     type="button"
                     onClick={() => handleSelectAllFiltered(false)}
-                    className="px-2.5 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 rounded-lg transition-colors cursor-pointer"
+                    className="px-2.5 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 rounded-lg transition-colors cursor-pointer shrink-0"
                   >
                     Təmizlə
                   </button>
@@ -675,7 +675,7 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
               </div>
 
               {/* Şagirdlərin Çekboks Qridi */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-72 overflow-y-auto p-2.5 pt-2.5 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-950/50 scrollbar-thin">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-72 overflow-y-auto p-3 pt-3.5 pb-3.5 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-950/50 scrollbar-thin mt-1">
                 {filteredStudents.length === 0 ? (
                   <div className="col-span-full p-6 text-center text-xs text-slate-400">
                     Bu sinif üzrə şagird tapılmadı
@@ -689,7 +689,7 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
                       <div
                         key={st.id}
                         onClick={() => hasUtis && toggleStudentSelection(st.id)}
-                        className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-2 select-none ${
+                        className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-2.5 select-none ${
                           !hasUtis
                             ? 'opacity-50 bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 cursor-not-allowed'
                             : isSelected
@@ -703,8 +703,8 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
                           }`}>
                             {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
                           </div>
-                          <div className="truncate">
-                            <span className="text-xs font-black block truncate text-slate-900 dark:text-white">
+                          <div className="truncate py-0.5">
+                            <span className="text-xs font-black block truncate text-slate-900 dark:text-white leading-snug">
                               {st.full_name}
                             </span>
                             <div className="flex items-center gap-1.5 text-[9.5px] text-slate-400 mt-0.5">

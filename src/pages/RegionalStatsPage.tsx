@@ -189,6 +189,11 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
   const [liveSessions, setLiveSessions] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState<boolean>(true);
 
+  // Reytinq Mənbə Ayrılığı (Tələb 7 & 8: ATROQ Testləri vs Nazirlik Monitorinqləri)
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'atroq' | 'ministry'>('all');
+  // Monitorinq Sinif Ayrılığı (9-cu və 11-ci sinif monitorinqləri qətiyyən bir-birinə qarışdırılmır)
+  const [monitoringGradeFilter, setMonitoringGradeFilter] = useState<'all' | '9' | '11'>('all');
+
   // Sync live database sessions from server
   useEffect(() => {
     async function fetchLiveStats() {
@@ -207,8 +212,31 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
     fetchLiveStats();
   }, []);
 
-  // Compute strictly from verified EDUNEX test completions
-  const regionalData = useMemo(() => calculateRegionalAnalytics(liveSessions), [liveSessions]);
+  // Filter sessions according to source and grade strictly before computing analytics
+  const filteredSessions = useMemo(() => {
+    return liveSessions.filter((s) => {
+      // Mənbə filtri
+      if (sourceFilter === 'atroq' && s.source_type === 'ministry') return false;
+      if (sourceFilter === 'ministry' && s.source_type !== 'ministry') return false;
+
+      // Sinif filtri (9 və 11-ci sinif monitorinq ayrılığı)
+      if (monitoringGradeFilter === '9') {
+        const g = (s.grade_class || '').toLowerCase();
+        if (!g.includes('9') && !g.includes('ix')) return false;
+      } else if (monitoringGradeFilter === '11') {
+        const g = (s.grade_class || '').toLowerCase();
+        if (!g.includes('11') && !g.includes('xi')) return false;
+      }
+
+      // İmtahanda iştirak etməyən və ya balı olmayan şagirdlər reytinqə daxil edilməsin
+      if (s.score === undefined || s.score === null || isNaN(Number(s.score))) return false;
+
+      return true;
+    });
+  }, [liveSessions, sourceFilter, monitoringGradeFilter]);
+
+  // Compute strictly from verified test completions
+  const regionalData = useMemo(() => calculateRegionalAnalytics(filteredSessions), [filteredSessions]);
   const districts = regionalData.districts;
   const schools = regionalData.schools;
   const students = regionalData.students;
@@ -572,6 +600,89 @@ export const RegionalStatsPage: React.FC<RegionalStatsPageProps> = ({ user }) =>
           3. ƏSAS MƏZMUN SAHƏSİ
           ============================================================== */}
       <div className="p-4 sm:p-6 flex flex-col gap-6 max-w-7xl w-full mx-auto flex-1">
+
+        {/* TƏLƏB 7 & 8: REYTİNQ MƏNBƏ VƏ SİNİF AYRILIĞI ZOLAĞI */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mr-1 flex items-center gap-1.5">
+              <Filter className="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" />
+              Reytinq Mənbəyi:
+            </span>
+            <button
+              type="button"
+              onClick={() => setSourceFilter('all')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                sourceFilter === 'all'
+                  ? 'bg-slate-900 dark:bg-blue-600 text-white shadow-2xs'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              Bütün Nəticələr
+            </button>
+            <button
+              type="button"
+              onClick={() => setSourceFilter('atroq')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                sourceFilter === 'atroq'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/60'
+              }`}
+            >
+              <GraduationCap className="w-3.5 h-3.5" />
+              <span>ATROQ Testlərinin Reytinqi</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setSourceFilter('ministry')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                sourceFilter === 'ministry'
+                  ? 'bg-blue-600 text-white shadow-2xs'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-950/60'
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Nazirliyin Monitorinq Reytinqi</span>
+            </button>
+          </div>
+
+          {/* 9-cu və 11-ci Sinif Monitorinq Ayrılığı */}
+          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 px-2 uppercase">Monitorinq Sinfi:</span>
+            <button
+              type="button"
+              onClick={() => setMonitoringGradeFilter('all')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                monitoringGradeFilter === 'all'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+              }`}
+            >
+              Bütün
+            </button>
+            <button
+              type="button"
+              onClick={() => setMonitoringGradeFilter('9')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                monitoringGradeFilter === '9'
+                  ? 'bg-blue-600 text-white shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-blue-600'
+              }`}
+            >
+              9-cu Sinif
+            </button>
+            <button
+              type="button"
+              onClick={() => setMonitoringGradeFilter('11')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                monitoringGradeFilter === '11'
+                  ? 'bg-blue-600 text-white shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-blue-600'
+              }`}
+            >
+              11-ci Sinif
+            </button>
+          </div>
+        </div>
 
         {/* Real Data Notice Banner (Tələb 7: Real baza əsasında) */}
         {overview.totalStudents === 0 && (

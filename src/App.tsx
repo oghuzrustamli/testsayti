@@ -207,7 +207,7 @@ export function App() {
               ) : activeTab === 'student_database' ? (
                 <UtisDatabasePage user={currentUser} />
               ) : activeTab === 'ministry_exams' ? (
-                <UtisDatabasePage user={currentUser} />
+                <MinistryExamsPage user={currentUser} />
               ) : (
                 <>
                   {/* TEACHER VIEWS */}
