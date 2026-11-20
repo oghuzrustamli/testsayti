@@ -2039,6 +2039,99 @@ app.get('/api/ministry-exams/students', (req, res) => {
   }
 });
 
+// Naxçıvan Təhsil Nazirliyinin Sınaq İmtahan Nəticə Cədvəlini (HTML) tam emal edən köməkçi funksiya
+// ƏSAS TƏLƏB: Ümumi Net yox, Şagirdin topladığı Ümumi Bal (Grand Total Score) emal olunub bazaya və istifadəçiyə ötürülür
+function parseMinistryExamHtml(resHtml) {
+  if (!resHtml) return { score: null, totalNet: null, subjects: [], status: 'not_found' };
+
+  const hasToastrError = resHtml.includes('toastr["error"]') ||
+    resHtml.includes('tap\\u0131lmad\\u0131') ||
+    resHtml.includes('tapılmadı');
+
+  if (hasToastrError) {
+    return {
+      status: 'not_found',
+      errorMessage: 'Bu iş nömrəsinə (UTİS koduna) uyğun nəticə tapılmadı',
+      score: null,
+      totalNet: null,
+      subjects: []
+    };
+  }
+
+  const cleanHtml = resHtml
+    .replace(/&#220;/g, 'Ü')
+    .replace(/&#252;/g, 'ü')
+    .replace(/&#601;/g, 'ə')
+    .replace(/&nbsp;/g, ' ');
+
+  // 1. Ümumi Bal (ƏSAS YEKUN BAL: məs. 189.17 və ya 202.08)
+  const totalBalMatch = cleanHtml.match(/(?:Ümumi|Ümümi|Umumi|Umümi)\s*bal\s*:\s*(?:<[^>]+>\s*)*([0-9]+(?:[\.,][0-9]+)?)/i)
+    || cleanHtml.match(/(?:Ümumi|Ümümi|Umumi|Umümi)\s*bal\b[^\d]*?([0-9]+(?:[\.,][0-9]+)?)/i);
+
+  // 2. Ümumi Net (YEKUN XALIS DÜZ SAYI: məs. 55)
+  const totalNetMatch = cleanHtml.match(/(?:Ümumi|Ümümi|Umumi|Umümi)\s*net\s*:\s*(?:<[^>]+>\s*)*([0-9]+(?:[\.,][0-9]+)?)/i)
+    || cleanHtml.match(/(?:Ümumi|Ümümi|Umumi|Umümi)\s*net\b[^\d]*?([0-9]+(?:[\.,][0-9]+)?)/i);
+
+  let score = totalBalMatch ? parseFloat(totalBalMatch[1].replace(',', '.')) : null;
+  const totalNet = totalNetMatch ? parseFloat(totalNetMatch[1].replace(',', '.')) : null;
+
+  // 3. Fənlər üzrə ayrılıqda nəticələr (Xarici dil, Ana dili, Riyaziyyat və s.)
+  const subjects = [];
+  const subjectBlocks = cleanHtml.split(/Fənnin\s*adı\s*:\s*<\/?[^>]+>\s*<strong[^>]*>/i);
+
+  if (subjectBlocks.length > 1) {
+    for (let i = 1; i < subjectBlocks.length; i++) {
+      const block = subjectBlocks[i];
+      const nameEnd = block.indexOf('</strong>');
+      if (nameEnd === -1) continue;
+      const subjName = block.substring(0, nameEnd).trim();
+
+      const balMatch = block.match(/Cəmi\s*bal\s*:\s*<\/?[^>]+>\s*<strong[^>]*>([0-9]+(?:[\.,][0-9]+)?)\s*bal/i);
+      const netMatch = block.match(/Cəmi\s*net\s*:\s*<\/?[^>]+>\s*<strong[^>]*>([0-9]+(?:[\.,][0-9]+)?)/i);
+      const duzMatch = block.match(/Cəmi\s*düz\s*:\s*<\/?[^>]+>\s*<strong[^>]*>([0-9]+)/i);
+
+      const subjScore = balMatch ? parseFloat(balMatch[1].replace(',', '.')) : null;
+      const subjNet = netMatch ? parseFloat(netMatch[1].replace(',', '.')) : null;
+      const subjDuz = duzMatch ? parseInt(duzMatch[1]) : null;
+
+      subjects.push({
+        subject: subjName,
+        score: subjScore,
+        net: subjNet,
+        correct: subjDuz
+      });
+    }
+  }
+
+  // Əgər yekun "Ümumi bal" xüsusi teqdən tapılmayıbsa, fənlərin cəmi balını toplayırıq
+  if (score === null && subjects.length > 0) {
+    const validScores = subjects.map(s => s.score).filter(s => typeof s === 'number' && !isNaN(s));
+    if (validScores.length > 0) {
+      score = Math.round(validScores.reduce((a, b) => a + b, 0) * 100) / 100;
+    }
+  }
+
+  // Əgər hələ də score null-dursa amma sonluqda bal qeydi varsa
+  if (score === null) {
+    const fallbackMatch = cleanHtml.match(/\b([0-9]+(?:[\.,][0-9]+)?)\s*bal\b/i);
+    if (fallbackMatch) {
+      score = parseFloat(fallbackMatch[1].replace(',', '.'));
+    }
+  }
+
+  const tableMatch = resHtml.match(/<table[\s\S]*?<\/table>/i);
+
+  return {
+    status: (score !== null || tableMatch) ? 'found' : 'not_found',
+    score,
+    totalNet,
+    subjects,
+    errorMessage: (score === null && !tableMatch) ? 'Bu iş nömrəsinə (UTİS koduna) uyğun nəticə tapılmadı' : null,
+    rawTableHtml: tableMatch ? tableMatch[0] : null,
+    textSummary: tableMatch ? tableMatch[0].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : ''
+  };
+}
+
 // 5. Tək şagird üçün nəticə sorğusu (İdarə olunan ardıcıllıq və dərhal bazaya yazılma)
 app.post('/api/ministry-exams/query-student', async (req, res) => {
   try {
@@ -2115,40 +2208,18 @@ app.post('/api/ministry-exams/query-student', async (req, res) => {
 
     const resHtml = await postRes.text();
 
-    let status = 'not_found';
-    let score = null;
-    let detailsJson = null;
-    let errorMessage = null;
+    const parsed = parseMinistryExamHtml(resHtml);
+    const status = parsed.status;
+    const score = parsed.score; // DƏQİQ ÜMUMİ BAL (Net yox!)
+    const errorMessage = parsed.errorMessage;
 
-    const hasToastrError = resHtml.includes('toastr["error"]') || resHtml.includes('tap\\u0131lmad\\u0131') || resHtml.includes('tapılmadı');
-
-    if (hasToastrError) {
-      status = 'not_found';
-      errorMessage = 'Bu iş nömrəsinə (UTİS koduna) uyğun nəticə tapılmadı';
-    } else {
-      const tableMatch = resHtml.match(/<table[\s\S]*?<\/table>/i);
-      const scoreMatch = resHtml.match(/(?:Ümumi\s*bal|Bal|Nəticə|Xal)[\s:–-]*([0-9]+(?:[\.,][0-9]+)?)/i);
-
-      if (scoreMatch) {
-        score = parseFloat(scoreMatch[1].replace(',', '.'));
-      }
-
-      if (tableMatch) {
-        detailsJson = JSON.stringify({
-          rawTableHtml: tableMatch[0],
-          textSummary: tableMatch[0].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
-        });
-      }
-
-      if (score === null) {
-        const anyNumber = resHtml.match(/\b([0-9]{2,3}(?:[\.,][0-9]+)?)\s*bal\b/i);
-        if (anyNumber) {
-          score = parseFloat(anyNumber[1].replace(',', '.'));
-        }
-      }
-
-      status = 'found';
-    }
+    const detailsJson = JSON.stringify({
+      rawTableHtml: parsed.rawTableHtml,
+      textSummary: parsed.textSummary,
+      total_score: parsed.score,
+      total_net: parsed.totalNet,
+      subjects: parsed.subjects
+    });
 
     const resId = 'min-res-' + student_id + '-' + exam_id;
 
@@ -2196,6 +2267,8 @@ app.post('/api/ministry-exams/query-student', async (req, res) => {
         exam_id,
         exam_title,
         score,
+        total_net: parsed.totalNet,
+        subjects: parsed.subjects,
         details_json: detailsJson,
         status,
         error_message: errorMessage,

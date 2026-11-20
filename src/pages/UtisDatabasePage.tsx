@@ -1802,7 +1802,7 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                         <th className="py-3 px-3">Sinfi</th>
                         <th className="py-3 px-4">UTİS Kodu</th>
                         <th className="py-3 px-4">İmtahanın Adı</th>
-                        <th className="py-3 px-3 text-center">Topladığı Bal</th>
+                        <th className="py-3 px-3 text-center">Topladığı Ümumi Bal</th>
                         <th className="py-3 px-3 text-center">Status</th>
                         <th className="py-3 px-3 text-right">Təkrar Yoxla</th>
                       </tr>
@@ -1817,9 +1817,16 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                           <td className="py-3 px-4 text-slate-400 max-w-xs truncate" title={r.exam_title}>{r.exam_title}</td>
                           <td className="py-3 px-3 text-center">
                             {r.status === 'found' && r.score !== null ? (
-                              <span className="px-2.5 py-1 rounded-lg text-xs font-bold font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
-                                {r.score} bal
-                              </span>
+                              <div className="flex flex-col items-center">
+                                <span className="px-2.5 py-1 rounded-lg text-xs font-bold font-mono bg-emerald-950 text-emerald-300 border border-emerald-800 shadow-sm">
+                                  {r.score} bal
+                                </span>
+                                {r.total_net !== undefined && r.total_net !== null && (
+                                  <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                    Net: {r.total_net}
+                                  </span>
+                                )}
+                              </div>
                             ) : (
                               <span className="text-slate-500 font-mono">—</span>
                             )}

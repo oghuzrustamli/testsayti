@@ -63,6 +63,7 @@ interface QueryResultItem {
   exam_id: string;
   exam_title: string;
   score: number | null;
+  total_net?: number | null;
   details_json?: string | null;
   status: 'found' | 'not_found' | 'error' | 'no_utis';
   error_message?: string | null;
@@ -850,7 +851,7 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
                         <th className="py-2.5 px-3">Sinfi</th>
                         <th className="py-2.5 px-3">UTİS Kodu</th>
                         <th className="py-2.5 px-3">İmtahanın Adı</th>
-                        <th className="py-2.5 px-3 text-center">Topladığı Bal</th>
+                        <th className="py-2.5 px-3 text-center">Topladığı Ümumi Bal</th>
                         <th className="py-2.5 px-3">Tarix</th>
                         <th className="py-2.5 px-3">Status</th>
                         <th className="py-2.5 px-3 text-center">Əməliyyat</th>
@@ -881,9 +882,16 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
                             </td>
                             <td className="py-2.5 px-3 text-center">
                               {isFound ? (
-                                <span className="font-mono font-black text-sm px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 shadow-2xs">
-                                  {r.score !== null ? r.score : '0'} bal
-                                </span>
+                                <div className="flex flex-col items-center">
+                                  <span className="font-mono font-black text-sm px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 shadow-2xs">
+                                    {r.score !== null ? r.score : '0'} bal
+                                  </span>
+                                  {r.total_net !== undefined && r.total_net !== null && (
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+                                      Net: {r.total_net}
+                                    </span>
+                                  )}
+                                </div>
                               ) : isNotFound ? (
                                 <span className="text-slate-400 font-semibold">—</span>
                               ) : (
@@ -1057,7 +1065,7 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
                         <th className="py-2.5 px-3">Sinfi</th>
                         <th className="py-2.5 px-3">UTİS Kodu</th>
                         <th className="py-2.5 px-3">İmtahanın Adı</th>
-                        <th className="py-2.5 px-3 text-center">Topladığı Bal</th>
+                        <th className="py-2.5 px-3 text-center">Topladığı Ümumi Bal</th>
                         <th className="py-2.5 px-3">Nəticə Tarixi</th>
                         <th className="py-2.5 px-3">Status</th>
                         <th className="py-2.5 px-3 text-center">Sil</th>

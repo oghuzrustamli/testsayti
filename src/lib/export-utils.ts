@@ -259,16 +259,27 @@ export function exportMinistryExamResultsToExcel(
 
   const wb = XLSX.utils.book_new();
 
-  const excelRows = results.map((r, idx) => ({
-    '№': idx + 1,
-    'Şagirdin Adı və Soyadı': `${r.student_name || ''} ${r.student_surname || ''}`.trim() || r.full_name || '—',
-    'Sinfi': r.grade || r.grade_class || '—',
-    'UTİS Kodu': r.utis_code || '—',
-    'İmtahanın Adı': r.exam_title || examTitle,
-    'Topladığı Bal': r.score !== null && r.score !== undefined ? r.score : (r.status === 'found' ? 0 : 'Nəticə tapılmadı'),
-    'Nəticənin Əldə Edilmə Tarixi': r.fetched_at ? new Date(r.fetched_at).toLocaleString('az-AZ') : '—',
-    'Status': r.status === 'found' ? 'Nəticə tapıldı' : r.status === 'not_found' ? 'Nəticə tapılmadı' : r.status === 'no_utis' ? 'UTİS yoxdur' : 'Xəta'
-  }));
+  const excelRows = results.map((r, idx) => {
+    let netVal = r.total_net;
+    if ((netVal === undefined || netVal === null) && r.details_json) {
+      try {
+        const parsedDetails = typeof r.details_json === 'string' ? JSON.parse(r.details_json) : r.details_json;
+        netVal = parsedDetails?.total_net;
+      } catch {}
+    }
+
+    return {
+      '№': idx + 1,
+      'Şagirdin Adı və Soyadı': `${r.student_name || ''} ${r.student_surname || ''}`.trim() || r.full_name || '—',
+      'Sinfi': r.grade || r.grade_class || '—',
+      'UTİS Kodu': r.utis_code || '—',
+      'İmtahanın Adı': r.exam_title || examTitle,
+      'Topladığı Ümumi Bal': r.score !== null && r.score !== undefined ? r.score : (r.status === 'found' ? 0 : 'Nəticə tapılmadı'),
+      'Ümumi Net': (netVal !== undefined && netVal !== null) ? netVal : '—',
+      'Nəticənin Əldə Edilmə Tarixi': r.fetched_at ? new Date(r.fetched_at).toLocaleString('az-AZ') : '—',
+      'Status': r.status === 'found' ? 'Nəticə tapıldı' : r.status === 'not_found' ? 'Nəticə tapılmadı' : r.status === 'no_utis' ? 'UTİS yoxdur' : 'Xəta'
+    };
+  });
 
   const ws = XLSX.utils.json_to_sheet(excelRows);
 
@@ -278,7 +289,8 @@ export function exportMinistryExamResultsToExcel(
     { wch: 12 },  // Sinfi
     { wch: 14 },  // UTİS
     { wch: 45 },  // İmtahan
-    { wch: 16 },  // Bal
+    { wch: 20 },  // Ümumi Bal
+    { wch: 14 },  // Ümumi Net
     { wch: 22 },  // Tarix
     { wch: 18 },  // Status
   ];
