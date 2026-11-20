@@ -428,9 +428,22 @@ function seedUtisData() {
     }
 
     // 3. Məktəblərin Doldurulması (Azərbaycanın Bütün Əsas Məktəbləri)
-    const insSchool = db.prepare('INSERT OR IGNORE INTO Schools (id, name, district, settlement, utis_code, school_type, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+    const insSchool = db.prepare(`
+      INSERT INTO Schools (id, name, district, settlement, utis_code, school_type, status, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        name = excluded.name,
+        district = excluded.district,
+        settlement = excluded.settlement,
+        utis_code = excluded.utis_code,
+        school_type = excluded.school_type
+    `);
     for (const s of INITIAL_AZERBAIJAN_SCHOOLS) {
-      insSchool.run(s.id, s.name, s.district, s.settlement, s.utis_code, s.type, 'active', now);
+      try {
+        insSchool.run(s.id, s.name, s.district, s.settlement, s.utis_code, s.type, 'active', now);
+      } catch (err) {
+        // If unique constraint on name or utis_code triggered, continue
+      }
     }
 
     // 4. Mövcud 272 şagirdin Məktəb, Rayon və Kəndə bağlanması

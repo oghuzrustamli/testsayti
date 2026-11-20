@@ -124,6 +124,7 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
   const [historyExamFilter, setHistoryExamFilter] = useState<string>('all');
   const [historyGradeFilter, setHistoryGradeFilter] = useState<string>('all');
   const [loadingHistory, setLoadingHistory] = useState<boolean>(false);
+  const [allSchoolsList, setAllSchoolsList] = useState<any[]>([]);
 
   // Settings State
   const [settingsUrlInput, setSettingsUrlInput] = useState<string>('');
@@ -131,13 +132,23 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
   const [connectionTestResult, setConnectionTestResult] = useState<{ success: boolean; msg: string } | null>(null);
   const [savingSettings, setSavingSettings] = useState<boolean>(false);
 
-  // Load Initial Settings, Available Exams, Students
+  // Load Initial Settings, Available Exams, Students, Official Schools
   useEffect(() => {
     loadSettings();
     loadAvailableExams();
     loadStudents();
     loadHistoryResults();
+    loadOfficialSchools();
   }, []);
+
+  const loadOfficialSchools = async () => {
+    try {
+      const res = await api.getUtisSchools();
+      if (res.success && Array.isArray(res.schools)) {
+        setAllSchoolsList(res.schools);
+      }
+    } catch {}
+  };
 
   // Update selected student IDs whenever grade filter changes
   useEffect(() => {
@@ -224,17 +235,40 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
     return found ? found.title : 'Sınaq İmtahanı';
   }, [isCustomExam, customExamTitle, selectedExamId, availableExams]);
 
-  // Available Districts and Schools for filtering
+  // Available Districts and Schools for filtering (Bütün Azərbaycan rayon və şəhərləri)
   const availableDistricts = useMemo(() => {
     const set = new Set<string>();
+    allSchoolsList.forEach((s) => {
+      if (s.district) set.add(s.district);
+    });
     allStudents.forEach((s) => {
       if (s.district) set.add(s.district);
     });
-    return Array.from(set).sort();
-  }, [allStudents]);
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'az'));
+  }, [allStudents, allSchoolsList]);
 
   const availableSchools = useMemo(() => {
     const set = new Set<string>();
+    const cleanDist = selectedDistrictFilter.replace(/\s+(rayonu|şəhəri)/i, '').toLowerCase().trim();
+    const isBaki = cleanDist === 'bakı' || selectedDistrictFilter.toLowerCase().includes('bakı');
+    const bakiDistricts = new Set(['sabunçu rayonu', 'qaradağ rayonu', 'xəzər rayonu', 'yasamal rayonu', 'səbail rayonu', 'nəsimi rayonu', 'nərimanov rayonu', 'xətai rayonu', 'nizami rayonu', 'suraxanı rayonu', 'binəqədi rayonu', 'pirallahı rayonu', 'bakı şəhəri']);
+
+    // 1. Rəsmi Məktəb Reyestrindən gətirilən bütün məktəblər
+    allSchoolsList.forEach((s) => {
+      if (!s.name) return;
+      if (selectedDistrictFilter === 'all') {
+        set.add(s.name);
+      } else if (s.district) {
+        const sDist = s.district.toLowerCase();
+        if (isBaki && (bakiDistricts.has(sDist) || sDist.includes('bakı'))) {
+          set.add(s.name);
+        } else if (sDist === selectedDistrictFilter.toLowerCase() || sDist.includes(cleanDist) || selectedDistrictFilter.toLowerCase().includes(sDist)) {
+          set.add(s.name);
+        }
+      }
+    });
+
+    // 2. Şagird bazasındakı mövcud məktəblər
     allStudents.forEach((s) => {
       if (s.school_name) {
         if (selectedDistrictFilter === 'all' || s.district === selectedDistrictFilter) {
@@ -242,8 +276,9 @@ export const MinistryExamsPage: React.FC<MinistryExamsPageProps> = ({ user }) =>
         }
       }
     });
-    return Array.from(set).sort();
-  }, [allStudents, selectedDistrictFilter]);
+
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'az'));
+  }, [allStudents, allSchoolsList, selectedDistrictFilter]);
 
   // Filtered Students for Query Screen
   const filteredStudents = useMemo(() => {

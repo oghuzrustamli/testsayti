@@ -2040,8 +2040,20 @@ app.get('/api/ministry-exams/students', (req, res) => {
     const params = [];
 
     if (district && district !== 'all') {
-      query += ` AND district = ?`;
-      params.push(district);
+      const cleanDist = district.replace(/\s+(rayonu|şəhəri)/i, '').trim();
+      const bakiDistricts = [
+        'Sabunçu rayonu', 'Qaradağ rayonu', 'Xəzər rayonu', 'Yasamal rayonu',
+        'Səbail rayonu', 'Nəsimi rayonu', 'Nərimanov rayonu', 'Xətai rayonu',
+        'Binəqədi rayonu', 'Nizami rayonu', 'Suraxanı rayonu', 'Pirallahı rayonu',
+        'Bakı şəhəri'
+      ];
+      if (cleanDist.toLowerCase() === 'bakı' || district.toLowerCase().includes('bakı')) {
+        query += ` AND (district = ? OR district LIKE ? OR district IN (${bakiDistricts.map(() => '?').join(',')}))`;
+        params.push(district, `%${cleanDist}%`, ...bakiDistricts);
+      } else {
+        query += ` AND (district = ? OR district LIKE ? OR district LIKE ?)`;
+        params.push(district, `%${cleanDist}%`, `%${district}%`);
+      }
     }
 
     if (school && school !== 'all') {
@@ -2573,8 +2585,20 @@ app.get('/api/utis/schools', (req, res) => {
     const params = [];
 
     if (district && district !== 'all') {
-      query += ` AND s.district = ?`;
-      params.push(district);
+      const cleanDist = district.replace(/\s+(rayonu|şəhəri)/i, '').trim();
+      const bakiDistricts = [
+        'Sabunçu rayonu', 'Qaradağ rayonu', 'Xəzər rayonu', 'Yasamal rayonu',
+        'Səbail rayonu', 'Nəsimi rayonu', 'Nərimanov rayonu', 'Xətai rayonu',
+        'Binəqədi rayonu', 'Nizami rayonu', 'Suraxanı rayonu', 'Pirallahı rayonu',
+        'Bakı şəhəri'
+      ];
+      if (cleanDist.toLowerCase() === 'bakı' || district.toLowerCase().includes('bakı')) {
+        query += ` AND (s.district = ? OR s.district LIKE ? OR s.district IN (${bakiDistricts.map(() => '?').join(',')}))`;
+        params.push(district, `%${cleanDist}%`, ...bakiDistricts);
+      } else {
+        query += ` AND (s.district = ? OR s.district LIKE ? OR s.district LIKE ?)`;
+        params.push(district, `%${cleanDist}%`, `%${district}%`);
+      }
     }
     if (settlement && settlement !== 'all') {
       query += ` AND s.settlement = ?`;
@@ -2737,8 +2761,20 @@ app.get('/api/utis/students', (req, res) => {
     const params = [];
 
     if (district && district !== 'all') {
-      query += ` AND district = ?`;
-      params.push(district);
+      const cleanDist = district.replace(/\s+(rayonu|şəhəri)/i, '').trim();
+      const bakiDistricts = [
+        'Sabunçu rayonu', 'Qaradağ rayonu', 'Xəzər rayonu', 'Yasamal rayonu',
+        'Səbail rayonu', 'Nəsimi rayonu', 'Nərimanov rayonu', 'Xətai rayonu',
+        'Binəqədi rayonu', 'Nizami rayonu', 'Suraxanı rayonu', 'Pirallahı rayonu',
+        'Bakı şəhəri'
+      ];
+      if (cleanDist.toLowerCase() === 'bakı' || district.toLowerCase().includes('bakı')) {
+        query += ` AND (district = ? OR district LIKE ? OR district IN (${bakiDistricts.map(() => '?').join(',')}))`;
+        params.push(district, `%${cleanDist}%`, ...bakiDistricts);
+      } else {
+        query += ` AND (district = ? OR district LIKE ? OR district LIKE ?)`;
+        params.push(district, `%${cleanDist}%`, `%${district}%`);
+      }
     }
 
     if (settlement && settlement !== 'all') {

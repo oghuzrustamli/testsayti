@@ -43,6 +43,24 @@ interface UtisDatabasePageProps {
   user: User;
 }
 
+export function formatSchoolUnifiedName(school: any): string {
+  if (!school) return '';
+  const district = (school.district || '').trim();
+  const settlement = school.settlement && school.settlement.trim() && school.settlement !== district
+    ? `, ${school.settlement.trim()}`
+    : '';
+  const prefix = district ? `${district}${settlement}` : '';
+  const schoolName = (school.name || '').trim();
+  
+  if (prefix) {
+    if (schoolName.toLowerCase().startsWith(prefix.toLowerCase())) {
+      return schoolName;
+    }
+    return `${prefix} – ${schoolName}`;
+  }
+  return schoolName;
+}
+
 export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
   // Əsas Tablar (Məktəblər Bazası ayrıca xüsusi bölmə kimi əlavə olundu)
   const [activeMainTab, setActiveMainTab] = useState<'registry' | 'schools' | 'exams' | 'stats' | 'excel' | 'gateway'>('registry');
@@ -517,26 +535,45 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
     return Array.from(set).sort();
   }, [districts]);
 
-  // Filtrlənmiş Məktəblər Siyahısı (Bütün Azərbaycan üzrə)
+  // Vahid Azərbaycan Məktəbləri Reyestri (A-dan Z-yə Əlifba Sıralaması ilə)
   const filteredSchools = useMemo(() => {
-    return schools.filter(s => {
-      if (schoolRegionFilter !== 'all') {
-        const dist = districts.find(d => d.name === s.district);
-        if (dist && dist.parent_region !== schoolRegionFilter) return false;
-      }
-      if (schoolDistrictFilter !== 'all' && s.district !== schoolDistrictFilter) return false;
-      if (schoolTypeFilter !== 'all' && s.school_type !== schoolTypeFilter) return false;
-      if (schoolSearchQuery.trim()) {
-        const q = schoolSearchQuery.toLowerCase().trim();
+    let list = [...schools];
+
+    if (schoolSearchQuery.trim()) {
+      const q = schoolSearchQuery.toLowerCase().trim();
+      list = list.filter(s => {
+        const unifiedName = formatSchoolUnifiedName(s).toLowerCase();
+        const matchUnified = unifiedName.includes(q);
         const matchName = (s.name || '').toLowerCase().includes(q);
         const matchUtis = (s.utis_code || '').toLowerCase().includes(q);
         const matchSettlement = (s.settlement || '').toLowerCase().includes(q);
         const matchDistrict = (s.district || '').toLowerCase().includes(q);
-        if (!matchName && !matchUtis && !matchSettlement && !matchDistrict) return false;
-      }
-      return true;
+        return matchUnified || matchName || matchUtis || matchSettlement || matchDistrict;
+      });
+    }
+
+    // Azərbaycan əlifbasına uyğun A-dan Z-yə sıralama (az-AZ localeCompare)
+    return list.sort((a, b) => {
+      const nameA = formatSchoolUnifiedName(a);
+      const nameB = formatSchoolUnifiedName(b);
+      return nameA.localeCompare(nameB, 'az', { sensitivity: 'base' });
     });
-  }, [schools, districts, schoolRegionFilter, schoolDistrictFilter, schoolTypeFilter, schoolSearchQuery]);
+  }, [schools, schoolSearchQuery]);
+
+  // Sınaq İmtahanı Bölməsində Rayona görə Süzgəclənmiş Məktəblər
+  const examFilteredSchools = useMemo(() => {
+    if (!examDistrict || examDistrict === 'all') return schools;
+    const cleanDist = examDistrict.replace(/\s+(rayonu|şəhəri)/i, '').toLowerCase().trim();
+    const isBaki = cleanDist === 'bakı' || examDistrict.toLowerCase().includes('bakı');
+    const bakiDistricts = new Set(['sabunçu rayonu', 'qaradağ rayonu', 'xəzər rayonu', 'yasamal rayonu', 'səbail rayonu', 'nəsimi rayonu', 'nərimanov rayonu', 'xətai rayonu', 'nizami rayonu', 'suraxanı rayonu', 'binəqədi rayonu', 'pirallahı rayonu', 'bakı şəhəri']);
+
+    return schools.filter(s => {
+      if (!s.district) return false;
+      const sDist = s.district.toLowerCase();
+      if (isBaki && (bakiDistricts.has(sDist) || sDist.includes('bakı'))) return true;
+      return sDist === examDistrict.toLowerCase() || sDist.includes(cleanDist) || examDistrict.toLowerCase().includes(sDist);
+    });
+  }, [schools, examDistrict]);
 
   // Məktəblərin Excel İxracı
   const handleExportSchoolsExcel = () => {
@@ -547,6 +584,7 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
 
     const exportData = filteredSchools.map((s, idx) => ({
       'Sıra №': idx + 1,
+      'Vahid Reyestr Adı': formatSchoolUnifiedName(s),
       'Məktəbin adı': s.name,
       'Rayon / Şəhər': s.district,
       'Kənd / Qəsəbə': s.settlement || '',
@@ -1540,121 +1578,74 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                 </div>
               </div>
 
-              {/* FİLTR SEÇİMLƏRİ */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {/* 1. Regional / İqtisadi Zona */}
-                <div>
-                  <label className="block text-xs text-slate-400 mb-1">İqtisadi / Regional Zona:</label>
-                  <select
-                    value={schoolRegionFilter}
-                    onChange={(e) => {
-                      setSchoolRegionFilter(e.target.value);
-                      setSchoolDistrictFilter('all');
-                    }}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="all">Bütün Regionlar (AR)</option>
-                    {economicRegions.map(reg => (
-                      <option key={reg} value={reg}>{reg}</option>
-                    ))}
-                  </select>
+              {/* VAHİD AXTARIŞ PANELİ (Rayon, şəhər, yer, məktəb tipi seçimləri ləğv edildi - Tələb 1.1) */}
+              <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3.5 space-y-2">
+                <div className="relative">
+                  <Search className="w-4 h-4 text-blue-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={schoolSearchQuery}
+                    onChange={(e) => setSchoolSearchQuery(e.target.value)}
+                    placeholder="Məktəb adı, nömrəsi (məs: 148, 135, 35, 15, 106), şəhər, rayon və ya qəsəbə/kənd üzrə axtar..."
+                    className="w-full pl-10 pr-10 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-inner"
+                  />
+                  {schoolSearchQuery && (
+                    <button
+                      onClick={() => setSchoolSearchQuery('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1 cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
-
-                {/* 2. Rayon / Şəhər */}
-                <div>
-                  <label className="block text-xs text-slate-400 mb-1">Rayon / Şəhər:</label>
-                  <select
-                    value={schoolDistrictFilter}
-                    onChange={(e) => setSchoolDistrictFilter(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="all">Bütün Rayon və Şəhərlər ({districts.length})</option>
-                    {districts
-                      .filter(d => schoolRegionFilter === 'all' || d.parent_region === schoolRegionFilter)
-                      .map(d => (
-                        <option key={d.id} value={d.name}>{d.name}</option>
-                      ))}
-                  </select>
-                </div>
-
-                {/* 3. Məktəb Tipi */}
-                <div>
-                  <label className="block text-xs text-slate-400 mb-1">Məktəb Tipi:</label>
-                  <select
-                    value={schoolTypeFilter}
-                    onChange={(e) => setSchoolTypeFilter(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="all">Bütün Tiplər</option>
-                    <option value="tam_orta">Tam orta məktəb</option>
-                    <option value="umumi_orta">Ümumi orta məktəb</option>
-                    <option value="ibtidai">İbtidai məktəb</option>
-                    <option value="lisey">Lisey</option>
-                    <option value="gimnaziya">Gimnaziya</option>
-                    <option value="ozel">Özəl təhsil müəssisəsi</option>
-                  </select>
-                </div>
-
-                {/* 4. Axtarış */}
-                <div>
-                  <label className="block text-xs text-slate-400 mb-1">Axtarış (Ad, UTİS və ya Kənd):</label>
-                  <div className="relative">
-                    <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      value={schoolSearchQuery}
-                      onChange={(e) => setSchoolSearchQuery(e.target.value)}
-                      placeholder="Məktəb adı, kodu və ya kənd..."
-                      className="w-full pl-8 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-blue-500"
-                    />
+                <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-400 px-1 gap-2">
+                  <span>Ölkə üzrə bütün məktəblər Azərbaycan əlifbası ilə <strong>A-dan Z-yə</strong> vahid siyahıda sıralanmışdır (Tələb 1.2).</span>
+                  <div className="flex items-center gap-2">
+                    {schoolSearchQuery && (
+                      <button
+                        onClick={() => setSchoolSearchQuery('')}
+                        className="text-xs text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                      >
+                        Axtarışı sıfırla
+                      </button>
+                    )}
+                    <span className="text-emerald-400 font-semibold font-mono">Tapıldı: {filteredSchools.length} məktəb</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* MƏKTƏBLƏR CƏDVƏLİ */}
+            {/* MƏKTƏBLƏR CƏDVƏLİ (VAHİD REYESTR FORMASI) */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
               <div className="p-4 border-b border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-semibold text-white">Məktəblərin Siyahısı</h4>
+                  <Building2 className="w-4 h-4 text-blue-400" />
+                  <h4 className="text-sm font-semibold text-white">Azərbaycan Respublikasının Bütün Məktəbləri (Vahid Siyahı)</h4>
                   <span className="px-2 py-0.5 rounded-full text-[11px] bg-slate-800 text-slate-300 font-mono">
                     {filteredSchools.length} məktəb
                   </span>
                 </div>
-                {(schoolRegionFilter !== 'all' || schoolDistrictFilter !== 'all' || schoolTypeFilter !== 'all' || schoolSearchQuery) && (
-                  <button
-                    onClick={() => {
-                      setSchoolRegionFilter('all');
-                      setSchoolDistrictFilter('all');
-                      setSchoolTypeFilter('all');
-                      setSchoolSearchQuery('');
-                    }}
-                    className="text-xs text-blue-400 hover:text-blue-300 underline cursor-pointer"
-                  >
-                    Filtrləri sıfırla
-                  </button>
-                )}
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-950/70 border-b border-slate-800 text-slate-400">
-                      <th className="py-3 px-3 w-10 text-center font-semibold">№</th>
-                      <th className="py-3 px-4 font-semibold">Məktəbin Rəsmi Adı</th>
-                      <th className="py-3 px-3 font-semibold">Rayon / Şəhər</th>
-                      <th className="py-3 px-3 font-semibold">Kənd / Qəsəbə / Ünvan</th>
-                      <th className="py-3 px-3 font-semibold text-center">UTİS Kodu</th>
-                      <th className="py-3 px-3 font-semibold text-center">Tipi</th>
-                      <th className="py-3 px-3 font-semibold text-center">Şagird Sayı</th>
-                      <th className="py-3 px-3 text-center font-semibold">Əməliyyat</th>
+                    <tr className="bg-slate-950/70 border-b border-slate-800 text-slate-400 uppercase text-[11px] tracking-wider">
+                      <th className="py-3 px-3 w-12 text-center font-bold">№</th>
+                      <th className="py-3 px-4 font-bold">Vahid Reyestr Adı (Şəhər / Rayon – Qəsəbə / Kənd – Məktəb)</th>
+                      <th className="py-3 px-3 font-bold text-center">Rəsmi UTİS Kodu</th>
+                      <th className="py-3 px-3 font-bold">Rayon / Şəhər</th>
+                      <th className="py-3 px-3 font-bold">Qəsəbə / Kənd</th>
+                      <th className="py-3 px-3 font-bold text-center">Tipi</th>
+                      <th className="py-3 px-3 font-bold text-center">Şagird Sayı</th>
+                      <th className="py-3 px-3 text-center font-bold">Əməliyyat</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60">
+                  <tbody className="divide-y divide-slate-800/60 font-normal">
                     {filteredSchools.length === 0 ? (
                       <tr>
                         <td colSpan={8} className="py-8 text-center text-slate-500">
-                          Seçilmiş filtrlərə uyğun heç bir məktəb tapılmadı
+                          Axtarış sorğusuna uyğun heç bir məktəb tapılmadı
                         </td>
                       </tr>
                     ) : (
@@ -1662,10 +1653,19 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                         <tr key={school.id} className="hover:bg-slate-800/40 transition-colors">
                           <td className="py-3 px-3 text-center text-slate-400 font-mono">{idx + 1}</td>
                           <td className="py-3 px-4">
-                            <div className="font-medium text-white flex items-center gap-1.5">
+                            <div className="font-semibold text-white flex items-center gap-2">
                               <Building2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                              <span>{school.name}</span>
+                              <span className="text-slate-100">{formatSchoolUnifiedName(school)}</span>
                             </div>
+                          </td>
+                          <td className="py-3 px-3 text-center font-mono font-bold text-emerald-400">
+                            {school.utis_code ? (
+                              <span className="px-2 py-0.5 rounded bg-emerald-950/70 border border-emerald-800/60 text-emerald-300">
+                                {school.utis_code}
+                              </span>
+                            ) : (
+                              <span className="text-slate-600">—</span>
+                            )}
                           </td>
                           <td className="py-3 px-3 text-slate-300">
                             <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-200 text-[11px]">
@@ -1673,10 +1673,7 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                             </span>
                           </td>
                           <td className="py-3 px-3 text-slate-400">
-                            {school.settlement || 'Mərkəz / Qəsəbə'}
-                          </td>
-                          <td className="py-3 px-3 text-center font-mono font-bold text-emerald-400">
-                            {school.utis_code ? school.utis_code : <span className="text-slate-600">—</span>}
+                            {school.settlement || 'Mərkəz'}
                           </td>
                           <td className="py-3 px-3 text-center">
                             <span className={`px-2 py-0.5 rounded-md text-[10px] font-medium ${
@@ -1772,16 +1769,20 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                 </div>
               </div>
 
-              {/* Filtr Zolağı: Rayon, Məktəb, Sinif */}
+              {/* Filtr Zolağı: Rayon, Məktəb, Sinif (Dinamik Kaskad - Tələb 2.1 və 2.2) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Rayon / Şəhər Seçin:</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Rayon / Şəhər Seçin:</label>
                   <select
                     value={examDistrict}
-                    onChange={(e) => setExamDistrict(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                    onChange={(e) => {
+                      const newDist = e.target.value;
+                      setExamDistrict(newDist);
+                      setExamSchool('all');
+                    }}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-medium"
                   >
-                    <option value="all">Bütün Rayonlar</option>
+                    <option value="all">Bütün Rayon və Şəhərlər ({districts.length})</option>
                     {districts.map(d => (
                       <option key={d.id} value={d.name}>{d.name}</option>
                     ))}
@@ -1789,25 +1790,27 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Məktəb Seçin:</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Məktəb Seçin:</label>
                   <select
                     value={examSchool}
                     onChange={(e) => setExamSchool(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-medium"
                   >
-                    <option value="all">Bütün Məktəblər</option>
-                    {schools.map(s => (
-                      <option key={s.id} value={s.name}>{s.name}</option>
+                    <option value="all">Bütün Məktəblər ({examFilteredSchools.length})</option>
+                    {examFilteredSchools.map(s => (
+                      <option key={s.id} value={s.name}>
+                        {formatSchoolUnifiedName(s)}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Sinif Seçin:</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Sinif Seçin:</label>
                   <select
                     value={examGrade}
                     onChange={(e) => setExamGrade(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-medium"
                   >
                     <option value="all">Bütün Siniflər</option>
                     {ROMAN_CLASSES.map(cls => (
@@ -1822,13 +1825,13 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={selectAllStudents}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors cursor-pointer"
                   >
                     Hamısını Seç (UTİS kodlu)
                   </button>
                   <button
                     onClick={deselectAllStudents}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors cursor-pointer"
                   >
                     Seçimi Təmizlə
                   </button>
@@ -1839,7 +1842,7 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                   {isQuerying ? (
                     <button
                       onClick={() => setCancelRequested(true)}
-                      className="px-4 py-2 rounded-xl text-xs font-semibold bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 flex items-center gap-2"
+                      className="px-4 py-2 rounded-xl text-xs font-semibold bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 flex items-center gap-2 cursor-pointer"
                     >
                       <XCircle className="w-4 h-4" />
                       <span>Sorğunu Dayandır</span>
@@ -1848,7 +1851,7 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                     <button
                       onClick={handleRunBatchExamQuery}
                       disabled={selectedStudentIds.size === 0}
-                      className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-600/30 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-600/30 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
                     >
                       <Globe className="w-4 h-4" />
                       <span>Nəticələri Avtomatik Əldə Et ({selectedStudentIds.size} şagird)</span>
@@ -1857,42 +1860,104 @@ export const UtisDatabasePage: React.FC<UtisDatabasePageProps> = ({ user }) => {
                 </div>
               </div>
 
-              {/* Şagird Seçim Qutuları (Grid) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-72 overflow-y-auto p-2.5 pt-2.5 bg-slate-950/40 rounded-xl border border-slate-800/60">
-                {examStudentsList.map(st => {
-                  const isSelected = selectedStudentIds.has(st.id);
-                  const hasUtis = st.utis_code && st.utis_code.trim().length >= 5;
+              {/* TƏLƏB 2.4: ŞAGİRDLƏRİN SİYAHISI EXCEL CƏDVƏLİ FORMASINDA (QUTU/KART FORMATI LƏĞV EDİLDİ) */}
+              <div className="overflow-x-auto border border-slate-800 rounded-xl bg-slate-950/70 shadow-inner max-h-80 overflow-y-auto scrollbar-thin">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead className="sticky top-0 z-10 bg-slate-900 border-b border-slate-800 text-slate-400 font-bold uppercase text-[11px] tracking-wider">
+                    <tr>
+                      <th className="py-2.5 px-3 w-12 text-center">
+                        <input
+                          type="checkbox"
+                          checked={
+                            examStudentsList.length > 0 &&
+                            examStudentsList.every(s => !s.utis_code || selectedStudentIds.has(s.id))
+                          }
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              const sIds = new Set<string>();
+                              examStudentsList.forEach(s => {
+                                if (s.utis_code && s.utis_code.trim()) sIds.add(s.id);
+                              });
+                              setSelectedStudentIds(sIds);
+                            } else {
+                              setSelectedStudentIds(new Set());
+                            }
+                          }}
+                          className="w-3.5 h-3.5 rounded text-blue-600 cursor-pointer"
+                        />
+                      </th>
+                      <th className="py-2.5 px-2.5 w-12 text-center font-mono">№</th>
+                      <th className="py-2.5 px-3">Adı</th>
+                      <th className="py-2.5 px-3">Soyadı</th>
+                      <th className="py-2.5 px-3">Ata adı</th>
+                      <th className="py-2.5 px-3 text-center">Sinif</th>
+                      <th className="py-2.5 px-3 font-mono text-center">UTİS kodu</th>
+                      <th className="py-2.5 px-3 font-mono text-center">FİN kodu</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 font-normal">
+                    {examStudentsList.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="py-8 text-center text-slate-500">
+                          Seçilmiş məktəb və sinif üzrə şagird tapılmadı
+                        </td>
+                      </tr>
+                    ) : (
+                      examStudentsList.map((st, idx) => {
+                        const isSelected = selectedStudentIds.has(st.id);
+                        const hasUtis = !!(st.utis_code && st.utis_code.trim().length >= 4);
 
-                  return (
-                    <div
-                      key={st.id}
-                      onClick={() => hasUtis && toggleStudentSelection(st.id)}
-                      className={`p-2.5 rounded-xl border flex items-center justify-between text-xs cursor-pointer transition-all ${
-                        !hasUtis
-                          ? 'opacity-40 bg-slate-900 border-slate-800 cursor-not-allowed'
-                          : isSelected
-                          ? 'bg-blue-950/60 border-blue-500 text-white shadow-sm shadow-blue-500/20'
-                          : 'bg-slate-900/80 border-slate-800 hover:border-slate-700 text-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors ${
-                          isSelected ? 'bg-blue-600 border-blue-500 text-white' : 'border-slate-600 bg-slate-950'
-                        }`}>
-                          {isSelected && <Check className="w-3 h-3" />}
-                        </div>
-                        <div className="truncate">
-                          <p className="font-medium truncate">{st.full_name}</p>
-                          <div className="flex items-center gap-2 text-[10px] text-slate-400">
-                            <span>{st.grade_class}</span>
-                            <span>•</span>
-                            <span className="font-mono text-emerald-400">{st.utis_code || 'UTİS yoxdur'}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                        const nameParts = (st.full_name || '').split(' ');
+                        const fName = st.first_name || nameParts[0] || '';
+                        const lName = st.last_name || nameParts.slice(1).join(' ') || '';
+                        const fatherName = st.father_name || '—';
+
+                        return (
+                          <tr
+                            key={st.id}
+                            onClick={() => hasUtis && toggleStudentSelection(st.id)}
+                            className={`transition-colors cursor-pointer text-xs select-none ${
+                              !hasUtis
+                                ? 'opacity-40 bg-slate-900/40 text-slate-500 cursor-not-allowed'
+                                : isSelected
+                                ? 'bg-blue-950/50 font-semibold text-white'
+                                : 'hover:bg-slate-900/60 text-slate-300'
+                            }`}
+                          >
+                            <td className="py-2 px-3 text-center" onClick={(e) => e.stopPropagation()}>
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                disabled={!hasUtis}
+                                onChange={() => hasUtis && toggleStudentSelection(st.id)}
+                                className="w-3.5 h-3.5 rounded text-blue-600 cursor-pointer"
+                              />
+                            </td>
+                            <td className="py-2 px-2.5 text-center text-slate-500 font-mono text-[11px]">{idx + 1}</td>
+                            <td className="py-2 px-3 font-medium text-white whitespace-nowrap">{fName}</td>
+                            <td className="py-2 px-3 font-medium text-white whitespace-nowrap">{lName}</td>
+                            <td className="py-2 px-3 font-medium text-white whitespace-nowrap">{fatherName}</td>
+                            <td className="py-2 px-3 text-center whitespace-nowrap">
+                              <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-800 text-slate-200">
+                                {st.grade_class}
+                              </span>
+                            </td>
+                            <td className="py-2 px-3 font-mono text-center whitespace-nowrap">
+                              {hasUtis ? (
+                                <span className="font-bold text-emerald-400">{st.utis_code}</span>
+                              ) : (
+                                <span className="text-rose-400 text-[11px]">Yoxdur</span>
+                              )}
+                            </td>
+                            <td className="py-2 px-3 font-mono text-center text-slate-300 whitespace-nowrap">
+                              {st.fin_code ? <span className="font-bold">{st.fin_code}</span> : '—'}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
 
